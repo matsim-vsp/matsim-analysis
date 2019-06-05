@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,49 +16,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.project;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioUtils;
+package org.matsim.analysis.od;
 
 /**
- * @author nagel
- *
- */
-public class RunMatsim{
+* @author ikaddoura
+*/
 
-	public static void main(String[] args) {
-		if ( args.length==0 ) {
-			args = new String [] { "scenarios/equil/config.xml" } ;
-		} else {
-			Gbl.assertIf( args[0] != null && !args[0].equals( "" ) );
-		}
+public class ODRelation {
 
-		Config config = ConfigUtils.loadConfig( args ) ;
-		
-		// possibly modify config here
-		
-		// ---
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
-		// possibly modify scenario here
-		
-		// ---
-		
-		Controler controler = new Controler( scenario ) ;
-		
-		// possibly modify controler here
+	private final String odId;
+	private final String origin;
+	private final String destination;
+	private double trips;
 
-//		controler.addOverridingModule( new OTFVisLiveModule() ) ;
-		
-		// ---
-		
-		controler.run();
+	public ODRelation(String odId, String origin, String destination) {
+		this.odId = odId;
+		this.origin = origin;
+		this.destination = destination;
+		this.trips = 1;
 	}
-	
+
+	public String getOdId() {
+		return odId;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public String getDestination() {
+		return destination;
+	}
+
+	public Double getTrips() {
+		return trips;
+	}
+
+	public void setTrips(double trips) {
+		this.trips = trips;
+	}
+
 }
+

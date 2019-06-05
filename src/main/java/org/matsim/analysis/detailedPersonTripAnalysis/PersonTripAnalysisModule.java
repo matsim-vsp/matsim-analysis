@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,8 +16,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-/**
- * @author nagel
- *
- */
-package org.matsim.gui;
+
+package org.matsim.analysis.detailedPersonTripAnalysis;
+
+import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
+import org.matsim.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
+import org.matsim.analysis.detailedPersonTripAnalysis.handler.PersonMoneyLinkHandler;
+import org.matsim.contrib.decongestion.handler.DelayAnalysis;
+import org.matsim.core.controler.AbstractModule;
+
+public class PersonTripAnalysisModule extends AbstractModule {
+	
+	@Override
+	public void install() {
+		
+		this.bind(BasicPersonTripAnalysisHandler.class).asEagerSingleton();
+		this.bind(NoiseAnalysisHandler.class).asEagerSingleton();
+		this.bind(PersonMoneyLinkHandler.class).asEagerSingleton();
+		this.bind(DelayAnalysis.class).asEagerSingleton();
+		
+		this.addEventHandlerBinding().to(BasicPersonTripAnalysisHandler.class);
+		this.addEventHandlerBinding().to(NoiseAnalysisHandler.class);
+		this.addEventHandlerBinding().to(PersonMoneyLinkHandler.class);
+		this.addEventHandlerBinding().to(DelayAnalysis.class);
+		
+		this.addControlerListenerBinding().to(AnalysisControlerListener.class);
+	}
+}

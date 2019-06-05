@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,39 +16,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.project;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+package org.matsim.analysis.vtts;
+
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.StartupListener;
 
 /**
- * @author nagel
- *
- */
-public class RunMatsimTest{
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+* @author ikaddoura
+*/
 
-	@Test
-	public final void test() {
-		try {
-			String [] args = {"scenarios/equil/config.xml",
-				  "--config:controler.outputDirectory", utils.getOutputDirectory(),
-				  "--config:controler.lastIteration=1",
-				  "--config:controler.writeEventsInterval=1"
-			} ;
-			RunMatsim.main( args ) ;
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).fatal("there was an exception: \n" + ee ) ;
+public class VTTScomputation implements StartupListener, AfterMobsimListener {
 
-			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
-		}
+	private final VTTSHandler vttsHandler;
 
-
+	public VTTScomputation(VTTSHandler vttsHandler) {
+		this.vttsHandler = vttsHandler;
 	}
 
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		event.getServices().getEvents().addHandler(vttsHandler);
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		this.vttsHandler.computeFinalVTTS();
+	}
+	
 }
+
