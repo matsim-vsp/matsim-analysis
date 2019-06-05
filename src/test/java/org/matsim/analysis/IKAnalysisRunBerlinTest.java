@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.project;
+package org.matsim.analysis;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class IKAnalysisRunBerlinTest {
 	public final void test1() {
 		
 		{
-			Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "analysis/config.xml");
+			Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "/config.xml");
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output1");
 			config.controler().setRunId("run1");
 			config.strategy().setFractionOfIterationsToDisableInnovation(1.0);
@@ -57,7 +57,7 @@ public class IKAnalysisRunBerlinTest {
 		}
 		
 		{
-			Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "analysis/config.xml");
+			Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "/config.xml");
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output0");
 			config.controler().setRunId("run0");
 			config.controler().setLastIteration(0);
