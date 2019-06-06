@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.MatsimAnalysis;
@@ -42,6 +43,12 @@ public class IKAnalysisRunBerlinTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
+	@Test
+	public final void testTest() {
+		log.info( "Hello world." );
+		Assert.assertTrue( true );
+	}
+	
 	@Test
 	public final void test1() {
 		
