@@ -33,8 +33,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-public class IKAnalysisRunOpenBerlin {
-	private static final Logger log = Logger.getLogger(IKAnalysisRunOpenBerlin.class);
+public class AnalysisRunExample {
+	private static final Logger log = Logger.getLogger(AnalysisRunExample.class);
 			
 	public static void main(String[] args) throws IOException {
 			
