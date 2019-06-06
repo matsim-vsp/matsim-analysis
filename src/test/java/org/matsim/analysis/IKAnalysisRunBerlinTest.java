@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.IKAnalysis;
+import org.matsim.analysis.MatsimAnalysis;
 import org.matsim.analysis.modalSplitUserType.AgentAnalysisFilter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -128,7 +128,7 @@ public class IKAnalysisRunBerlinTest {
 		final String stageActivitySubString = "interaction";
 		final String zoneId = null;
 
-		IKAnalysis analysis = new IKAnalysis(
+		MatsimAnalysis analysis = new MatsimAnalysis(
 				scenario1,
 				scenario0,
 				visualizationScriptInputDirectory,

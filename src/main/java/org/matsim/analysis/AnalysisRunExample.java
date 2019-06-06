@@ -129,7 +129,7 @@ public class AnalysisRunExample {
 			modes.add(mode);
 		}
 
-		IKAnalysis analysis = new IKAnalysis(
+		MatsimAnalysis analysis = new MatsimAnalysis(
 				scenario1,
 				scenario0,
 				visualizationScriptInputDirectory,

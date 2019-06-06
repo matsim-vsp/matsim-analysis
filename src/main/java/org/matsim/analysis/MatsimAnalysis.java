@@ -75,8 +75,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * - writes out the network as a shapefile.
  *  
  */
-public class IKAnalysis {
-	private static final Logger log = Logger.getLogger(IKAnalysis.class);
+public class MatsimAnalysis {
+	private static final Logger log = Logger.getLogger(MatsimAnalysis.class);
 
 	private final String scenarioCRS;	
 	private final String shapeFileZones;
@@ -118,7 +118,7 @@ public class IKAnalysis {
 	 * @param helpLegModes
 	 * @param stageActivitySubString
 	 */
-	public IKAnalysis(Scenario scenario, String visualizationScriptInputDirectory, String scenarioCRS, int scalingFactor, List<String> modes, String analyzeSubpopulation, String zoneId, String[] helpLegModes, String stageActivitySubString) {
+	public MatsimAnalysis(Scenario scenario, String visualizationScriptInputDirectory, String scenarioCRS, int scalingFactor, List<String> modes, String analyzeSubpopulation, String zoneId, String[] helpLegModes, String stageActivitySubString) {
 		
 		String runDirectory = scenario.getConfig().controler().getOutputDirectory();
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
@@ -168,7 +168,7 @@ public class IKAnalysis {
 	 * @param helpLegModes
 	 * @param stageActivitySubString
 	 */
-	public IKAnalysis(Scenario scenario1, Scenario scenario0,
+	public MatsimAnalysis(Scenario scenario1, Scenario scenario0,
 			String visualizationScriptInputDirectory, String scenarioCRS, String shapeFileZones, String zonesCRS, String homeActivityPrefix, int scalingFactor,
 			List<AgentAnalysisFilter> filters1, List<AgentAnalysisFilter> filters0, List<String> modes, String analyzeSubpopulation, String zoneId, String[] helpLegModes, String stageActivitySubString) {
 
@@ -218,7 +218,7 @@ public class IKAnalysis {
 	 * @param crs
 	 * @param scaleFactor
 	 */
-	public IKAnalysis(Scenario scenario, String crs, int scaleFactor) {
+	public MatsimAnalysis(Scenario scenario, String crs, int scaleFactor) {
 		String runDirectory = scenario.getConfig().controler().getOutputDirectory();
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 
