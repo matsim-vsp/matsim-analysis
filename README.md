@@ -14,6 +14,4 @@ Writes out several files (shp, csv) which may be used for visualizations in GIS 
 
 ### Note
 
-"Never trust an analysis which you haven't written yourself!"
-
 The analysis results should be correct for the tested simulation setups and MATSim versions. There is no guarantee that the code does something useful in all possible cases MATSim may be used or extended!
