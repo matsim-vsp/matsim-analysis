@@ -8,6 +8,11 @@ env:
   matrix:
     - TEST=IKAnalysisRunBerlinTest#testTest
     - TEST=IKAnalysisRunBerlinTest#test1
+    - TEST=VTTSHandlerTest
+    - TEST=ModeAnalysisTest
+    - TEST=BasicPersonTripAnalysisTest
+    - TEST=NoiseAnalysisTest
+    - TEST=PersonTripAnalysisTest
    
 script:
   - mvn -Dtest=${TEST} test --batch-mode -Dmatsim.preferLocalDtds=true -Dmaven.javadoc.skip -e
