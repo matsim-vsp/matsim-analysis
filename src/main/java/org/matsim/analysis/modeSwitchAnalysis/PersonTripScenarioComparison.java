@@ -192,7 +192,7 @@ public class PersonTripScenarioComparison {
 		int personCounter = 0;
 		for (Id<Person> personId : basicHandler1.getPersonId2tripNumber2legMode().keySet()) {
 			
-			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(personId.toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 						
 			if (analyzePerson(subpopulationOfPerson)) {
 				Map<Integer, String> tripNr2legMode = basicHandler1.getPersonId2tripNumber2legMode().get(personId);
@@ -419,7 +419,7 @@ public class PersonTripScenarioComparison {
 	        
 			for (Id<Person> personId : scenario1.getPopulation().getPersons().keySet()) {
 				
-				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(personId.toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 				if (analyzePerson(subpopulationOfPerson)) {
 					double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -486,7 +486,7 @@ public class PersonTripScenarioComparison {
 	        
 			for (Id<Person> personId : scenario1.getPopulation().getPersons().keySet()) {
 				
-				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(personId.toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 				if (analyzePerson(subpopulationOfPerson)) {
 					boolean analyzePerson = true;
 					if (basicHandler1.getPersonId2tripNumber2stuckAbort().get(personId) != null) {
@@ -581,7 +581,7 @@ public class PersonTripScenarioComparison {
 	        
 	        	for (Id<Person> personId : switchType2agents.get(modeA + "2" + modeA).keySet()) {
 					
-	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(personId.toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 					if (analyzePerson(subpopulationOfPerson)) {
 						double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -645,7 +645,7 @@ public class PersonTripScenarioComparison {
 	        
 	        	for (Id<Person> personId : switchType2agents.get("x2" + modeA).keySet()) {
 	        		
-	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(personId.toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 					if (analyzePerson(subpopulationOfPerson)) {
 	        			double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -706,7 +706,7 @@ public class PersonTripScenarioComparison {
 	        
 	        	for (Id<Person> personId : switchType2agents.get(modeA + "2x").keySet()) {
 					
-	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(personId.toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 					if (analyzePerson(subpopulationOfPerson)) {
 						double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -896,7 +896,7 @@ public class PersonTripScenarioComparison {
 		
 		for (Person person : this.scenario1.getPopulation().getPersons().values()) {
 			
-			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+			String subpopulationOfPerson = (String) person.getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 			if (analyzePerson(subpopulationOfPerson)) {
 				double score1 = person.getSelectedPlan().getScore();
 				double score0 = this.scenarioToCompareWith.getPopulation().getPersons().get(person.getId()).getSelectedPlan().getScore();
@@ -945,7 +945,7 @@ public class PersonTripScenarioComparison {
         			homeX = this.personId2homeActCoord.get(personId).getX();
         			homeY = this.personId2homeActCoord.get(personId).getY();
         		}
-    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersonAttributes().getAttribute(personId.toString(), scenario1.getConfig().plans().getSubpopulationAttributeName());
+    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 				writer.write(personId + ";" + subpopulationOfPerson  + ";"
         + homeX
         + ";" + homeY

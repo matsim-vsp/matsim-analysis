@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -58,6 +60,7 @@ public class IKAnalysisRunBerlinTest {
 			config.controler().setRunId("run1");
 			config.strategy().setFractionOfIterationsToDisableInnovation(1.0);
 			config.controler().setLastIteration(1);
+			config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
 			Scenario scenario = ScenarioUtils.loadScenario(config) ;
 			Controler controler = new Controler( scenario ) ;
 			controler.run();
@@ -68,6 +71,7 @@ public class IKAnalysisRunBerlinTest {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output0");
 			config.controler().setRunId("run0");
 			config.controler().setLastIteration(0);
+			config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
 			Scenario scenario = ScenarioUtils.loadScenario(config) ;
 			Controler controler = new Controler( scenario ) ;
 			controler.run();
@@ -104,25 +108,25 @@ public class IKAnalysisRunBerlinTest {
 		
 		List<AgentAnalysisFilter> filters1 = new ArrayList<>();
 		
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter(scenario1);
+		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
 		filter1a.setPersonAttribute("berlin");
 		filter1a.setPersonAttributeName("home-activity-zone");
 		filter1a.preProcess(scenario1);
 		filters1.add(filter1a);
 
-		AgentAnalysisFilter filter1b = new AgentAnalysisFilter(scenario1);
+		AgentAnalysisFilter filter1b = new AgentAnalysisFilter();
 		filter1b.preProcess(scenario1);
 		filters1.add(filter1b);
 		
 		List<AgentAnalysisFilter> filters0 = new ArrayList<>();
 		
-		AgentAnalysisFilter filter0a = new AgentAnalysisFilter(scenario0);
+		AgentAnalysisFilter filter0a = new AgentAnalysisFilter();
 		filter0a.setPersonAttribute("berlin");
 		filter0a.setPersonAttributeName("home-activity-zone");
 		filter0a.preProcess(scenario0);
 		filters0.add(filter0a);
 		
-		AgentAnalysisFilter filter0b = new AgentAnalysisFilter(scenario0);
+		AgentAnalysisFilter filter0b = new AgentAnalysisFilter();
 		filter0b.preProcess(scenario0);
 		filters0.add(filter0b);
 		
@@ -131,8 +135,9 @@ public class IKAnalysisRunBerlinTest {
 		modes.add(TransportMode.pt);
 		modes.add("bicycle");
 		
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.access_walk, TransportMode.egress_walk};
+		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, TransportMode.access_walk, TransportMode.egress_walk};
 		final String stageActivitySubString = "interaction";
+		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
 		final String zoneId = null;
 
 		MatsimAnalysis analysis = new MatsimAnalysis(
@@ -148,7 +153,7 @@ public class IKAnalysisRunBerlinTest {
 				filters0,
 				modes,
 				analyzeSubpopulation,
-				zoneId, helpLegModes, stageActivitySubString);
+				zoneId, helpLegModes, stageActivitySubString, stageActivities);
 		analysis.run();
 	
 		log.info("Done.");
@@ -165,26 +170,14 @@ public class IKAnalysisRunBerlinTest {
 
 			String networkFile;
 			String populationFile;
-			String personAttributesFile;
 			String configFile = runDirectory + runId + ".output_config.xml";
 			log.info("Setting config file to " + configFile);
 			
 			if (new File(configFile).exists()) {
 
 				configFile = runDirectory + runId + ".output_config.xml";
-
-//				networkFile = runDirectory + runId + ".output_network.xml.gz";
-//				populationFile = runDirectory + runId + ".output_plans.xml.gz";
-				
 				networkFile = runId + ".output_network.xml.gz";
 				populationFile = runId + ".output_plans.xml.gz";
-				
-				if (personAttributesFileToReplaceOutputFile == null) {
-//					personAttributesFile = runDirectory + runId + ".output_personAttributes.xml.gz";
-					personAttributesFile = runId + ".output_personAttributes.xml.gz";
-				} else {
-					personAttributesFile = personAttributesFileToReplaceOutputFile;
-				}
 				
 			} else {
 
@@ -196,11 +189,6 @@ public class IKAnalysisRunBerlinTest {
 				
 				log.info("Trying to load config file " + configFile);
 				
-				if (personAttributesFileToReplaceOutputFile == null) {
-					personAttributesFile = runDirectory + "output_personAttributes.xml.gz";
-				} else {
-					personAttributesFile = personAttributesFileToReplaceOutputFile;
-				}
 			}
 
 			Config config = ConfigUtils.loadConfig(configFile);
@@ -214,9 +202,15 @@ public class IKAnalysisRunBerlinTest {
 				log.info("Setting run Id to " + runId);
 				config.controler().setRunId(runId);
 			}
+			
+			if (personAttributesFileToReplaceOutputFile != null) {
+				config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
+				config.plans().setInputPersonAttributeFile(personAttributesFileToReplaceOutputFile);
+			} else {
+				config.plans().setInputPersonAttributeFile(null);
+			}
 
 			config.plans().setInputFile(populationFile);
-			config.plans().setInputPersonAttributeFile(personAttributesFile);
 			config.network().setInputFile(networkFile);
 			config.vehicles().setVehiclesFile(null);
 			config.transit().setTransitScheduleFile(null);

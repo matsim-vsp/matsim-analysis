@@ -56,11 +56,12 @@ public class ModeAnalysis {
 	private Map<String, List<Double>> mode2TripEuclideanDistancesFiltered = new HashMap<>();		
 
 	private double totalTripsFiltered = 0.;
-	private final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction");
+	private final StageActivityTypes stageActivities;
 
-	public ModeAnalysis(Scenario scenario, AgentAnalysisFilter filter) {
+	public ModeAnalysis(Scenario scenario, AgentAnalysisFilter filter, StageActivityTypes stageActivities) {
 		this.scenario = scenario;
 		this.filter = filter;
+		this.stageActivities = stageActivities;
 	}
 
 	public void run() {
@@ -82,7 +83,7 @@ public class ModeAnalysis {
 						routeDistance += leg.getRoute().getDistance();
 					}
 					
-					MainModeIdentifierOnlyTransitWalkImpl modeIdentifier = new MainModeIdentifierOnlyTransitWalkImpl();
+					AnalysisMainModeIdentifier modeIdentifier = new AnalysisMainModeIdentifier();
 					String currentLegMode = modeIdentifier.identifyMainMode(trip.getTripElements());
 					
 					if (mode2TripCounterFiltered.containsKey(currentLegMode)) {

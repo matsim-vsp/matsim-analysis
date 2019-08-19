@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -97,9 +98,7 @@ public class IKNetworkPopulationWriter {
 		exportNetwork2Shp2();
 		
 		// population
-//		exportActivities2Shp();
-//		exportActivities2ShpWithAttributes("CarOwnerInBaseCase", "subpopulation");
-		
+		exportActivities2Shp();	
 	}
 
 	private void loadScenario() {
@@ -189,7 +188,8 @@ public class IKNetworkPopulationWriter {
 					
 					Activity act = (Activity) pe;
 					// TODO: Add coordinate transformation?
-					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(act.getCoord()), new Object[] {act.getType(), p.getId().toString()}, null);
+					Coordinate coord = new Coordinate(MGC.coord2Coordinate(ct.transform(act.getCoord())));
+					SimpleFeature feature = factory.createPoint(coord, new Object[] {act.getType(), p.getId().toString()}, null);
 					features.add(feature);
 				}
 			}
@@ -197,41 +197,6 @@ public class IKNetworkPopulationWriter {
 		
 		log.info("Writing out activity points shapefile... ");
 		ShapeFileWriter.writeGeometries(features, outputPath + "activities.shp");
-		log.info("Writing out activity points shapefile... Done.");		
-	}
-	
-	private void exportActivities2ShpWithAttributes(String attributeFromPlansFile, String customAttributeFromPersonAttributeFile){
-		
-		if (scenario.getPopulation().getPersons() == null) {
-			new PopulationReader(scenario).readFile(populationFile);
-		}
-		
-		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(crs))
-		.setName("Activity")
-		.addAttribute("actType", String.class)
-		.addAttribute("Person Id", String.class)
-		.addAttribute("carUser", Boolean.class)
-		.addAttribute("userType", String.class)
-		.create();
-		
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
-		for (Person p : scenario.getPopulation().getPersons().values()){
-						
-			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-
-				if (pe instanceof Activity){
-					
-					Activity act = (Activity) pe;
-					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(act.getCoord()), new Object[] {act.getType(), p.getId().toString(), p.getAttributes().getAttribute(attributeFromPlansFile), scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), customAttributeFromPersonAttributeFile)}, null);
-					features.add(feature);
-				}
-			}
-		}
-		
-		log.info("Writing out activity points shapefile... ");
-		ShapeFileWriter.writeGeometries(features, outputPath + "activities-with-attributes.shp");
 		log.info("Writing out activity points shapefile... Done.");		
 	}
 }

@@ -52,16 +52,11 @@ public class AgentAnalysisFilter implements AgentFilter {
 	// filter by shape file
 	private String zoneFile = null;
 	private String relevantActivityTypePrefix = null;
-	
-	private final Scenario scenario;
-	
+		
 	private boolean dataPreprocessed = false;
 	private final Map<String, Geometry> zoneFeatures = new HashMap<>();
 	private final Map<Id<Person>, Coord> personId2homeCoord = new HashMap<>();
 	
-	public AgentAnalysisFilter(Scenario scenario) {
-		this.scenario = scenario;
-	}
 	public String getSubpopulation() {
 		return subpopulation;
 	}
@@ -102,8 +97,8 @@ public class AgentAnalysisFilter implements AgentFilter {
 		
 		// subpopulation
 		if (this.subpopulation != null ) {
-			if (this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") != null) {
-				String subPopulationName = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation");
+			if (person.getAttributes().getAttribute("subpopulation") != null) {
+				String subPopulationName = (String) person.getAttributes().getAttribute("subpopulation");
 				if (!subPopulationName.equals(this.subpopulation)) {
 					return false;
 				}
@@ -111,8 +106,8 @@ public class AgentAnalysisFilter implements AgentFilter {
 		}
 		
 		if (this.personAttributeName != null && this.personAttribute != null) {
-			if (this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), personAttributeName) != null) {
-				String homeZoneName = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), personAttributeName);
+			if (person.getAttributes().getAttribute(personAttributeName) != null) {
+				String homeZoneName = (String) person.getAttributes().getAttribute(personAttributeName);
 				if (!homeZoneName.equals(this.personAttribute)) {
 					return false;
 				}

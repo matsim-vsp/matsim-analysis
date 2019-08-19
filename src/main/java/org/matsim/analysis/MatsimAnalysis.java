@@ -54,6 +54,7 @@ import org.matsim.contrib.noise.personLinkMoneyEvents.CombinedPersonLinkMoneyEve
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -86,6 +87,7 @@ public class MatsimAnalysis {
 	private final int scalingFactor;
 	private final String[] helpLegModes;
 	private final String stageActivitySubString;
+	private final StageActivityTypes stageActivities;
 		
 	// policy case
 	private final String runDirectory;
@@ -117,8 +119,10 @@ public class MatsimAnalysis {
 	 * @param zoneId
 	 * @param helpLegModes
 	 * @param stageActivitySubString
+	 * @param stageActivities
 	 */
-	public MatsimAnalysis(Scenario scenario, String visualizationScriptInputDirectory, String scenarioCRS, int scalingFactor, List<String> modes, String analyzeSubpopulation, String zoneId, String[] helpLegModes, String stageActivitySubString) {
+	public MatsimAnalysis(Scenario scenario, String visualizationScriptInputDirectory, String scenarioCRS, int scalingFactor, List<String> modes, String analyzeSubpopulation, String zoneId,
+			String[] helpLegModes, String stageActivitySubString, StageActivityTypes stageActivities) {
 		
 		String runDirectory = scenario.getConfig().controler().getOutputDirectory();
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
@@ -149,6 +153,7 @@ public class MatsimAnalysis {
 		this.zoneId = zoneId;
 		this.helpLegModes = helpLegModes;
 		this.stageActivitySubString = stageActivitySubString;
+		this.stageActivities = stageActivities;
 	}
 	
 	/**
@@ -167,10 +172,12 @@ public class MatsimAnalysis {
 	 * @param zoneId
 	 * @param helpLegModes
 	 * @param stageActivitySubString
+	 * @param stageActivities
 	 */
 	public MatsimAnalysis(Scenario scenario1, Scenario scenario0,
 			String visualizationScriptInputDirectory, String scenarioCRS, String shapeFileZones, String zonesCRS, String homeActivityPrefix, int scalingFactor,
-			List<AgentAnalysisFilter> filters1, List<AgentAnalysisFilter> filters0, List<String> modes, String analyzeSubpopulation, String zoneId, String[] helpLegModes, String stageActivitySubString) {
+			List<AgentAnalysisFilter> filters1, List<AgentAnalysisFilter> filters0, List<String> modes, String analyzeSubpopulation, String zoneId,
+			String[] helpLegModes, String stageActivitySubString, StageActivityTypes stageActivities) {
 
 		if (scenario0 != null) this.outputDirectoryName = this.outputDirectoryName + "-comparison";
 		
@@ -211,6 +218,7 @@ public class MatsimAnalysis {
 		this.zoneId = zoneId;
 		this.helpLegModes = helpLegModes;
 		this.stageActivitySubString = stageActivitySubString;
+		this.stageActivities = stageActivities;
 	}
 
 	/**
@@ -250,6 +258,7 @@ public class MatsimAnalysis {
 		this.zoneId = null;
 		this.helpLegModes = null;
 		this.stageActivitySubString = null;
+		this.stageActivities = null;
 	}
 
 	public void run() {
@@ -391,7 +400,7 @@ public class MatsimAnalysis {
 			
 			if (filters1 != null) {
 				for (AgentAnalysisFilter filter : filters1) {
-					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter);
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter, stageActivities);
 					modeAnalysis1.run();
 					modeAnalysisList1.add(modeAnalysis1);
 				}
@@ -406,7 +415,7 @@ public class MatsimAnalysis {
 			
 			if (filters0 != null) {
 				for (AgentAnalysisFilter filter : filters0) {
-					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter);
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter, stageActivities);
 					modeAnalysis0.run();
 					modeAnalysisList0.add(modeAnalysis0);
 				}
