@@ -22,6 +22,7 @@ package org.matsim.analysis.gisAnalysis;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -42,6 +43,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.matsim.core.utils.gis.PolygonFeatureFactory.Builder;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -66,8 +68,8 @@ public class GISAnalyzer {
 	private final Map<Integer, Geometry> zoneId2geometry = new HashMap<Integer, Geometry>();
 	private final String zonesCRS;
 	private final CoordinateTransformation ct;
-	
 	private final Map<Id<Person>, Integer> personId2homeZoneId;
+	private final List<String> modes;
 
 	public GISAnalyzer(
 			Scenario scenario,
@@ -75,11 +77,13 @@ public class GISAnalyzer {
 			int scalingFactor,
 			String homeActivity,
 			String zonesCRS,
-			String scenarioCRS) {
+			String scenarioCRS,
+			List<String> modes) {
 		
 		this.scalingFactor = scalingFactor;
 		this.zonesCRS = zonesCRS;
 		this.ct = TransformationFactory.getCoordinateTransformation(scenarioCRS, zonesCRS);
+		this.modes = modes;
 
 		log.info("Reading zone shapefile...");
 		int featureCounter = 0;
@@ -129,9 +133,6 @@ public class GISAnalyzer {
 			String runDirectory, String fileName,
 			Map<Id<Person>, Double> personId2userBenefits,
 			Map<Id<Person>, Double> personId2tollPayments,
-			Map<Id<Person>, Double> personId2congestionPayments,
-			Map<Id<Person>, Double> personId2noisePayments,
-			Map<Id<Person>, Double> personId2airPollutionPayments,
 			BasicPersonTripAnalysisHandler basicHandler) {
 		
 		String outputPath = runDirectory;
@@ -170,44 +171,30 @@ public class GISAnalyzer {
 		// absolute numbers mapped back to home location
 		log.info("Mapping absolute toll payments and user benefits to home location...");
 		Map<Integer,Double> zoneNr2tollPayments = getZoneNr2totalAmount(personId2tollPayments);
-		
-		Map<Integer,Double> zoneNr2congestionPayments = getZoneNr2totalAmount(personId2congestionPayments);
-		Map<Integer,Double> zoneNr2noisePayments = getZoneNr2totalAmount(personId2noisePayments);
-		Map<Integer,Double> zoneNr2airPollutionPayments = getZoneNr2totalAmount(personId2airPollutionPayments);
-
 		Map<Integer,Double> zoneNr2userBenefits = getZoneNr2totalAmount(personId2userBenefits);
-		
 		Map<Integer, Double> zoneNr2travelTime = getZoneNr2totalAmount(personId2travelTime);
 		
-		Map<Integer, Double> zoneNr2carTrips = getZoneNr2totalAmount(mode2personId2trips.get("car"));
-		Map<Integer, Double> zoneNr2ptSlowTrips = getZoneNr2totalAmount(mode2personId2trips.get("ptSlow"));
-		Map<Integer, Double> zoneNr2ptTrips = getZoneNr2totalAmount(mode2personId2trips.get("pt"));
-		Map<Integer, Double> zoneNr2taxiTrips = getZoneNr2totalAmount(mode2personId2trips.get("taxi"));
-		Map<Integer, Double> zoneNr2bicycleTrips = getZoneNr2totalAmount(mode2personId2trips.get("bicycle"));
-		Map<Integer, Double> zoneNr2walkTrips = getZoneNr2totalAmount(mode2personId2trips.get("walk"));
+		Map<String, Map<Integer, Double>> mode2zoneNr2Trips = new HashMap<>();
+		for (String mode : modes) {
+			mode2zoneNr2Trips.put(mode, getZoneNr2totalAmount(mode2personId2trips.get(mode)));
+		}
 		
 		log.info("Mapping absolute toll payments and user benefits to home location... Done.");
 		
 		log.info("Writing shape file...");
 		
-		PolygonFeatureFactory featureFactory = new PolygonFeatureFactory.Builder().
-				setCrs(MGC.getCRS(zonesCRS)).
-				setName("zone").
-				addAttribute("ID", Integer.class).
-				addAttribute("HomeAct", Integer.class).
-				addAttribute("Tolls", Double.class).
-				addAttribute("C", Double.class).
-				addAttribute("N", Double.class).
-				addAttribute("A", Double.class).
-				addAttribute("Scores", Double.class).
-				addAttribute("TT", Double.class).
-				addAttribute("car", Double.class).
-				addAttribute("taxi", Double.class).
-				addAttribute("ptSlow", Double.class).
-				addAttribute("pt", Double.class).
-				addAttribute("walk", Double.class).
-				addAttribute("bicycle", Double.class).
-				create();
+		Builder featureFactoryBuilder = new PolygonFeatureFactory.Builder();
+		featureFactoryBuilder.setCrs(MGC.getCRS(zonesCRS));
+		featureFactoryBuilder.setName("zone");
+		featureFactoryBuilder.addAttribute("ID", Integer.class);
+		featureFactoryBuilder.addAttribute("HomeAct", Integer.class);
+		featureFactoryBuilder.addAttribute("Tolls", Double.class);
+		featureFactoryBuilder.addAttribute("Scores", Double.class);
+		featureFactoryBuilder.addAttribute("TT", Double.class);	
+		for (String mode : modes) {
+			featureFactoryBuilder.addAttribute(mode, Double.class);
+		}
+		PolygonFeatureFactory featureFactory = featureFactoryBuilder.create();
 		
 		Collection<SimpleFeature> featuresToWriteOut = new ArrayList<SimpleFeature>();
 
@@ -216,17 +203,11 @@ public class GISAnalyzer {
 			attributeValues.put("ID", id);
 			attributeValues.put("HomeAct", zoneNr2homeActivities.get(id));
 			attributeValues.put("Tolls", zoneNr2tollPayments.get(id));
-			attributeValues.put("C", zoneNr2congestionPayments.get(id));
-			attributeValues.put("N", zoneNr2noisePayments.get(id));
-			attributeValues.put("A", zoneNr2airPollutionPayments.get(id));
 			attributeValues.put("Scores", zoneNr2userBenefits.get(id));
 			attributeValues.put("TT", zoneNr2travelTime.get(id));
-			attributeValues.put("car", zoneNr2carTrips.get(id));
-			attributeValues.put("taxi", zoneNr2taxiTrips.get(id));
-			attributeValues.put("ptSlow", zoneNr2ptSlowTrips.get(id));
-			attributeValues.put("pt", zoneNr2ptTrips.get(id));
-			attributeValues.put("walk", zoneNr2walkTrips.get(id));
-			attributeValues.put("bicycle", zoneNr2bicycleTrips.get(id));
+			for (String mode : modes) {
+				attributeValues.put(mode, mode2zoneNr2Trips.get(mode).get(id));
+			}
 
 			Geometry geometry = (Geometry) features.get(id).getDefaultGeometry();
 			Coordinate[] coordinates = geometry.getCoordinates();

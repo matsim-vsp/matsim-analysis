@@ -33,34 +33,57 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-public class AnalysisRunExample {
-	private static final Logger log = Logger.getLogger(AnalysisRunExample.class);
+public class AnalysisRunExampleOpenBerlinScenario {
+	private static final Logger log = Logger.getLogger(AnalysisRunExampleOpenBerlinScenario.class);
 			
 	public static void main(String[] args) throws IOException {
-			
-		final String runDirectory = "/path-to-run-directory/";
-		final String runId = "run-id";		
-		final String runDirectoryToCompareWith = null;
-		final String runIdToCompareWith = null;	
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
-		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
-		final String zoneId = "Id";
-		final String visualizationScriptInputDirectory = "./visualization-scripts/";
-		final String scenarioCRS = TransformationFactory.DHDN_GK4;	
-		final String shapeFileZones = "polygon-shape-file.shp";
-		final String zonesCRS = TransformationFactory.DHDN_GK4;
-		final String homeActivityPrefix = "home";
-		final int scalingFactor = 10;
-		final String modesString = TransportMode.car + "," + TransportMode.pt;
 		
-		Scenario scenario1 = loadScenario(runDirectory, runId, null);
-		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, null);
+		final String runDirectory = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.3-1pct/output-berlin-v5.3-1pct/";
+		final String runId = "berlin-v5.3-1pct";		
+		
+		final String runDirectoryToCompareWith = null;
+		final String runIdToCompareWith = null;
+		
+		final String visualizationScriptInputDirectory = "./visualization-scripts/";
+		
+		final String scenarioCRS = TransformationFactory.DHDN_GK4;	
+		
+		final String shapeFileZones = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/berlin-sav-v5.2-10pct/input/shp-stadtteile-split-zone-3/Bezirksregionen_zone_GK4_fixed.shp";
+		final String zonesCRS = TransformationFactory.DHDN_GK4;
+		final String zoneId = "NO";
+		
+		final String homeActivityPrefix = "home";
+		final int scalingFactor = 100;
+		
+		final String modesString = "car,pt,bicycle,walk,ride";
+		
+		final String analysisOutputDirectory = "./scenarios/";
+				
+		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, TransportMode.access_walk, TransportMode.egress_walk};
+		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
+		
+		Scenario scenario1 = loadScenario(runDirectory, runId, null, analysisOutputDirectory);
+		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, null, analysisOutputDirectory);
 		
 		List<AgentAnalysisFilter> filter1 = new ArrayList<>();
-		
+
 		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
+		filter1a.setSubpopulation("person");
+		filter1a.setPersonAttribute("berlin");
+		filter1a.setPersonAttributeName("home-activity-zone");
 		filter1a.preProcess(scenario1);
 		filter1.add(filter1a);
+		
+		AgentAnalysisFilter filter1b = new AgentAnalysisFilter();
+		filter1b.preProcess(scenario1);
+		filter1.add(filter1b);
+		
+		AgentAnalysisFilter filter1c = new AgentAnalysisFilter();
+		filter1c.setSubpopulation("person");
+		filter1c.setPersonAttribute("brandenburg");
+		filter1c.setPersonAttributeName("home-activity-zone");
+		filter1c.preProcess(scenario1);
+		filter1.add(filter1c);
 		
 		List<AgentAnalysisFilter> filter0 = null;
 		
@@ -68,7 +91,7 @@ public class AnalysisRunExample {
 		for (String mode : modesString.split(",")) {
 			modes.add(mode);
 		}
-		
+
 		MatsimAnalysis analysis = new MatsimAnalysis(
 				scenario1,
 				scenario0,
@@ -87,7 +110,7 @@ public class AnalysisRunExample {
 		analysis.run();
 	}
 	
-	private static Scenario loadScenario(String runDirectory, String runId, String personAttributesFileToReplaceOutputFile) {
+	private static Scenario loadScenario(String runDirectory, String runId, String personAttributesFileToReplaceOutputFile, String analysisOutputDirectory) {
 		log.info("Loading scenario...");
 		
 		if (runDirectory == null) {
@@ -106,12 +129,15 @@ public class AnalysisRunExample {
 
 		String networkFile;
 		String populationFile;
+		String personAttributesFile;
 		String configFile;
 		
-		configFile = runDirectory + runId + ".output_config.xml";	
+		configFile = runDirectory + runId + ".output_config.xml";
+		
 		networkFile = runId + ".output_network.xml.gz";
 		populationFile = runId + ".output_plans.xml.gz";
-
+		personAttributesFile = runId + ".output_personAttributes.xml.gz";
+		
 		Config config = ConfigUtils.loadConfig(configFile);
 
 		if (config.controler().getRunId() != null) {
@@ -120,8 +146,9 @@ public class AnalysisRunExample {
 			config.controler().setRunId(runId);
 		}
 
-		config.controler().setOutputDirectory(runDirectory);
+		config.controler().setOutputDirectory(analysisOutputDirectory);
 		config.plans().setInputFile(populationFile);
+		config.plans().setInputPersonAttributeFile(personAttributesFile);
 		config.network().setInputFile(networkFile);
 		config.vehicles().setVehiclesFile(null);
 		config.transit().setTransitScheduleFile(null);

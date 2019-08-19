@@ -31,12 +31,10 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.actDurations.ActDurationHandler;
 import org.matsim.analysis.detailedPersonTripAnalysis.PersonTripAnalysis;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
-import org.matsim.analysis.detailedPersonTripAnalysis.handler.PersonMoneyLinkHandler;
 import org.matsim.analysis.dynamicLinkDemand.DynamicLinkDemandEventHandler;
 import org.matsim.analysis.gisAnalysis.GISAnalyzer;
 import org.matsim.analysis.gisAnalysis.MoneyExtCostHandler;
 import org.matsim.analysis.linkDemand.LinkDemandEventHandler;
-import org.matsim.analysis.modalSplitUserType.AgentAnalysisFilter;
 import org.matsim.analysis.modalSplitUserType.ModeAnalysis;
 import org.matsim.analysis.modeSwitchAnalysis.PersonTripScenarioComparison;
 import org.matsim.analysis.od.ODAnalysis;
@@ -85,7 +83,7 @@ public class MatsimAnalysis {
 	private final String homeActivityPrefix;
 	private final int scalingFactor;
 	private final String[] helpLegModes;
-	private final String stageActivitySubString;
+	private final String stageActivitySubString = "interaction";
 	private final StageActivityTypes stageActivities;
 		
 	// policy case
@@ -105,8 +103,6 @@ public class MatsimAnalysis {
 	private String outputDirectoryName = "analysis-v2.0";
 
 	private final String visualizationScriptInputDirectory;
-
-	private final String analyzeSubpopulation;
 	
 	/**
 	 * @param scenario
@@ -117,11 +113,10 @@ public class MatsimAnalysis {
 	 * @param analyzeSubpopulation
 	 * @param zoneId
 	 * @param helpLegModes
-	 * @param stageActivitySubString
 	 * @param stageActivities
 	 */
-	public MatsimAnalysis(Scenario scenario, String visualizationScriptInputDirectory, String scenarioCRS, int scalingFactor, List<String> modes, String analyzeSubpopulation, String zoneId,
-			String[] helpLegModes, String stageActivitySubString, StageActivityTypes stageActivities) {
+	public MatsimAnalysis(Scenario scenario, String visualizationScriptInputDirectory, String scenarioCRS, int scalingFactor, List<String> modes, String zoneId,
+			String[] helpLegModes, StageActivityTypes stageActivities) {
 		
 		String runDirectory = scenario.getConfig().controler().getOutputDirectory();
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
@@ -147,11 +142,9 @@ public class MatsimAnalysis {
 		this.filters1 = null;
 		
 		this.modes = modes;
-		this.analyzeSubpopulation = analyzeSubpopulation;
 		
 		this.zoneId = zoneId;
 		this.helpLegModes = helpLegModes;
-		this.stageActivitySubString = stageActivitySubString;
 		this.stageActivities = stageActivities;
 	}
 	
@@ -170,13 +163,12 @@ public class MatsimAnalysis {
 	 * @param analyzeSubpopulation
 	 * @param zoneId
 	 * @param helpLegModes
-	 * @param stageActivitySubString
 	 * @param stageActivities
 	 */
 	public MatsimAnalysis(Scenario scenario1, Scenario scenario0,
 			String visualizationScriptInputDirectory, String scenarioCRS, String shapeFileZones, String zonesCRS, String homeActivityPrefix, int scalingFactor,
-			List<AgentAnalysisFilter> filters1, List<AgentAnalysisFilter> filters0, List<String> modes, String analyzeSubpopulation, String zoneId,
-			String[] helpLegModes, String stageActivitySubString, StageActivityTypes stageActivities) {
+			List<AgentAnalysisFilter> filters1, List<AgentAnalysisFilter> filters0, List<String> modes, String zoneId,
+			String[] helpLegModes, StageActivityTypes stageActivities) {
 
 		if (scenario0 != null) this.outputDirectoryName = this.outputDirectoryName + "-comparison";
 		
@@ -213,10 +205,8 @@ public class MatsimAnalysis {
 		
 		this.modes = modes;
 		
-		this.analyzeSubpopulation = analyzeSubpopulation;
 		this.zoneId = zoneId;
 		this.helpLegModes = helpLegModes;
-		this.stageActivitySubString = stageActivitySubString;
 		this.stageActivities = stageActivities;
 	}
 
@@ -252,7 +242,6 @@ public class MatsimAnalysis {
 
 		LinkDemandEventHandler trafficVolumeAnalysis1 = null;
 		DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis1 = null;
-		PersonMoneyLinkHandler personTripMoneyHandler1 = null;
 		MoneyExtCostHandler personMoneyHandler1 = null;
 		ActDurationHandler actHandler1 = null;
 		VTTSHandler vttsHandler1 = null;
@@ -268,9 +257,6 @@ public class MatsimAnalysis {
 			trafficVolumeAnalysis1 = new LinkDemandEventHandler(scenario1.getNetwork());
 			dynamicTrafficVolumeAnalysis1 = new DynamicLinkDemandEventHandler(scenario1.getNetwork());
 			
-			personTripMoneyHandler1 = new PersonMoneyLinkHandler();
-			personTripMoneyHandler1.setBasicHandler(basicHandler1);
-			
 			personMoneyHandler1 = new MoneyExtCostHandler();
 			
 			actHandler1 = new ActDurationHandler();
@@ -284,7 +270,6 @@ public class MatsimAnalysis {
 			events1.addHandler(delayAnalysis1);
 			events1.addHandler(trafficVolumeAnalysis1);
 			events1.addHandler(dynamicTrafficVolumeAnalysis1);
-			events1.addHandler(personTripMoneyHandler1);
 			events1.addHandler(personMoneyHandler1);
 			events1.addHandler(actHandler1);
 			events1.addHandler(vttsHandler1);
@@ -297,7 +282,6 @@ public class MatsimAnalysis {
 		DelayAnalysis delayAnalysis0 = null;
 		LinkDemandEventHandler trafficVolumeAnalysis0 = null;
 		DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis0 = null;
-		PersonMoneyLinkHandler personTripMoneyHandler0 = null;
 		MoneyExtCostHandler personMoneyHandler0 = null;
 		ActDurationHandler actHandler0 = null;
 		VTTSHandler vttsHandler0 = null;
@@ -313,9 +297,6 @@ public class MatsimAnalysis {
 			trafficVolumeAnalysis0 = new LinkDemandEventHandler(scenario0.getNetwork());
 			dynamicTrafficVolumeAnalysis0 = new DynamicLinkDemandEventHandler(scenario0.getNetwork());
 			
-			personTripMoneyHandler0 = new PersonMoneyLinkHandler();
-			personTripMoneyHandler0.setBasicHandler(basicHandler0);
-			
 			personMoneyHandler0 = new MoneyExtCostHandler();
 			
 			actHandler0 = new ActDurationHandler();
@@ -329,7 +310,6 @@ public class MatsimAnalysis {
 			events0.addHandler(delayAnalysis0);
 			events0.addHandler(trafficVolumeAnalysis0);
 			events0.addHandler(dynamicTrafficVolumeAnalysis0);
-			events0.addHandler(personTripMoneyHandler0);
 			events0.addHandler(personMoneyHandler0);
 			events0.addHandler(actHandler0);
 			events0.addHandler(vttsHandler0);
@@ -393,7 +373,6 @@ public class MatsimAnalysis {
 				analysisOutputDirectory,
 				personId2userBenefit1, basicHandler1,
 				delayAnalysis1,
-				personTripMoneyHandler1,
 				trafficVolumeAnalysis1,
 				dynamicTrafficVolumeAnalysis1,
 				personMoneyHandler1,
@@ -409,7 +388,6 @@ public class MatsimAnalysis {
 				personId2userBenefit0,
 				basicHandler0,
 				delayAnalysis0,
-				personTripMoneyHandler0,
 				trafficVolumeAnalysis0,
 				dynamicTrafficVolumeAnalysis0,
 				personMoneyHandler0,
@@ -430,27 +408,22 @@ public class MatsimAnalysis {
 			personTripScenarioComparisonOutputDirectory = analysisOutputDirectory + "scenario-comparison_" + runId + "-vs-" + runIdToCompareWith + "/";
 			createDirectory(personTripScenarioComparisonOutputDirectory);
 
-			PersonTripScenarioComparison scenarioComparisonAllSubpopulations = new PersonTripScenarioComparison(null, this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes);
-			PersonTripScenarioComparison scenarioComparisonSpecificSubpopulation = new PersonTripScenarioComparison(analyzeSubpopulation, this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes);
-			try {
+			for (AgentAnalysisFilter filter : this.filters1) {
 				
-				scenarioComparisonAllSubpopulations.analyzeByMode();
-				scenarioComparisonAllSubpopulations.analyzeByScore(0.0);
-				scenarioComparisonAllSubpopulations.analyzeByScore(1.0);
-				scenarioComparisonAllSubpopulations.analyzeByScore(10.0);
-				scenarioComparisonAllSubpopulations.analyzeByScore(100.0);
+				log.info("Person trip scenario comparison: " + filter.toFileName());
 				
-				if (analyzeSubpopulation != null && !analyzeSubpopulation.equals("null") && !analyzeSubpopulation.equals("")) {
-					log.info("Running subpopulation-specific scenario comparison... (subpopulation: " + analyzeSubpopulation + ")");
-					scenarioComparisonSpecificSubpopulation.analyzeByMode();
-					scenarioComparisonSpecificSubpopulation.analyzeByScore(0.0);
-					scenarioComparisonSpecificSubpopulation.analyzeByScore(1.0);
-					scenarioComparisonSpecificSubpopulation.analyzeByScore(10.0);
-					scenarioComparisonSpecificSubpopulation.analyzeByScore(100.0);
+				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, filter);
+				
+				try {
+					scenarioComparisonFiltered.analyzeByMode();
+					scenarioComparisonFiltered.analyzeByScore(0.0);
+					scenarioComparisonFiltered.analyzeByScore(1.0);
+					scenarioComparisonFiltered.analyzeByScore(10.0);
+					scenarioComparisonFiltered.analyzeByScore(100.0);			
+				
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-				
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		
 		}
@@ -544,7 +517,6 @@ public class MatsimAnalysis {
 			Map<Id<Person>, Double> personId2userBenefit,
 			BasicPersonTripAnalysisHandler basicHandler,
 			DelayAnalysis delayAnalysis,
-			PersonMoneyLinkHandler personTripMoneyHandler,
 			LinkDemandEventHandler trafficVolumeAnalysis,
 			DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis,
 			MoneyExtCostHandler personMoneyHandler,
@@ -566,9 +538,9 @@ public class MatsimAnalysis {
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
 
 		// trip-based analysis
-		analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, basicHandler, null, null);
+		analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, basicHandler, null);
 		for (String mode : modes) {
-			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, basicHandler, null, null);
+			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, basicHandler, null);
 		}
 
 		// person-based analysis
@@ -582,7 +554,7 @@ public class MatsimAnalysis {
 		for (String mode : modes) {
 			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, personId2userBenefit, basicHandler, null);
 		}
-		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, personId2userBenefit, basicHandler, null, personTripMoneyHandler, delayAnalysis);
+		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, personId2userBenefit, basicHandler, null, delayAnalysis);
 		
 		// time-specific trip distance analysis
 		for (String mode : modes) {
@@ -597,18 +569,6 @@ public class MatsimAnalysis {
 			SortedMap<Double, List<Double>> departureTime2tolls = analysis.getParameter2Values(mode, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
 			analysis.printAvgValuePerParameter(personTripAnalysisOutputDirectoryWithPrefix + "tollsPerDepartureTime_"+ mode +"_3600.csv", departureTime2tolls);
 				
-			// time-specific congestion toll payments analysis
-			SortedMap<Double, List<Double>> departureTime2congestionTolls = analysis.getParameter2Values(mode, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), personTripMoneyHandler.getPersonId2tripNumber2congestionPayment(), 3600., 30 * 3600.);
-			analysis.printAvgValuePerParameter(personTripAnalysisOutputDirectoryWithPrefix + "congestionTollsPerDepartureTime_"+ mode +"_3600.csv", departureTime2congestionTolls);
-			
-			// time-specific noise toll payments analysis
-			SortedMap<Double, List<Double>> departureTime2noiseTolls = analysis.getParameter2Values(mode, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), personTripMoneyHandler.getPersonId2tripNumber2noisePayment(), 3600., 30 * 3600.);
-			analysis.printAvgValuePerParameter(personTripAnalysisOutputDirectoryWithPrefix + "noiseTollsPerDepartureTime_"+ mode +"_3600.csv", departureTime2noiseTolls);
-			
-			// time-specific air pollution toll payments analysis
-			SortedMap<Double, List<Double>> departureTime2airPollutionTolls = analysis.getParameter2Values(mode, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), personTripMoneyHandler.getPersonId2tripNumber2airPollutionPayment(), 3600., 30 * 3600.);
-			analysis.printAvgValuePerParameter(personTripAnalysisOutputDirectoryWithPrefix + "airPollutionTollsPerDepartureTime_"+ mode +"_3600.csv", departureTime2airPollutionTolls);
-			
 		}
 
 		// #####################################
@@ -635,8 +595,8 @@ public class MatsimAnalysis {
 			createDirectory(spatialAnalysisOutputDirectory);
 			String spatialAnalysisOutputDirectoryWithPrefix = spatialAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".";
 			
-			GISAnalyzer gisAnalysis = new GISAnalyzer(scenario, shapeFileZones, scalingFactor, homeActivityPrefix, zonesCRS, scenarioCRS);
-			gisAnalysis.analyzeZoneTollsUserBenefits(spatialAnalysisOutputDirectoryWithPrefix, "tolls_userBenefits_travelTime_modes_zones.shp", personId2userBenefit, personMoneyHandler.getPersonId2toll(), personMoneyHandler.getPersonId2congestionToll(), personMoneyHandler.getPersonId2noiseToll(), personMoneyHandler.getPersonId2airPollutionToll(), basicHandler);
+			GISAnalyzer gisAnalysis = new GISAnalyzer(scenario, shapeFileZones, scalingFactor, homeActivityPrefix, zonesCRS, scenarioCRS, modes);
+			gisAnalysis.analyzeZoneTollsUserBenefits(spatialAnalysisOutputDirectoryWithPrefix, "tolls_userBenefits_travelTime_modes_zones.shp", personId2userBenefit, personMoneyHandler.getPersonId2toll(), basicHandler);
 		}
 		
 		// #####################################

@@ -36,7 +36,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
-import org.matsim.analysis.detailedPersonTripAnalysis.handler.PersonMoneyLinkHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
@@ -209,9 +208,7 @@ public class PersonTripAnalysis {
 	public void printTripInformation(String outputPath,
 			String mode,
 			BasicPersonTripAnalysisHandler basicHandler,
-			NoiseAnalysisHandler noiseHandler,
-			PersonMoneyLinkHandler moneyHandler
-			) {
+			NoiseAnalysisHandler noiseHandler) {
 		
 		boolean ignoreModes = false;
 		if (mode == null) {
@@ -238,9 +235,6 @@ public class PersonTripAnalysis {
 					+ "waiting time (for taxi/pt) (trip) [sec];"
 					+ "travel distance (trip) [m];"
 					+ "toll payments (trip) [monetary units];"
-					+ "congestion toll payments (trip) [monetary units];"
-					+ "noise toll payments (trip) [monetary units];"
-					+ "air pollution toll payments (trip) [monetary units];"
 					+ "approximate caused noise cost (trip) [monetary units]"); // TODO make this accurate?!
 			
 			bw.newLine();
@@ -305,27 +299,6 @@ public class PersonTripAnalysis {
 							tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
 						}
 						
-						String congestionTollPayment = "unknown";						
-						if (moneyHandler != null) {
-							if (moneyHandler.getPersonId2tripNumber2congestionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).containsKey(trip)) {
-								congestionTollPayment = String.valueOf(moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).get(trip));
-							}
-						}
-						
-						String noiseTollPayment = "unknown";
-						if (moneyHandler != null) {
-							if (moneyHandler.getPersonId2tripNumber2noisePayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2noisePayment().get(id).containsKey(trip)) {
-								noiseTollPayment = String.valueOf(moneyHandler.getPersonId2tripNumber2noisePayment().get(id).get(trip));
-							}
-						}
-						
-						String airPollutionTollPayment = "unknown";
-						if (moneyHandler != null) {
-							if (moneyHandler.getPersonId2tripNumber2airPollutionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).containsKey(trip)) {
-								airPollutionTollPayment = String.valueOf(moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).get(trip));
-							}
-						}
-						
 						String causedNoiseCost = "unknown";
 						if (noiseHandler != null) {
 							if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
@@ -346,9 +319,6 @@ public class PersonTripAnalysis {
 						+ waitingTime + ";"
 						+ travelDistance + ";"
 						+ tollPayment + ";"
-						+ congestionTollPayment + ";"
-						+ noiseTollPayment + ";"
-						+ airPollutionTollPayment + ";"
 						+ causedNoiseCost
 						);
 						bw.newLine();						
@@ -485,7 +455,6 @@ public class PersonTripAnalysis {
 			Map<Id<Person>, Double> personId2userBenefit,
 			BasicPersonTripAnalysisHandler basicHandler,
 			NoiseAnalysisHandler noiseHandler,
-			PersonMoneyLinkHandler moneyHandler,
 			DelayAnalysis delayAnalysis
 			) {
 	
@@ -622,9 +591,6 @@ public class PersonTripAnalysis {
 			int allStuckAndAbortTrips = 0;
 			double affectedNoiseCost = 0.;
 			double moneyPaymentsByUsers = 0.;
-			double congestionPayments = 0.;
-			double noisePayments = 0.;
-			double airPollutionPayments = 0.;
 			double causedNoiseCost = 0.;
 			
 			for (Id<Person> id : basicHandler.getScenario().getPopulation().getPersons().keySet()) {
@@ -652,21 +618,7 @@ public class PersonTripAnalysis {
 						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
 							moneyPaymentsByUsers = moneyPaymentsByUsers + basicHandler.getPersonId2tripNumber2payment().get(id).get(trip);
 						}
-						
-						if (moneyHandler != null) {
-							if (moneyHandler.getPersonId2tripNumber2congestionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).containsKey(trip)) {
-								congestionPayments = congestionPayments + moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).get(trip);
-							}
-							
-							if (moneyHandler.getPersonId2tripNumber2noisePayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2noisePayment().get(id).containsKey(trip)) {
-								noisePayments = noisePayments + moneyHandler.getPersonId2tripNumber2noisePayment().get(id).get(trip);
-							}
-							
-							if (moneyHandler.getPersonId2tripNumber2airPollutionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).containsKey(trip)) {
-								airPollutionPayments = airPollutionPayments + moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).get(trip);
-							}
-						}
-						
+					
 						if (noiseHandler != null) {
 							if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
 								causedNoiseCost = causedNoiseCost + noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
@@ -724,37 +676,12 @@ public class PersonTripAnalysis {
 			bw.write("caused noise damage costs (sample size) (caused by car users or passengers) [monetary units];" + causedNoiseCost);
 			bw.newLine();
 			
-			bw.write("congestion toll payments (sample size) (payed by private car users) [monetary units];" + congestionPayments);
-			bw.newLine();
-			
-			bw.write("noise toll payments (sample size) (payed by private car users) [monetary units];" + noisePayments);
-			bw.newLine();
-			
-			bw.write("air pollution toll payments (sample size) (payed by private car users) [monetary units];" + airPollutionPayments);
-			bw.newLine();
-			
 			if (delayAnalysis != null) {
 				bw.write("total delay (sample size) [hours];" + delayAnalysis.getTotalDelay() / 3600.);
 				bw.newLine();
 			}
 			
 			bw.write("-----------");
-			bw.newLine();
-						
-			double paymentsSAVUserFormerCarUser = 0.;
-
-			int savUsersFormerCarUsers = 0;
-			int savUsersFormerNonCarUsers = 0;
-			
-			// TODO: other money payments by users?
-			
-			bw.write("number of taxi users (former car users) (sample size);" + savUsersFormerCarUsers);
-			bw.newLine();
-			
-			bw.write("number of taxi users (former non-car users) (sample size);" + savUsersFormerNonCarUsers);
-			bw.newLine();
-			
-			bw.write("total reward of all taxi users (former car users) (sample size) [monetary units];" + paymentsSAVUserFormerCarUser);
 			bw.newLine();
 			
 			bw.write("total reward of all transport users (sample size) [monetary units];" + basicHandler.getTotalRewardsByPersons());

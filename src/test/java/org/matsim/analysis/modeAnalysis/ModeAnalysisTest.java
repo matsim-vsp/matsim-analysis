@@ -29,7 +29,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.modalSplitUserType.AgentAnalysisFilter;
+import org.matsim.analysis.AgentAnalysisFilter;
 import org.matsim.analysis.modalSplitUserType.ModeAnalysis;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;

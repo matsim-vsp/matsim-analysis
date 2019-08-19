@@ -30,6 +30,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.AgentAnalysisFilter;
+import org.matsim.analysis.AgentFilter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -125,7 +127,7 @@ public class ModeAnalysis {
 		if (filter == null) {
 			outputFileName = "tripModeAnalysis.csv";
 		} else {
-			outputFileName = "tripModeAnalysis_" + filter.toFileName() + ".csv";
+			outputFileName = "tripModeAnalysis" + filter.toFileName() + ".csv";
 		}
 		
 		File file = new File(outputDirectory + outputFileName);
@@ -157,7 +159,7 @@ public class ModeAnalysis {
 			if (filter == null) {
 				outputFileName = mode + "_tripRouteDistances.csv";
 			} else {
-				outputFileName = mode + "_tripRouteDistances_" + filter.toFileName() + ".csv";
+				outputFileName = mode + "_tripRouteDistances" + filter.toFileName() + ".csv";
 			}
 			File file = new File(outputDirectory + outputFileName);
 
@@ -187,7 +189,7 @@ public class ModeAnalysis {
 			if (filter == null) {
 				outputFileName = mode + "_tripEuclideanDistances.csv";
 			} else {
-				outputFileName = mode + "_tripEuclideanDistances_" + filter.toFileName() + ".csv";
+				outputFileName = mode + "_tripEuclideanDistances" + filter.toFileName() + ".csv";
 			}
 			File file = new File(outputDirectory + outputFileName);
 
@@ -283,7 +285,7 @@ public class ModeAnalysis {
 		if (filter == null) {
 			outputFileName = "tripsPerModeAndEuclideanDistanceGroup.csv";
 		} else {
-			outputFileName = "tripsPerModeAndEuclideanDistanceGroup_" + filter.toFileName() + ".csv";
+			outputFileName = "tripsPerModeAndEuclideanDistanceGroup" + filter.toFileName() + ".csv";
 		}
 		writeDistances(outputDirectory, outputFileName, distanceGroups, this.mode2TripEuclideanDistancesFiltered);
 	}
@@ -294,7 +296,7 @@ public class ModeAnalysis {
 		if (filter == null) {
 			outputFileName = "tripsPerModeAndRouteDistanceGroup.csv";
 		} else {
-			outputFileName = "tripsPerModeAndRouteDistanceGroup_" + filter.toFileName() + ".csv";
+			outputFileName = "tripsPerModeAndRouteDistanceGroup" + filter.toFileName() + ".csv";
 		}
 		writeDistances(outputDirectory, outputFileName, distanceGroups, this.mode2TripRouteDistancesFiltered);
 

@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.MatsimAnalysis;
-import org.matsim.analysis.modalSplitUserType.AgentAnalysisFilter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -97,14 +95,9 @@ public class IKAnalysisRunBerlinTest {
 		final String zonesCRS = null;
 		final String homeActivityPrefix = "h";
 		final int scalingFactor = 100;
-		
-		final String analyzeSubpopulation = "person_no-potential-sav-user";
-		
-		// optional: person attributes file to replace the output person attributes file
-		final String personAttributesFile = null;
 
-		Scenario scenario1 = loadScenario(runDirectory, runId, personAttributesFile);
-		Scenario scenario0 = loadScenario(runDirectoryBaseCase, runIdBaseCase, personAttributesFile);
+		Scenario scenario1 = loadScenario(runDirectory, runId);
+		Scenario scenario0 = loadScenario(runDirectoryBaseCase, runIdBaseCase);
 		
 		List<AgentAnalysisFilter> filters1 = new ArrayList<>();
 		
@@ -117,6 +110,11 @@ public class IKAnalysisRunBerlinTest {
 		AgentAnalysisFilter filter1b = new AgentAnalysisFilter();
 		filter1b.preProcess(scenario1);
 		filters1.add(filter1b);
+		
+		AgentAnalysisFilter filter1c = new AgentAnalysisFilter();
+		filter1c.setSubpopulation("person_no-potential-sav-user");
+		filter1c.preProcess(scenario1);
+		filters1.add(filter1c);
 		
 		List<AgentAnalysisFilter> filters0 = new ArrayList<>();
 		
@@ -135,8 +133,7 @@ public class IKAnalysisRunBerlinTest {
 		modes.add(TransportMode.pt);
 		modes.add("bicycle");
 		
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, TransportMode.access_walk, TransportMode.egress_walk};
-		final String stageActivitySubString = "interaction";
+		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
 		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
 		final String zoneId = null;
 
@@ -152,14 +149,13 @@ public class IKAnalysisRunBerlinTest {
 				filters1,
 				filters0,
 				modes,
-				analyzeSubpopulation,
-				zoneId, helpLegModes, stageActivitySubString, stageActivities);
+				zoneId, helpLegModes, stageActivities);
 		analysis.run();
 	
 		log.info("Done.");
 	}
 	
-	private static Scenario loadScenario(String runDirectory, String runId, String personAttributesFileToReplaceOutputFile) {
+	private static Scenario loadScenario(String runDirectory, String runId) {
 		
 		if (runDirectory == null) {
 			return null;
@@ -202,15 +198,9 @@ public class IKAnalysisRunBerlinTest {
 				log.info("Setting run Id to " + runId);
 				config.controler().setRunId(runId);
 			}
-			
-			if (personAttributesFileToReplaceOutputFile != null) {
-				config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
-				config.plans().setInputPersonAttributeFile(personAttributesFileToReplaceOutputFile);
-			} else {
-				config.plans().setInputPersonAttributeFile(null);
-			}
 
 			config.plans().setInputFile(populationFile);
+			config.plans().setInputPersonAttributeFile(null);
 			config.network().setInputFile(networkFile);
 			config.vehicles().setVehiclesFile(null);
 			config.transit().setTransitScheduleFile(null);

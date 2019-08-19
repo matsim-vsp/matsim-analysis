@@ -107,7 +107,7 @@ public class PersonTripAnalysisTest {
 		}
 		
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
-		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler, null);
+		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
 		
@@ -136,7 +136,7 @@ public class PersonTripAnalysisTest {
 			line = br.readLine();
 			while(line != null) {
 				if (line.startsWith("person")) {
-					Assert.assertTrue("Output changed!?", line.equals("person Id;trip no.;mode;stuck and abort trip (yes/no);departure time (trip) [sec];enter vehicle time (trip) [sec];leave vehicle time (trip) [sec];arrival time (trip) [sec];travel time (trip) [sec];in-vehicle time (trip) [sec];waiting time (for taxi/pt) (trip) [sec];travel distance (trip) [m];toll payments (trip) [monetary units];congestion toll payments (trip) [monetary units];noise toll payments (trip) [monetary units];air pollution toll payments (trip) [monetary units];approximate caused noise cost (trip) [monetary units]"));
+					Assert.assertTrue("Output changed!?", line.equals("person Id;trip no.;mode;stuck and abort trip (yes/no);departure time (trip) [sec];enter vehicle time (trip) [sec];leave vehicle time (trip) [sec];arrival time (trip) [sec];travel time (trip) [sec];in-vehicle time (trip) [sec];waiting time (for taxi/pt) (trip) [sec];travel distance (trip) [m];toll payments (trip) [monetary units];approximate caused noise cost (trip) [monetary units]"));
 				} else {
 					tripInfos.add(line.split(";"));
 				}

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.analysis.modalSplitUserType;
+package org.matsim.analysis;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -97,7 +97,9 @@ public class AgentAnalysisFilter implements AgentFilter {
 		
 		// subpopulation
 		if (this.subpopulation != null ) {
-			if (person.getAttributes().getAttribute("subpopulation") != null) {
+			if (person.getAttributes().getAttribute("subpopulation") == null) {
+				return false;
+			} else {
 				String subPopulationName = (String) person.getAttributes().getAttribute("subpopulation");
 				if (!subPopulationName.equals(this.subpopulation)) {
 					return false;
@@ -168,7 +170,7 @@ public class AgentAnalysisFilter implements AgentFilter {
 	
 	@Override
 	public String toFileName() {
-		String fileName = "FILTER";
+		String fileName = "_FILTER";
 		
 		boolean atLeastOneFilterApplied = false;
 		
