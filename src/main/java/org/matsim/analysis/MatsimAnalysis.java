@@ -221,46 +221,6 @@ public class MatsimAnalysis {
 		this.stageActivities = stageActivities;
 	}
 
-	/**
-	 * @param scenario
-	 * @param crs
-	 * @param scaleFactor
-	 */
-	public MatsimAnalysis(Scenario scenario, String crs, int scaleFactor) {
-		String runDirectory = scenario.getConfig().controler().getOutputDirectory();
-		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
-
-		this.scenario1 = scenario;
-		this.runDirectory = runDirectory;
-		this.runId = scenario.getConfig().controler().getRunId();
-		
-		// scenario 0 will not be analyzed
-		this.scenario0 = null;
-		this.runDirectoryToCompareWith = null;
-		this.runIdToCompareWith = null;
-		
-		this.visualizationScriptInputDirectory = null;
-		
-		this.scenarioCRS = crs;
-		this.shapeFileZones = null;
-		this.zonesCRS = null;
-		this.homeActivityPrefix = null;
-		this.scalingFactor = scaleFactor;
-		
-		this.filters0 = null;
-		this.filters1 = null;
-		
-		this.modes = new ArrayList<>();
-		modes.add(TransportMode.car);
-		
-		this.analyzeSubpopulation = null;
-		
-		this.zoneId = null;
-		this.helpLegModes = null;
-		this.stageActivitySubString = null;
-		this.stageActivities = null;
-	}
-
 	public void run() {
 		
 		String analysisOutputDirectory = runDirectory + outputDirectoryName + "/";
