@@ -47,7 +47,6 @@ import org.matsim.analysis.visualizationScripts.VisualizationScriptAdjustment;
 import org.matsim.analysis.vtts.VTTSHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.noise.personLinkMoneyEvents.CombinedPersonLinkMoneyEventsReader;
@@ -103,7 +102,7 @@ public class MatsimAnalysis {
 	
 	private final List<String> modes;
 	
-	private String outputDirectoryName = "analysis-ik-v1.10";
+	private String outputDirectoryName = "analysis-v2.0";
 
 	private final String visualizationScriptInputDirectory;
 
