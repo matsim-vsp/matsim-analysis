@@ -20,6 +20,8 @@
 package org.matsim.analysis;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,8 +64,8 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, TransportMode.access_walk, TransportMode.egress_walk};
 		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
 		
-		Scenario scenario1 = loadScenario(runDirectory, runId, null, analysisOutputDirectory);
-		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, null, analysisOutputDirectory);
+		Scenario scenario1 = loadScenario(runDirectory, runId, analysisOutputDirectory);
+		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, analysisOutputDirectory);
 		
 		List<AgentAnalysisFilter> filter1 = new ArrayList<>();
 
@@ -110,7 +112,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		analysis.run();
 	}
 	
-	private static Scenario loadScenario(String runDirectory, String runId, String personAttributesFileToReplaceOutputFile, String analysisOutputDirectory) {
+	private static Scenario loadScenario(String runDirectory, String runId, String analysisOutputDirectory) {
 		log.info("Loading scenario...");
 		
 		if (runDirectory == null) {
@@ -134,11 +136,11 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		
 		configFile = runDirectory + runId + ".output_config.xml";
 		
-		networkFile = runId + ".output_network.xml.gz";
-		populationFile = runId + ".output_plans.xml.gz";
-		personAttributesFile = runId + ".output_personAttributes.xml.gz";
+		networkFile = runDirectory + runId + ".output_network.xml.gz";
+		populationFile = runDirectory + runId + ".output_plans.xml.gz";
+		personAttributesFile = runDirectory + runId + ".output_personAttributes.xml.gz";
 		
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.createConfig();
 
 		if (config.controler().getRunId() != null) {
 			if (!runId.equals(config.controler().getRunId())) throw new RuntimeException("Given run ID " + runId + " doesn't match the run ID given in the config file. Aborting...");
@@ -148,6 +150,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 
 		config.controler().setOutputDirectory(analysisOutputDirectory);
 		config.plans().setInputFile(populationFile);
+		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
 		config.plans().setInputPersonAttributeFile(personAttributesFile);
 		config.network().setInputFile(networkFile);
 		config.vehicles().setVehiclesFile(null);
