@@ -22,6 +22,7 @@ package org.matsim.analysis.pngSequence2Video;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
@@ -78,14 +79,18 @@ public class MATSimVideoUtils {
 		String outputFile = outputDirectoryWithRunId + pngFileName + ".mp4";
 		SequenceEncoder enc = new SequenceEncoder(new File(outputFile));
 			
-		Config config;
+		Config config = null;
 		
-		if (new File(configFile).exists()) {
-			config = ConfigUtils.loadConfig(configFile);		
-		} else if (new File(runDirectory + "output_config.xml").exists()) {
-			config = ConfigUtils.loadConfig(runDirectory + "output_config.xml");			
+		if (configFile.startsWith("http")) {
+			config = ConfigUtils.loadConfig(new URL(configFile));		
 		} else {
-			throw new RuntimeException("No (output) config file: " + configFile + ". Aborting...");
+			if (new File(configFile).exists()) {
+				config = ConfigUtils.loadConfig(configFile);		
+			} else if (new File(runDirectory + "output_config.xml").exists()) {
+				config = ConfigUtils.loadConfig(runDirectory + "output_config.xml");			
+			} else {
+				throw new RuntimeException("No (output) config file: " + configFile + ". Aborting...");
+			}
 		}
 
 		int counter = 0;

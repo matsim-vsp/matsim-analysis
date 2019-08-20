@@ -19,6 +19,8 @@
 
 package org.matsim.analysis.gisAnalysis;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -87,7 +89,19 @@ public class GISAnalyzer {
 
 		log.info("Reading zone shapefile...");
 		int featureCounter = 0;
-		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(shapeFileZones)) {
+		Collection<SimpleFeature> allFeatures = null;
+		if (shapeFileZones.startsWith("http")) {
+			URL shapeFileAsURL = null;
+			try {
+				shapeFileAsURL = new URL(shapeFileZones);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+			allFeatures = ShapeFileReader.getAllFeatures(shapeFileAsURL);
+		} else {
+			allFeatures = ShapeFileReader.getAllFeatures(shapeFileZones);
+		}
+		for (SimpleFeature feature : allFeatures) {
 			features.put(featureCounter, feature);
 			this.zoneId2geometry.put(featureCounter, (Geometry) feature.getDefaultGeometry());
 			featureCounter++;

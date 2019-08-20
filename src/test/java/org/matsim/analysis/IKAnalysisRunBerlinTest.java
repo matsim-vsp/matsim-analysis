@@ -32,8 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -75,31 +73,16 @@ public class IKAnalysisRunBerlinTest {
 			controler.run();
 		}
 		
-		final String runId;
-		final String runDirectory;
-		final String runIdBaseCase;
-		final String runDirectoryBaseCase;
-		final String shapeFileZones;
-		final String visualizationScriptInputDirectory;
+		final String runId = "run1";
+		final String runDirectory = testUtils.getOutputDirectory() +  "output1/";
 		
-		runId = "run1";
-		runDirectory = testUtils.getOutputDirectory() +  "output1/";
-		
-		runIdBaseCase = "run0";
-		runDirectoryBaseCase = testUtils.getOutputDirectory() + "output0/";
+		final String runIdBaseCase = "run0";
+		final String runDirectoryBaseCase = testUtils.getOutputDirectory() + "output0/";
 
-		shapeFileZones = null;
-		visualizationScriptInputDirectory = "./visualization-scripts/";
-			
-		final String scenarioCRS = null;
-		final String zonesCRS = null;
-		final String homeActivityPrefix = "h";
-		final int scalingFactor = 100;
-
-		Scenario scenario1 = loadScenario(runDirectory, runId);
-		Scenario scenario0 = loadScenario(runDirectoryBaseCase, runIdBaseCase);
+		final Scenario scenario1 = loadScenario(runDirectory, runId);
+		final Scenario scenario0 = loadScenario(runDirectoryBaseCase, runIdBaseCase);
 		
-		List<AgentAnalysisFilter> filters1 = new ArrayList<>();
+		final List<AgentAnalysisFilter> filters1 = new ArrayList<>();
 		
 		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
 		filter1a.setPersonAttribute("berlin");
@@ -116,7 +99,7 @@ public class IKAnalysisRunBerlinTest {
 		filter1c.preProcess(scenario1);
 		filters1.add(filter1c);
 		
-		List<AgentAnalysisFilter> filters0 = new ArrayList<>();
+		final List<AgentAnalysisFilter> filters0 = new ArrayList<>();
 		
 		AgentAnalysisFilter filter0a = new AgentAnalysisFilter();
 		filter0a.setPersonAttribute("berlin");
@@ -128,28 +111,22 @@ public class IKAnalysisRunBerlinTest {
 		filter0b.preProcess(scenario0);
 		filters0.add(filter0b);
 		
-		List<String> modes = new ArrayList<>();
+		final List<String> modes = new ArrayList<>();
 		modes.add(TransportMode.car);
 		modes.add(TransportMode.pt);
 		modes.add("bicycle");
 		
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
-		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
-		final String zoneId = null;
+		final String homeActivityPrefix = "h";
+		final int scalingFactor = 100;
 
-		MatsimAnalysis analysis = new MatsimAnalysis(
-				scenario1,
-				scenario0,
-				visualizationScriptInputDirectory,
-				scenarioCRS,
-				shapeFileZones,
-				zonesCRS,
-				homeActivityPrefix,
-				scalingFactor,
-				filters1,
-				filters0,
-				modes,
-				zoneId, helpLegModes, stageActivities);
+		MatsimAnalysis analysis = new MatsimAnalysis();
+		analysis.setScenario1(scenario1);
+		analysis.setScenario0(scenario0);
+		analysis.setHomeActivityPrefix(homeActivityPrefix);
+		analysis.setScalingFactor(scalingFactor);
+		analysis.setFilters1(filters1);
+		analysis.setFilters0(filters0);
+		analysis.setModes(modes);
 		analysis.run();
 	
 		log.info("Done.");

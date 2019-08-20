@@ -25,13 +25,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class AnalysisRunExample {
 	private static final Logger log = Logger.getLogger(AnalysisRunExample.class);
@@ -40,65 +36,31 @@ public class AnalysisRunExample {
 			
 		final String runDirectory = "/path-to-run-directory/";
 		final String runId = "run-id";		
-		final String runDirectoryToCompareWith = null;
-		final String runIdToCompareWith = null;	
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
-		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
-		final String zoneId = "Id";
-		final String visualizationScriptInputDirectory = "./visualization-scripts/";
-		final String scenarioCRS = TransformationFactory.DHDN_GK4;	
-		final String shapeFileZones = "polygon-shape-file.shp";
-		final String zonesCRS = TransformationFactory.DHDN_GK4;
-		final String homeActivityPrefix = "home";
-		final int scalingFactor = 10;
-		final String modesString = TransportMode.car + "," + TransportMode.pt;
+		final String modesString = "car,pt";
 		
-		Scenario scenario1 = loadScenario(runDirectory, runId, null);
-		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, null);
+		Scenario scenario1 = loadScenario(runDirectory, runId);
 		
-		List<AgentAnalysisFilter> filter1 = new ArrayList<>();
-		
+		List<AgentAnalysisFilter> filters1 = new ArrayList<>();
 		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
 		filter1a.preProcess(scenario1);
-		filter1.add(filter1a);
-		
-		List<AgentAnalysisFilter> filter0 = null;
-		
+		filters1.add(filter1a);
+				
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
 			modes.add(mode);
 		}
 		
-		MatsimAnalysis analysis = new MatsimAnalysis(
-				scenario1,
-				scenario0,
-				visualizationScriptInputDirectory,
-				scenarioCRS,
-				shapeFileZones,
-				zonesCRS,
-				homeActivityPrefix,
-				scalingFactor,
-				filter1,
-				filter0,
-				modes,
-				zoneId,
-				helpLegModes,
-				stageActivities);
+		MatsimAnalysis analysis = new MatsimAnalysis();
+		analysis.setScenario1(scenario1);
+		analysis.setFilters1(filters1);
+		analysis.setModes(modes);
 		analysis.run();
 	}
 	
-	private static Scenario loadScenario(String runDirectory, String runId, String personAttributesFileToReplaceOutputFile) {
+	private static Scenario loadScenario(String runDirectory, String runId) {
 		log.info("Loading scenario...");
 		
-		if (runDirectory == null) {
-			return null;	
-		}
-		
-		if (runDirectory.equals("")) {
-			return null;	
-		}
-		
-		if (runDirectory.equals("null")) {
+		if (runDirectory == null || runDirectory.equals("") || runDirectory.equals("null")) {
 			return null;	
 		}
 		

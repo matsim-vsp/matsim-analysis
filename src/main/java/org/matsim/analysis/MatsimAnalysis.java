@@ -21,6 +21,8 @@ package org.matsim.analysis;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +47,7 @@ import org.matsim.analysis.visualizationScripts.VisualizationScriptAdjustment;
 import org.matsim.analysis.vtts.VTTSHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.noise.personLinkMoneyEvents.CombinedPersonLinkMoneyEventsReader;
@@ -52,6 +55,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -76,149 +80,58 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class MatsimAnalysis {
 	private static final Logger log = Logger.getLogger(MatsimAnalysis.class);
 
-	private final String scenarioCRS;	
-	private final String shapeFileZones;
-	private final String zonesCRS;
-	private final String zoneId;
-	private final String homeActivityPrefix;
-	private final int scalingFactor;
-	private final String[] helpLegModes;
-	private final String stageActivitySubString = "interaction";
-	private final StageActivityTypes stageActivities;
-		
+	private String scenarioCRS;	
+	private String shapeFileZones;
+	private String zonesCRS;
+	private String zoneId;
+	private String homeActivityPrefix = "home";
+	private int scalingFactor;
+	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
+	private String stageActivitySubString = "interaction";
+	private StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction", "taxi interaction");
+	private List<String> modes;	
+	private String visualizationScriptInputDirectory = "./visualization-scripts/";
+
 	// policy case
-	private final String runDirectory;
-	private final String runId;
-	private final Scenario scenario1;
-	private final List<AgentAnalysisFilter> filters1;
+	private Scenario scenario1;
+	private List<AgentAnalysisFilter> filters1;
 	
 	// base case (optional)
-	private final String runDirectoryToCompareWith;
-	private final String runIdToCompareWith;
-	private final Scenario scenario0;
-	private final List<AgentAnalysisFilter> filters0;
+	private Scenario scenario0;
+	private List<AgentAnalysisFilter> filters0;
 	
-	private final List<String> modes;
-	
-	private String outputDirectoryName = "analysis-v2.0";
-
-	private final String visualizationScriptInputDirectory;
-	
-	/**
-	 * @param scenario
-	 * @param visualizationScriptInputDirectory
-	 * @param scenarioCRS
-	 * @param scalingFactor
-	 * @param modes
-	 * @param analyzeSubpopulation
-	 * @param zoneId
-	 * @param helpLegModes
-	 * @param stageActivities
-	 */
-	public MatsimAnalysis(Scenario scenario, String visualizationScriptInputDirectory, String scenarioCRS, int scalingFactor, List<String> modes, String zoneId,
-			String[] helpLegModes, StageActivityTypes stageActivities) {
-		
-		String runDirectory = scenario.getConfig().controler().getOutputDirectory();
-		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
-
-		this.scenario1 = scenario;
-		this.runDirectory = runDirectory;
-		this.runId = scenario.getConfig().controler().getRunId();
-		
-		// scenario 0 will not be analyzed
-		this.scenario0 = null;
-		this.runDirectoryToCompareWith = null;
-		this.runIdToCompareWith = null;
-		
-		this.visualizationScriptInputDirectory = visualizationScriptInputDirectory;
-		
-		this.scenarioCRS = scenarioCRS;
-		this.shapeFileZones = null;
-		this.zonesCRS = null;
-		this.homeActivityPrefix = null;
-		this.scalingFactor = scalingFactor;
-		
-		this.filters0 = null;
-		this.filters1 = null;
-		
-		this.modes = modes;
-		
-		this.zoneId = zoneId;
-		this.helpLegModes = helpLegModes;
-		this.stageActivities = stageActivities;
-	}
-	
-	/**
-	 * @param scenario1
-	 * @param scenario0
-	 * @param visualizationScriptInputDirectory
-	 * @param scenarioCRS
-	 * @param shapeFileZones
-	 * @param zonesCRS
-	 * @param homeActivityPrefix
-	 * @param scalingFactor
-	 * @param filters1
-	 * @param filters0
-	 * @param modes
-	 * @param analyzeSubpopulation
-	 * @param zoneId
-	 * @param helpLegModes
-	 * @param stageActivities
-	 */
-	public MatsimAnalysis(Scenario scenario1, Scenario scenario0,
-			String visualizationScriptInputDirectory, String scenarioCRS, String shapeFileZones, String zonesCRS, String homeActivityPrefix, int scalingFactor,
-			List<AgentAnalysisFilter> filters1, List<AgentAnalysisFilter> filters0, List<String> modes, String zoneId,
-			String[] helpLegModes, StageActivityTypes stageActivities) {
-
-		if (scenario0 != null) this.outputDirectoryName = this.outputDirectoryName + "-comparison";
-		
-		String runDirectory = scenario1.getConfig().controler().getOutputDirectory();
-		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
-
-		String runDirectoryToCompareWith = null;
-		if (scenario0 != null) {
-			runDirectoryToCompareWith = scenario0.getConfig().controler().getOutputDirectory();
-			if (!runDirectoryToCompareWith.endsWith("/")) runDirectoryToCompareWith = runDirectoryToCompareWith + "/";
-		}
-		
-		String runIdToCompareWith = null;
-		if (scenario0 != null) runIdToCompareWith = scenario0.getConfig().controler().getRunId();
-
-		this.scenario1 = scenario1;
-		this.runDirectory = runDirectory;
-		this.runId = scenario1.getConfig().controler().getRunId();
-
-		this.scenario0 = scenario0;
-		this.runDirectoryToCompareWith = runDirectoryToCompareWith;
-		this.runIdToCompareWith = runIdToCompareWith;
-		
-		this.visualizationScriptInputDirectory = visualizationScriptInputDirectory;
-		
-		this.scenarioCRS = scenarioCRS;
-		this.shapeFileZones = shapeFileZones;
-		this.zonesCRS = zonesCRS;
-		this.homeActivityPrefix = homeActivityPrefix;
-		this.scalingFactor = scalingFactor;
-		
-		this.filters0 = filters0;
-		this.filters1 = filters1;
-		
-		this.modes = modes;
-		
-		this.zoneId = zoneId;
-		this.helpLegModes = helpLegModes;
-		this.stageActivities = stageActivities;
-	}
+	private String analysisOutputDirectory;
+	private final String outputDirectoryName = "analysis-v2.0";
 
 	public void run() {
 		
-		String analysisOutputDirectory = runDirectory + outputDirectoryName + "/";
-		File folder = new File(analysisOutputDirectory);			
+		String outputDirectoryName = this.outputDirectoryName;
+	
+		final String runId = scenario1.getConfig().controler().getRunId();
+		String runDirectory = scenario1.getConfig().controler().getOutputDirectory();
+		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
+		
+		String runIdToCompareWith = null;
+		String runDirectoryToCompareWith = null;
+		if (scenario0 != null) {
+			runIdToCompareWith = scenario0.getConfig().controler().getRunId();
+			runDirectoryToCompareWith = scenario0.getConfig().controler().getOutputDirectory();
+			if (!runDirectoryToCompareWith.endsWith("/")) runDirectoryToCompareWith = runDirectoryToCompareWith + "/";
+			outputDirectoryName = this.outputDirectoryName + "-comparison";
+		}
+		
+		String outputDirectoryForAnalysisFiles = null;
+		if (this.analysisOutputDirectory == null) {
+			outputDirectoryForAnalysisFiles = runDirectory + outputDirectoryName + "/";
+		} else {
+			outputDirectoryForAnalysisFiles = this.analysisOutputDirectory + outputDirectoryName + "/";
+		}
+		File folder = new File(outputDirectoryForAnalysisFiles);			
 		folder.mkdirs();
 		
 		OutputDirectoryLogging.catchLogEntries();
 		try {
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(analysisOutputDirectory);
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectoryForAnalysisFiles);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -370,7 +283,7 @@ public class MatsimAnalysis {
 		log.info("Printing results...");
 		if (scenario1 != null) printResults(
 				scenario1,
-				analysisOutputDirectory,
+				outputDirectoryForAnalysisFiles,
 				personId2userBenefit1, basicHandler1,
 				delayAnalysis1,
 				trafficVolumeAnalysis1,
@@ -384,7 +297,7 @@ public class MatsimAnalysis {
 		
 		log.info("Printing results...");
 		if (scenario0 != null) printResults(scenario0,
-				analysisOutputDirectory,
+				outputDirectoryForAnalysisFiles,
 				personId2userBenefit0,
 				basicHandler0,
 				delayAnalysis0,
@@ -405,7 +318,7 @@ public class MatsimAnalysis {
 		
 		if (scenario1 != null & scenario0 != null) {
 			
-			personTripScenarioComparisonOutputDirectory = analysisOutputDirectory + "scenario-comparison_" + runId + "-vs-" + runIdToCompareWith + "/";
+			personTripScenarioComparisonOutputDirectory = outputDirectoryForAnalysisFiles + "scenario-comparison_" + runId + "-vs-" + runIdToCompareWith + "/";
 			createDirectory(personTripScenarioComparisonOutputDirectory);
 
 			for (AgentAnalysisFilter filter : this.filters1) {
@@ -435,11 +348,11 @@ public class MatsimAnalysis {
 		// traffic volumes
 		if (scenario1 != null & scenario0 != null) {
 			String visScriptTemplateFile = visualizationScriptInputDirectory + "traffic-volume_absolute-difference_noCRS.qgs";
-			String visScriptOutputFile = analysisOutputDirectory + "link-volume-analysis/" + "traffic-volume_absolute-difference_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
+			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "link-volume-analysis/" + "traffic-volume_absolute-difference_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
 			
 			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(this.runId);
-			script.setRunIdToCompareWith(this.runIdToCompareWith);
+			script.setRunId(runId);
+			script.setRunIdToCompareWith(runIdToCompareWith);
 			script.setScalingFactor(String.valueOf(this.scalingFactor));
 			script.setCRS(this.scenarioCRS);
 			script.write();
@@ -448,10 +361,10 @@ public class MatsimAnalysis {
 		// absolute traffic volumes policy case
 		if (scenario1 != null) {
 			String visScriptTemplateFile = visualizationScriptInputDirectory + "traffic-volume_absolute_noCRS.qgs";
-			String visScriptOutputFile = analysisOutputDirectory + "link-volume-analysis/" + runId + ".traffic-volume_absolute.qgs";
+			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "link-volume-analysis/" + runId + ".traffic-volume_absolute.qgs";
 			
 			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(this.runId);
+			script.setRunId(runId);
 			script.setScalingFactor(String.valueOf(this.scalingFactor));
 			script.setCRS(this.scenarioCRS);
 			script.write();
@@ -460,11 +373,11 @@ public class MatsimAnalysis {
 		// spatial zone-based analysis
 		if (scenario1 != null & scenario0 != null) {
 			String visScriptTemplateFile = visualizationScriptInputDirectory + "zone-based-analysis_welfare_modes.qgs";
-			String visScriptOutputFile = analysisOutputDirectory + "zone-based-analysis_welfare_modes/" + "zone-based-analysis_welfare_modes_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
+			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "zone-based-analysis_welfare_modes/" + "zone-based-analysis_welfare_modes_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
 			
 			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(this.runId);
-			script.setRunIdToCompareWith(this.runIdToCompareWith);
+			script.setRunId(runId);
+			script.setRunIdToCompareWith(runIdToCompareWith);
 			script.setScalingFactor(String.valueOf(this.scalingFactor));
 			script.setCRS(this.zonesCRS);
 			script.write();
@@ -476,8 +389,8 @@ public class MatsimAnalysis {
 			String visScriptOutputFile = personTripScenarioComparisonOutputDirectory + "scenario-comparison_person-specific-mode-switch-effects_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
 			
 			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(this.runId);
-			script.setRunIdToCompareWith(this.runIdToCompareWith);
+			script.setRunId(runId);
+			script.setRunIdToCompareWith(runIdToCompareWith);
 			script.setScalingFactor(String.valueOf(this.scalingFactor));
 			script.setCRS(this.scenarioCRS);
 			script.write();
@@ -489,8 +402,8 @@ public class MatsimAnalysis {
 			String visScriptOutputFile = personTripScenarioComparisonOutputDirectory + "scenario-comparison_person-specific-winner-loser_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
 			
 			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(this.runId);
-			script.setRunIdToCompareWith(this.runIdToCompareWith);
+			script.setRunId(runId);
+			script.setRunIdToCompareWith(runIdToCompareWith);
 			script.setScalingFactor(String.valueOf(this.scalingFactor));
 			script.setCRS(this.scenarioCRS);
 			script.write();
@@ -499,11 +412,11 @@ public class MatsimAnalysis {
 		// externality-specific toll payments
 		{
 			String visScriptTemplateFile = visualizationScriptInputDirectory + "extCostPerTimeOfDay-cne_percentages.R";
-			String visScriptOutputFile = analysisOutputDirectory + "person-trip-welfare-analysis/" + "extCostPerTimeOfDay-cne_percentages_" + runId + ".R";
+			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "person-trip-welfare-analysis/" + "extCostPerTimeOfDay-cne_percentages_" + runId + ".R";
 					
 			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(this.runId);
-			script.setRunIdToCompareWith(this.runIdToCompareWith);
+			script.setRunId(runId);
+			script.setRunIdToCompareWith(runIdToCompareWith);
 			script.setScalingFactor(String.valueOf(this.scalingFactor));
 			script.setCRS(this.scenarioCRS);
 			script.write();
@@ -736,16 +649,91 @@ public class MatsimAnalysis {
 	}
 
 	private void readEventsFile(String runDirectory, String runId, EventsManager events) {
-		String eventsFile;
-		log.info("Trying to read " + runDirectory + runId + ".output_events.xml.gz" + "...");
-		if (new File(runDirectory + runId + ".output_events.xml.gz").exists()) {
-			eventsFile = runDirectory + runId + ".output_events.xml.gz";
+		if (runDirectory.startsWith("http")) {
+			String eventsFile = runDirectory + runId + ".output_events.xml.gz";
+			log.info("Trying to read " + eventsFile + " as URL...");
+			URL eventsFileURL = null;
+			try {
+				eventsFileURL = new URL(eventsFile);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+			new CombinedPersonLinkMoneyEventsReader(events).readURL(eventsFileURL);
 		} else {
-			log.info(runDirectory + runId + ".output_events.xml.gz not found. Trying to read file without runId prefix...");
-			eventsFile = runDirectory + "output_events.xml.gz";
-			log.info("Trying to read " + eventsFile + "...");
+			if (new File(runDirectory + runId + ".output_events.xml.gz").exists()) {
+				String eventsFile = runDirectory + runId + ".output_events.xml.gz";
+				log.info("Trying to read " + eventsFile + "...");
+				new CombinedPersonLinkMoneyEventsReader(events).readFile(eventsFile);
+
+			} else if (new File(runDirectory + "output_events.xml.gz").exists()){
+				log.info(runDirectory + runId + ".output_events.xml.gz not found. Trying to read file without runId prefix...");
+				String eventsFile = runDirectory + "output_events.xml.gz";
+				log.info("Trying to read " + eventsFile + "...");
+				new CombinedPersonLinkMoneyEventsReader(events).readFile(eventsFile);
+				
+			} else {
+				throw new RuntimeException("Events file not found for runDirectory: " + runDirectory + " and runId: " + runId + ". Aborting...");
+			}
 		}
-		new CombinedPersonLinkMoneyEventsReader(events).readFile(eventsFile);
+	}
+
+	public void setScenarioCRS(String scenarioCRS) {
+		this.scenarioCRS = scenarioCRS;
+	}
+
+	public void setHomeActivityPrefix(String homeActivityPrefix) {
+		this.homeActivityPrefix = homeActivityPrefix;
+	}
+
+	public void setScalingFactor(int scalingFactor) {
+		this.scalingFactor = scalingFactor;
+	}
+
+	public void setHelpLegModes(String[] helpLegModes) {
+		this.helpLegModes = helpLegModes;
+	}
+
+	public void setStageActivitySubString(String stageActivitySubString) {
+		this.stageActivitySubString = stageActivitySubString;
+	}
+
+	public void setStageActivities(StageActivityTypes stageActivities) {
+		this.stageActivities = stageActivities;
+	}
+
+	public void setModes(List<String> modes) {
+		this.modes = modes;
+	}
+
+	public void setVisualizationScriptInputDirectory(String visualizationScriptInputDirectory) {
+		this.visualizationScriptInputDirectory = visualizationScriptInputDirectory;
+	}
+
+	public void setScenario1(Scenario scenario1) {
+		this.scenario1 = scenario1;
+	}
+
+	public void setFilters1(List<AgentAnalysisFilter> filters1) {
+		this.filters1 = filters1;
+	}
+
+	public void setScenario0(Scenario scenario0) {
+		this.scenario0 = scenario0;
+	}
+
+	public void setFilters0(List<AgentAnalysisFilter> filters0) {
+		this.filters0 = filters0;
+	}
+
+	public void setZoneInformation(String shapeFileZones, String zonesCRS, String zoneId) {
+		this.shapeFileZones = shapeFileZones;
+		this.zonesCRS = zonesCRS;
+		this.zoneId = zoneId;
+	}
+
+	public void setAnalysisOutputDirectory(String analysisOutputDirectory) {
+		if (!analysisOutputDirectory.endsWith("/")) analysisOutputDirectory = analysisOutputDirectory + "/";
+		this.analysisOutputDirectory = analysisOutputDirectory;
 	}
 
 }

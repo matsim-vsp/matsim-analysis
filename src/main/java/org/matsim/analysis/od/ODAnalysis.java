@@ -100,8 +100,12 @@ public final class ODAnalysis {
 		if (network != null && this.shapeFileCRS != null) {
 			String crsNetwork = (String) network.getAttributes().getAttribute("coordinateReferenceSystem");
 	        if (!shapeFileCRS.equalsIgnoreCase(crsNetwork)) {
-		        throw new RuntimeException("Coordinate transformation not yet implemented. Expecting shape file to have the following coordinate reference system: " + crsNetwork);
-		        // TODO: add coordinate transformation
+	        	if (shapeFileCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("GK4")) {
+	        		// should not cause any problems.
+	        	} else {
+	        		throw new RuntimeException("Coordinate transformation not yet implemented. Expecting shape file to have the following coordinate reference system: " + crsNetwork);
+			        // TODO: add coordinate transformation
+	        	}
 			}
 		}
 		
