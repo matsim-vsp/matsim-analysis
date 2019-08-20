@@ -68,7 +68,7 @@ public class PersonTripAnalysisTest {
 		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(helpLegModes, stageActivitySubString);	
 		basicHandler.setScenario(scenario);
 
-		VTTSHandler vttsHandler = new VTTSHandler(scenario);
+		VTTSHandler vttsHandler = new VTTSHandler(scenario, helpLegModes, stageActivitySubString);
 		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler();
 		noiseHandler.setBasicHandler(basicHandler);
 		

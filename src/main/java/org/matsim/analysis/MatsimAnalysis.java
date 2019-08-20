@@ -87,7 +87,6 @@ public class MatsimAnalysis {
 	private String homeActivityPrefix = "home";
 	private int scalingFactor;
 	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
-	private String stageActivitySubString = "interaction";
 	private StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction", "taxi interaction");
 	private List<String> modes;	
 	private String visualizationScriptInputDirectory = "./visualization-scripts/";
@@ -101,7 +100,9 @@ public class MatsimAnalysis {
 	private List<AgentAnalysisFilter> filters0;
 	
 	private String analysisOutputDirectory;
+
 	private final String outputDirectoryName = "analysis-v2.0";
+	private final String stageActivitySubString = "interaction";
 
 	public void run() {
 		
@@ -174,7 +175,7 @@ public class MatsimAnalysis {
 			
 			actHandler1 = new ActDurationHandler();
 			
-			vttsHandler1 = new VTTSHandler(scenario1);
+			vttsHandler1 = new VTTSHandler(scenario1, helpLegModes, stageActivitySubString);
 			
 			odHandler1 = new ODEventAnalysisHandler(helpLegModes, stageActivitySubString);
 			
@@ -214,7 +215,7 @@ public class MatsimAnalysis {
 			
 			actHandler0 = new ActDurationHandler();
 			
-			vttsHandler0 = new VTTSHandler(scenario0);
+			vttsHandler0 = new VTTSHandler(scenario0, helpLegModes, stageActivitySubString);
 			
 			odHandler0 = new ODEventAnalysisHandler(helpLegModes, stageActivitySubString);
 
@@ -691,10 +692,6 @@ public class MatsimAnalysis {
 
 	public void setHelpLegModes(String[] helpLegModes) {
 		this.helpLegModes = helpLegModes;
-	}
-
-	public void setStageActivitySubString(String stageActivitySubString) {
-		this.stageActivitySubString = stageActivitySubString;
 	}
 
 	public void setStageActivities(StageActivityTypes stageActivities) {

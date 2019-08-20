@@ -76,8 +76,8 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	private int currentIteration;
 	
 	private final Set<Id<Person>> personIdsToBeIgnored = new HashSet<>();
-	private final String[] activitiesToBeSkipped = {"pt interaction", "car interaction", "ride interaction", "bicycle interaction"};
-	private final String[] modesToBeSkipped = {"transit_walk", "access_walk", "egress_walk"};
+	private final String stageActivitySubString;
+	private final String[] modesToBeSkipped;
 	
 	private final Set<Id<Person>> departedPersonIds = new HashSet<>();
 	private final Map<Id<Person>, Double> personId2currentActivityStartTime = new HashMap<>();
@@ -96,11 +96,13 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		
 	private final double defaultVTTS_moneyPerHour; // for the car mode!
 	
-	public VTTSHandler(Scenario scenario) {
+	public VTTSHandler(Scenario scenario, String[] helpLegModes, String stageActivitySubString) {
 		
 		if (scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() == 0.) {
-			log.warn("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time. Aborting...");
+			log.warn("The marginal utility of money must not be 0.0. The VTTS is computed in Money per Time.");
 		}
+		this.modesToBeSkipped = helpLegModes;
+		this.stageActivitySubString = stageActivitySubString;
 		this.scenario = scenario;
 		this.currentIteration = Integer.MIN_VALUE;
 		this.defaultVTTS_moneyPerHour =
@@ -279,7 +281,14 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			// Calculate the agent's trip delay disutility.
 			// (Could be done similar to the activity delay disutility. As long as it is computed linearly, the following should be okay.)
 			String mode = this.personId2currentTripMode.get(personId);
-			double tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling() * (-1);
+			double marginalUtilityOfTraveling = 0.;
+			if (this.scenario.getConfig().planCalcScore().getModes().get(mode) != null) {
+				marginalUtilityOfTraveling = this.scenario.getConfig().planCalcScore().getModes().get(mode).getMarginalUtilityOfTraveling();
+			} else {
+				log.warn("Could not identify the marginal utility of traveling for mode " + mode + ". "
+						+ "Setting this value to zero. (Probably using subpopulations...)");
+			}
+			double tripDelayDisutilityOneSec = (1.0 / 3600.) * marginalUtilityOfTraveling * (-1);
 			
 			// Translate the disutility into monetary units.
 			double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
@@ -624,11 +633,10 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	}
 	
 	private boolean isActivityToBeSkipped(String actType) {
-		for (String activityToBeSkipped : this.activitiesToBeSkipped) {
-			if (actType.equals(activityToBeSkipped)) {
-				return true;
-			}
+		if (actType.contains(stageActivitySubString)) {
+			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 }

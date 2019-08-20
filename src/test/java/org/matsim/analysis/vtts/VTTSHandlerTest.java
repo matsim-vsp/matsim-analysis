@@ -111,7 +111,7 @@ public class VTTSHandlerTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		VTTSHandler vttsHandler = new VTTSHandler(scenario);
+		VTTSHandler vttsHandler = new VTTSHandler(scenario, new String[] {"transit_walk", "access_walk", "egress_walk", "non_network_walk"}, "interaction");
 		events.addHandler(vttsHandler);
 						
 		String eventsFile = testUtils.getInputDirectory() + "100.events.b1240739.xml";
