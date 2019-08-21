@@ -748,7 +748,7 @@ public class PersonTripScenarioComparison {
 		
 		{
 			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysis_aggregated" + filter.toFileName() + ".csv");
-			aggregatedTripWriter.write("trip-switch-type;number of trips (with stucking agents, sample size);number of trips (without stucking agents, sample size);average change in trip travel time (with stucking agents) [sec];average change in trip travel time (without stucking agents) [sec];average change in beeline speed (without stucking agents) [m/s]");
+			aggregatedTripWriter.write("from;to;number of trips (with stucking agents, sample size);number of trips (without stucking agents, sample size);average change in trip travel time (with stucking agents) [sec];average change in trip travel time (without stucking agents) [sec];average change in beeline speed (without stucking agents) [m/s]");
 			aggregatedTripWriter.newLine();
 			
 			for (String switchType : switchType2tripTTwithStuckingAgents.keySet()) {
@@ -781,7 +781,7 @@ public class PersonTripScenarioComparison {
 					avgDiffBeelineSpedWithoutStuckingAgents = diffBeelineSpeedSumWithoutStuckingAgents / tripsWithoutStuckingAgents;
 				}
 				
-				aggregatedTripWriter.write(switchType + ";" + tripsWithStuckingAgents + ";" + tripsWithoutStuckingAgents + ";" + avgDiffTTwithStuckingAgents + ";" + avgDiffTTwithoutStuckingAgents + ";" + avgDiffBeelineSpedWithoutStuckingAgents);
+				aggregatedTripWriter.write(switchType.split("2")[0] +";" + switchType.split("2")[1] + ";" + tripsWithStuckingAgents + ";" + tripsWithoutStuckingAgents + ";" + avgDiffTTwithStuckingAgents + ";" + avgDiffTTwithoutStuckingAgents + ";" + avgDiffBeelineSpedWithoutStuckingAgents);
 				aggregatedTripWriter.newLine();
 			}
 			
