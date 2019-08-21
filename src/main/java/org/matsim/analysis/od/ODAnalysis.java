@@ -71,6 +71,8 @@ public final class ODAnalysis {
 	private final Coordinate dummyCoordinateOutside = new Coordinate(0.0,0.0);
 	private final double scaleFactor;
 	private final String shapeFileCRS;
+	
+	private final boolean printSHPfiles = false;
 
     /**
      * @param outputDirectory
@@ -132,7 +134,6 @@ public final class ODAnalysis {
     			try {
     				shapeFileAsURL = new URL(shapeFile);
     			} catch (MalformedURLException e) {
-    				// TODO Auto-generated catch block
     				e.printStackTrace();
     			}
                 features = ShapeFileReader.getAllFeatures(shapeFileAsURL);
@@ -210,7 +211,7 @@ public final class ODAnalysis {
             try {
 				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_DAY_" + modes.toString() + ".csv");
 				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_DAY_" + modes.toString() + "_from-to-format.csv");
-	            printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_DAY_" + modes.toString() + ".shp");
+	            if (printSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_DAY_" + modes.toString() + ".shp");
 
             } catch (IOException e) {
 				e.printStackTrace();
@@ -219,7 +220,7 @@ public final class ODAnalysis {
 			Map<String, Map<String, ODRelation>> time2odRelation = new HashMap<>();
 			time2odRelation.put(from + "-" + to, filteredOdRelations);
 			try {
-				printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_DAY_" + modes.toString() + ".shp");
+				if (printSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_DAY_" + modes.toString() + ".shp");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -270,7 +271,7 @@ public final class ODAnalysis {
 				try {
 					writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".csv");
 					writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + "_from-to-format.csv");
-					printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
+					if (printSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -282,7 +283,7 @@ public final class ODAnalysis {
 					Map<String, Map<String, ODRelation>> time2odRelation = new HashMap<>();
 					time2odRelation.put(from + "-" + to, filteredOdRelations);
 					try {
-						printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
+						if (printSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -292,7 +293,7 @@ public final class ODAnalysis {
 			}
 
 			try {
-				printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins_" + modes.toString() + ".shp");
+				if (printSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins_" + modes.toString() + ".shp");
 				writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins_" + modes.toString() + "_from-to-format.csv");
 
 			} catch (IOException e) {
