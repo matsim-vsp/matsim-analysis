@@ -116,12 +116,12 @@ public final class ODAnalysis {
 			file.mkdirs();
 		}
 		
-		{
+		if (printSHPfiles) {
 			File file = new File(outputDirectory + "shapefiles_aggregated-od-analysis/");
 			file.mkdirs();
 		}
 		
-		{
+		if (printSHPfiles) {
 			File file = new File(outputDirectory + "shapefiles_trip-od-analysis/");
 			file.mkdirs();
 		}
@@ -181,22 +181,59 @@ public final class ODAnalysis {
 				odTrips.add(odTrip);
 			}
 		}
+		
+		List<Tuple<Double, Double>> timeBinsDay = new ArrayList<>();
+		timeBinsDay.add(new Tuple<Double, Double>(0., 36.));
+		filterTripsAndPrintInformation(odTrips, zones, modes, timeBinsDay);
+		if (modes.size() > 1) {
+			for (String mode : modes) {
+				List<String> eachModeSeparately = new ArrayList<>();
+				eachModeSeparately.add(mode);
+				filterTripsAndPrintInformation(odTrips, zones, eachModeSeparately, timeBinsDay);
+			}
+		}
+		
+		List<Tuple<Double, Double>> timeBinsPeriods = new ArrayList<>();
+		timeBinsPeriods.add(new Tuple<Double, Double>(0., 6.));
+		timeBinsPeriods.add(new Tuple<Double, Double>(6., 9.));
+		timeBinsPeriods.add(new Tuple<Double, Double>(9., 12.));
+		timeBinsPeriods.add(new Tuple<Double, Double>(12., 15.));
+		timeBinsPeriods.add(new Tuple<Double, Double>(15., 18.));
+		timeBinsPeriods.add(new Tuple<Double, Double>(18., 21.));
+		timeBinsPeriods.add(new Tuple<Double, Double>(21., 24.));
+		filterTripsAndPrintInformation(odTrips, zones, modes, timeBinsPeriods);		
+		if (modes.size() > 1) {
+			for (String mode : modes) {
+				List<String> eachModeSeparately = new ArrayList<>();
+				eachModeSeparately.add(mode);
+				filterTripsAndPrintInformation(odTrips, zones, eachModeSeparately, timeBinsPeriods);
+			}
+		}
+	}
 
-		{
+	private void filterTripsAndPrintInformation(List<ODTrip> odTrips, Map<String, Geometry> zones, List<String> modes, List<Tuple<Double, Double>> timeBins) {
+
+		LinkedHashMap<String, Map<String, ODRelation>> time2odRelations = new LinkedHashMap<>();
+
+		for (Tuple<Double,Double> timeBin : timeBins) {
+			
 			Map<String, ODRelation> filteredOdRelations = new HashMap<>();
-			int filteredTripCounter = 0;
 			List<ODTrip> filteredTrips = new ArrayList<>();
-			double from = 0.;
-			double to = 36 * 3600.;
-			TripFilter dayFilter = new TripFilter(from, to, "", modes);
+			int filteredTripCounter = 0;
+
+			double from = timeBin.getFirst() * 3600.;
+			double to = timeBin.getSecond() * 3600.;
+
+			TripFilter hourFilter = new TripFilter(from, to, "", modes);
 			log.info("###### " + from + " to " + to);
 			log.info("total number of trips (sample size): " + odTrips.size());
 
 			for (ODTrip trip : odTrips) {
-				if (dayFilter.considerTrip(trip)) {
+				if (hourFilter.considerTrip(trip)) {
 					filteredTripCounter++;
 					filteredTrips.add(trip);
 					String od = trip.getOrigin() + "-" + trip.getDestination();
+
 					if (filteredOdRelations.get(od) == null) {
 						filteredOdRelations.put(od, new ODRelation(od, trip.getOrigin(), trip.getDestination()));
 					} else {
@@ -208,98 +245,37 @@ public final class ODAnalysis {
 				}
 			}
 			log.info("filtered trips (sample size): " + filteredTripCounter);
-            try {
-				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_DAY_" + modes.toString() + ".csv");
-				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_DAY_" + modes.toString() + "_from-to-format.csv");
-	            if (printSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_DAY_" + modes.toString() + ".shp");
-
-            } catch (IOException e) {
-				e.printStackTrace();
-			}
-            
-			Map<String, Map<String, ODRelation>> time2odRelation = new HashMap<>();
-			time2odRelation.put(from + "-" + to, filteredOdRelations);
 			try {
-				if (printSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_DAY_" + modes.toString() + ".shp");
+				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".csv");
+				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + "_from-to-format.csv");
+				if (printSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+			
+			boolean writeHourlyShapefiles = true;
 
-		{
-			LinkedHashMap<String, Map<String, ODRelation>> time2odRelations = new LinkedHashMap<>();
-
-			List<Tuple<Double, Double>> timeBins = new ArrayList<>();
-			timeBins.add(new Tuple<Double, Double>(0., 6.));
-			timeBins.add(new Tuple<Double, Double>(6., 9.));
-			timeBins.add(new Tuple<Double, Double>(9., 12.));
-			timeBins.add(new Tuple<Double, Double>(12., 15.));
-			timeBins.add(new Tuple<Double, Double>(15., 18.));
-			timeBins.add(new Tuple<Double, Double>(18., 21.));
-			timeBins.add(new Tuple<Double, Double>(21., 24.));
-
-			for (Tuple<Double,Double> timeBin : timeBins) {
-				
-				Map<String, ODRelation> filteredOdRelations = new HashMap<>();
-				List<ODTrip> filteredTrips = new ArrayList<>();
-				int filteredTripCounter = 0;
-
-				double from = timeBin.getFirst() * 3600.;
-				double to = timeBin.getSecond() * 3600.;
-
-				TripFilter hourFilter = new TripFilter(from, to, "", modes);
-				log.info("###### " + from + " to " + to);
-				log.info("total number of trips (sample size): " + odTrips.size());
-
-				for (ODTrip trip : odTrips) {
-					if (hourFilter.considerTrip(trip)) {
-						filteredTripCounter++;
-						filteredTrips.add(trip);
-						String od = trip.getOrigin() + "-" + trip.getDestination();
-
-						if (filteredOdRelations.get(od) == null) {
-							filteredOdRelations.put(od, new ODRelation(od, trip.getOrigin(), trip.getDestination()));
-						} else {
-							double tripsSoFar = filteredOdRelations.get(od).getTrips();
-							filteredOdRelations.get(od).setTrips(tripsSoFar + 1);
-						}
-					} else {
-						// skip trip
-					}
-				}
-				log.info("filtered trips (sample size): " + filteredTripCounter);
+			if (writeHourlyShapefiles) {
+				Map<String, Map<String, ODRelation>> time2odRelation = new HashMap<>();
+				time2odRelation.put(from + "-" + to, filteredOdRelations);
 				try {
-					writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".csv");
-					writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + "_from-to-format.csv");
-					if (printSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
-
+					if (printSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
-				boolean writeHourlyShapefiles = true;
-
-				if (writeHourlyShapefiles) {
-					Map<String, Map<String, ODRelation>> time2odRelation = new HashMap<>();
-					time2odRelation.put(from + "-" + to, filteredOdRelations);
-					try {
-						if (printSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-
-				time2odRelations.put(timeBin.getFirst() + "-" + timeBin.getSecond(), filteredOdRelations);
 			}
 
-			try {
-				if (printSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins_" + modes.toString() + ".shp");
-				writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins_" + modes.toString() + "_from-to-format.csv");
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			time2odRelations.put(timeBin.getFirst() + "-" + timeBin.getSecond(), filteredOdRelations);
 		}
+
+		try {
+			if (printSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins_" + modes.toString() + ".shp");
+			writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins_" + modes.toString() + "_from-to-format.csv");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 
 	private void writeData(Map<String, ODRelation> odRelations, Map<String, Geometry> zones,  String fileName) throws IOException {
