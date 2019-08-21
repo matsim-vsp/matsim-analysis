@@ -72,7 +72,7 @@ public final class ODAnalysis {
 	private final double scaleFactor;
 	private final String shapeFileCRS;
 	
-	private final boolean printSHPfiles = false;
+	private final boolean printSHPfiles = true;
 
     /**
      * @param outputDirectory
@@ -214,6 +214,11 @@ public final class ODAnalysis {
 	private void filterTripsAndPrintInformation(List<ODTrip> odTrips, Map<String, Geometry> zones, List<String> modes, List<Tuple<Double, Double>> timeBins) {
 
 		LinkedHashMap<String, Map<String, ODRelation>> time2odRelations = new LinkedHashMap<>();
+		
+		String modesString = "";
+		for (String mode : modes) {
+			modesString = modesString + "_" + mode;
+		}
 
 		for (Tuple<Double,Double> timeBin : timeBins) {
 			
@@ -246,9 +251,9 @@ public final class ODAnalysis {
 			}
 			log.info("filtered trips (sample size): " + filteredTripCounter);
 			try {
-				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".csv");
-				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + "_from-to-format.csv");
-				if (printSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
+				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".csv");
+				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + "_from-to-format.csv");
+				if (printSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".shp");
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -260,7 +265,7 @@ public final class ODAnalysis {
 				Map<String, Map<String, ODRelation>> time2odRelation = new HashMap<>();
 				time2odRelation.put(from + "-" + to, filteredOdRelations);
 				try {
-					if (printSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + "_" + modes.toString() + ".shp");
+					if (printSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".shp");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -270,8 +275,8 @@ public final class ODAnalysis {
 		}
 
 		try {
-			if (printSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins_" + modes.toString() + ".shp");
-			writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins_" + modes.toString() + "_from-to-format.csv");
+			if (printSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins" + modesString + ".shp");
+			writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins" + modesString + "_from-to-format.csv");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -417,7 +422,7 @@ public final class ODAnalysis {
              						new Coordinate(originCoord),
              						new Coordinate(destinationCoord) }
 
-             					, new Object[] { od, odRelations.get(od).getOrigin(), odRelations.get(od).getDestination(), odRelations.get(od).getTrips()  * this.scaleFactor, Time.writeTime(from), Time.writeTime(to) }
+             					, new Object[] { od, odRelations.get(od).getOrigin(), odRelations.get(od).getDestination(), odRelations.get(od).getTrips()  * this.scaleFactor, Time.writeTime(from * 3600.), Time.writeTime(to * 3600.) }
                         		, null
              			);
              		features.add(feature);
@@ -425,10 +430,14 @@ public final class ODAnalysis {
              }
         }
 
-		if (!features.isEmpty()) {
-			ShapeFileWriter.writeGeometries(features, fileName);
+        if (!features.isEmpty()) {
+			try {
+				ShapeFileWriter.writeGeometries(features, fileName);
+			} catch (Exception e) {
+				log.warn("Shape file was not written out: " + fileName);
+			}
 		} else {
-			log.warn("Shape file was not written out.");
+			log.warn("Shape file was not written out (empty).");
 		}
 	}
 
@@ -459,10 +468,14 @@ public final class ODAnalysis {
  		features.add(feature);
         }
 
-		if (!features.isEmpty()) {
-			ShapeFileWriter.writeGeometries(features, fileName);
+        if (!features.isEmpty()) {
+			try {
+				ShapeFileWriter.writeGeometries(features, fileName);
+			} catch (Exception e) {
+				log.warn("Shape file was not written out: " + fileName);
+			}
 		} else {
-			log.warn("Shape file was not written out.");
+			log.warn("Shape file was not written out (empty).");
 		}
 	}
 

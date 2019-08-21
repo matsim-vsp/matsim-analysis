@@ -87,7 +87,7 @@ public class ODAnalysisTest {
 			ODAnalysis odAnalysis = new ODAnalysis(outputDirectory, network, runId, shapeFile, "GK4" , zoneId, modes, scaleFactor);
 			odAnalysis.process(handler1);
 
-            String csvFilename = outputDirectory+ "/od-analysis/" + runId + ".od-analysis_0.0-36.0_[drt].csv";
+            String csvFilename = outputDirectory+ "/od-analysis/" + runId + ".od-analysis_0.0-36.0_drt.csv";
             List<ODRelation> odRelationsList = ODAnalysisCSVReader(csvFilename);
 
             for (ODRelation odRelation : odRelationsList) {
