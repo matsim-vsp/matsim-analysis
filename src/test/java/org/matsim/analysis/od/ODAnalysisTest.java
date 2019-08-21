@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -47,12 +48,15 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 
 public class ODAnalysisTest {
+	
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
    
 	@Test
     public final void odAnalysisTest() {
 
-            final String outputDirectory = "test/output/";
-            final String runDirectory = "test/input/org/matsim/analysis/od/test_runDirectory/";
+            final String outputDirectory = testUtils.getOutputDirectory();
+            final String runDirectory = testUtils.getPackageInputDirectory() + "test_runDirectory/";
             final String runId = "berlin-drtA-v5.2-1pct";
             final String shapeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/berlin-sav-v5.2-10pct/input/shp-bezirke/bezirke_berlin.shp";
             final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.access_walk, TransportMode.egress_walk};
@@ -83,7 +87,7 @@ public class ODAnalysisTest {
 			ODAnalysis odAnalysis = new ODAnalysis(outputDirectory, network, runId, shapeFile, "GK4" , zoneId, modes, scaleFactor);
 			odAnalysis.process(handler1);
 
-            String csvFilename = outputDirectory+ "/od-analysis/" + runId + ".od-analysis_DAY_[drt].csv";
+            String csvFilename = outputDirectory+ "/od-analysis/" + runId + ".od-analysis_0.0-36.0_[drt].csv";
             List<ODRelation> odRelationsList = ODAnalysisCSVReader(csvFilename);
 
             for (ODRelation odRelation : odRelationsList) {
