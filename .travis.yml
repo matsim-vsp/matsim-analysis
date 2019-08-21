@@ -13,6 +13,7 @@ env:
     - TEST=BasicPersonTripAnalysisTest
     - TEST=NoiseAnalysisTest
     - TEST=PersonTripAnalysisTest
+    - TEST=ODAnalysisTest
    
 script:
   - mvn -Dtest=${TEST} test --batch-mode -Dmatsim.preferLocalDtds=true -Dmaven.javadoc.skip -e
