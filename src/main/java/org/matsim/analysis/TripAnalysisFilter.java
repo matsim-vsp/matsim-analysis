@@ -54,6 +54,11 @@ public class TripAnalysisFilter implements TripFilter {
 			throw new RuntimeException("Can't use the filter without pre-processing. Aborting...");
 		}
 		
+		if (origin == null || destination == null) {
+			log.warn("Origin or destination null. Can't interpret this trip. Origin: " + origin + "--> Destination: " +  destination);
+			return false;
+		}
+		
 		// assuming the same CRS!
 		boolean originWithProvidedGeometry = false;
 		for (Geometry geometry : zoneFeatures.values()) {
