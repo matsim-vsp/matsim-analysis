@@ -129,8 +129,8 @@ public class IKAnalysisRunBerlinTest {
 		analysis.setScenario0(scenario0);
 		analysis.setHomeActivityPrefix(homeActivityPrefix);
 		analysis.setScalingFactor(scalingFactor);
-		analysis.setFilters1(agentFilters1);
-		analysis.setFilters0(agentFilters0);
+		analysis.setAgentFilters1(agentFilters1);
+		analysis.setAgentFilters0(agentFilters0);
 		analysis.setTripFilters1(tripFilters1);
 		analysis.setModes(modes);
 		analysis.run();

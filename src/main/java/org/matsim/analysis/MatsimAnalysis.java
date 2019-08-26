@@ -723,7 +723,7 @@ public class MatsimAnalysis {
 		this.scenario1 = scenario1;
 	}
 
-	public void setFilters1(List<AgentAnalysisFilter> filters1) {
+	public void setAgentFilters1(List<AgentAnalysisFilter> filters1) {
 		this.agentFilters1 = filters1;
 	}
 
@@ -735,7 +735,7 @@ public class MatsimAnalysis {
 		this.scenario0 = scenario0;
 	}
 
-	public void setFilters0(List<AgentAnalysisFilter> filters0) {
+	public void setAgentFilters0(List<AgentAnalysisFilter> filters0) {
 		this.filters0 = filters0;
 	}
 

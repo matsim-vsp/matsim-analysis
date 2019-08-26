@@ -52,7 +52,7 @@ public class AnalysisRunExample {
 		
 		MatsimAnalysis analysis = new MatsimAnalysis();
 		analysis.setScenario1(scenario1);
-		analysis.setFilters1(filters1);
+		analysis.setAgentFilters1(filters1);
 		analysis.setModes(modes);
 		analysis.run();
 	}

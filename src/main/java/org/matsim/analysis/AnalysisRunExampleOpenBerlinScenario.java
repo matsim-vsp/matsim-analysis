@@ -60,28 +60,39 @@ public class AnalysisRunExampleOpenBerlinScenario {
 
 		final String visualizationScriptInputDirectory = "./visualization-scripts/";
 
-		final List<AgentAnalysisFilter> filters1 = new ArrayList<>();
+		final List<AgentAnalysisFilter> agentFilters1 = new ArrayList<>();
 
 		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
 		filter1a.setSubpopulation("person");
 		filter1a.setPersonAttribute("berlin");
 		filter1a.setPersonAttributeName("home-activity-zone");
 		filter1a.preProcess(scenario1);
-		filters1.add(filter1a);
+		agentFilters1.add(filter1a);
 		
 		AgentAnalysisFilter filter1b = new AgentAnalysisFilter();
 		filter1b.preProcess(scenario1);
-		filters1.add(filter1b);
+		agentFilters1.add(filter1b);
 		
 		AgentAnalysisFilter filter1c = new AgentAnalysisFilter();
 		filter1c.setSubpopulation("person");
 		filter1c.setPersonAttribute("brandenburg");
 		filter1c.setPersonAttributeName("home-activity-zone");
 		filter1c.preProcess(scenario1);
-		filters1.add(filter1c);
+		agentFilters1.add(filter1c);
 		
-		final List<AgentAnalysisFilter> filters0 = null;
+		final List<AgentAnalysisFilter> agentFilters0 = null;
 		
+		final List<TripAnalysisFilter> tripFilters1 = new ArrayList<>();
+		
+		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter();
+		tripFilter1a.preProcess(scenario1);
+		tripFilters1.add(tripFilter1a);
+		
+		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter();
+		tripFilter1b.setZoneFile(shapeFileZones);
+		tripFilter1b.preProcess(scenario1);
+		tripFilters1.add(tripFilter1b);
+				
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
 			modes.add(mode);
@@ -90,10 +101,11 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		MatsimAnalysis analysis = new MatsimAnalysis();
 		
 		analysis.setScenario1(scenario1);
-		analysis.setFilters1(filters1);
+		analysis.setAgentFilters1(agentFilters1);
+		analysis.setTripFilters1(tripFilters1);
 		
 		analysis.setScenario0(scenario0);
-		analysis.setFilters0(filters0);
+		analysis.setAgentFilters0(agentFilters0);
 		
 		analysis.setScenarioCRS(scenarioCRS);
 		analysis.setZoneInformation(shapeFileZones, zonesCRS, zoneId);

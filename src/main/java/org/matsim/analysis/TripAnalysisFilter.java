@@ -19,6 +19,8 @@
 
 package org.matsim.analysis;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,7 +106,16 @@ public class TripAnalysisFilter implements TripFilter {
 	    	    
 		if (scenario != null &&  zoneFile != null) {					
 			log.info("Reading shape file...");
-			Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(zoneFile);
+			Collection<SimpleFeature> features = null;
+			if (zoneFile.startsWith("http")) {
+				try {
+					features = ShapeFileReader.getAllFeatures(new URL(zoneFile));
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+			} else {
+				features = ShapeFileReader.getAllFeatures(zoneFile);
+			}
 			int counter = 0;
 			for (SimpleFeature feature : features) {
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
