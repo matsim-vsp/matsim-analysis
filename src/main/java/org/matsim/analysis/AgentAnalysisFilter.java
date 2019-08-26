@@ -170,7 +170,7 @@ public class AgentAnalysisFilter implements AgentFilter {
 	
 	@Override
 	public String toFileName() {
-		String fileName = "_FILTER";
+		String fileName = "_PERSONFILTER";
 		
 		boolean atLeastOneFilterApplied = false;
 		

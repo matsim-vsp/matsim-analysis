@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentAnalysisFilter;
+import org.matsim.analysis.TripAnalysisFilter;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -56,7 +57,7 @@ public class PersonTripScenarioComparison {
 	private final Map<Id<Person>, Map<Integer, Coord>> personId2actNr2coord;
 	private final Map<Id<Person>, Coord> personId2homeActCoord;
 	private final List<String> modes;
-	private final AgentAnalysisFilter filter;
+	private final AgentAnalysisFilter agentFilter;
 	
     public PersonTripScenarioComparison(
     		String homeActivity,
@@ -66,7 +67,7 @@ public class PersonTripScenarioComparison {
     		Scenario scenarioToCompareWith,
     		BasicPersonTripAnalysisHandler basicHandlerToCompareWith,
     		List<String> modes,
-    		AgentAnalysisFilter filter) {
+    		AgentAnalysisFilter agentFilter) {
     	
 		this.analysisOutputDirectory = analysisOutputDirectory;
 		this.scenario1 = scenario1;
@@ -74,7 +75,7 @@ public class PersonTripScenarioComparison {
 		this.scenarioToCompareWith = scenarioToCompareWith;
 		this.basicHandlerToCompareWith = basicHandlerToCompareWith;
 		this.modes = modes;
-		this.filter = filter;
+		this.agentFilter = agentFilter;
 		
 		log.info("Getting activity coordinates from plans...");
 		
@@ -108,7 +109,7 @@ public class PersonTripScenarioComparison {
     	log.info("Getting activity coordinates from plans... Done.");
 	}
 
-	public void analyzeByMode() throws IOException {
+	public void analyzeByMode(TripAnalysisFilter tripFilter) throws IOException {
     	
 		Map<String, Map<String, Coord>> switchAndCoordType2Coord = new HashMap<>();
 		Map<String, Map<Id<Person>, Integer>> switchType2agents = new HashMap<>();
@@ -118,7 +119,7 @@ public class PersonTripScenarioComparison {
 
 		Map<String, BufferedWriter> bufferedWriter = new HashMap<>();
 		
-		bufferedWriter.put("all", IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_all" + filter.toFileName() + ".csv"));
+		bufferedWriter.put("all", IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_all" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
 		
 		for (String mode : modes) {
 			switchAndCoordType2Coord.put(mode+"2"+mode+"Origin", new HashMap<>());
@@ -133,10 +134,10 @@ public class PersonTripScenarioComparison {
 			switchAndCoordType2Coord.put("x2"+mode+"Destination", new HashMap<>());
 			switchAndCoordType2Coord.put("x2"+mode+"HomeCoord", new HashMap<>());
 			
-			bufferedWriter.put(mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + filter.toFileName() + ".csv"));
-			bufferedWriter.put("x2" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_x2" + mode + filter.toFileName() + ".csv"));
-			bufferedWriter.put(mode + "2x", IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2x" + filter.toFileName() +".csv"));
-			bufferedWriter.put(mode + "2" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2" + mode + filter.toFileName() + ".csv"));
+			bufferedWriter.put(mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+			bufferedWriter.put("x2" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_x2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+			bufferedWriter.put(mode + "2x", IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2x" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+			bufferedWriter.put(mode + "2" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
 
 			for (String mode2 : modes) {
 
@@ -146,8 +147,8 @@ public class PersonTripScenarioComparison {
 
 
 				if (!mode2.equals(mode)) {
-					bufferedWriter.put(mode2 + "2" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode2 + "2" + mode + filter.toFileName() + ".csv"));
-					bufferedWriter.put(mode + "2" + mode2, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2" + mode2 + filter.toFileName() + ".csv"));
+					bufferedWriter.put(mode2 + "2" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode2 + "2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+					bufferedWriter.put(mode + "2" + mode2, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2" + mode2 + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
 					
 					switchType2tripTTwithStuckingAgents.put(mode2 + "2" + mode, new ArrayList<>());
 					switchType2tripTTwithStuckingAgents.put(mode + "2" + mode2, new ArrayList<>());
@@ -178,202 +179,210 @@ public class PersonTripScenarioComparison {
 			
 			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 						
-			if (filter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
+			if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 				Map<Integer, String> tripNr2legMode = basicHandler1.getPersonId2tripNumber2legMode().get(personId);
 				
 				for (Integer tripNr : tripNr2legMode.keySet()) {
-					String mode1 = tripNr2legMode.get(tripNr);
 					
-					if (basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId) == null) {
-						throw new RuntimeException("Person " + personId + " from run directory1 " + analysisOutputDirectory + "doesn't exist in run directory0 " + analysisOutputDirectory + ". Are you comparing the same scenario? Aborting...");
-					}
+					Coord originCoord = basicHandler1.getPersonId2tripNumber2originCoord().get(personId).get(tripNr);
+					Coord destinationCoord = basicHandler1.getPersonId2tripNumber2destinationCoord().get(personId).get(tripNr);
 
-					String mode0 = "unknown";
-					if (basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId).get(tripNr) == null) {
-						log.warn("Could not identify the trip mode of person " + personId + " and trip number " + tripNr + ". Setting mode to 'unknown'.");
+					if (tripFilter != null && !tripFilter.considerTrip(originCoord, destinationCoord)) {
+						// skip trip
+						
 					} else {
-						mode0 = basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId).get(tripNr);
-					}
-					
-					String stuck0 = "no";
-					if (basicHandlerToCompareWith.getPersonId2tripNumber2stuckAbort().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2stuckAbort().get(personId).get(tripNr) != null) {
-						stuck0 = "yes";
-					}
-					
-					String stuck1 = "no";
-					if (basicHandler1.getPersonId2tripNumber2stuckAbort().get(personId) != null && basicHandler1.getPersonId2tripNumber2stuckAbort().get(personId).get(tripNr) != null) {
-						stuck1 = "yes";
-					}
-					
-					bufferedWriter.get("all").write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-							+ stuck0 + ";" + stuck1 + ";"
-							+ mode0 + ";" + mode1 + ";" 
-							+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-							+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-							+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-							+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
-							);
-					bufferedWriter.get("all").newLine();
-					
-					
-					// mode-specific analysis
-					
-					for (String modeA : modes) {
-											
-						// x --> mode
-
-						if (mode1.equals(modeA) && !mode0.equals(modeA)) {
-							String modeSwitchType = "x2" + modeA;
-							bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-									+ stuck0 + ";" + stuck1 + ";"
-									+ mode0 + ";" + mode1 + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
-									);
-							bufferedWriter.get(modeSwitchType).newLine();
-							
-							Map<Id<Person>, Integer> x2modeAgents = switchType2agents.get(modeSwitchType);
-							
-							if (x2modeAgents.get(personId) == null) {
-								x2modeAgents.put(personId, 1);
-							} else {
-								x2modeAgents.put(personId, x2modeAgents.get(personId) + 1);
-							}
-							
-							switchAndCoordType2Coord.get("x2" + modeA + "Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
-							switchAndCoordType2Coord.get("x2" + modeA + "Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
-		                	
-		                	if (personId2homeActCoord.get(personId) != null) {
-		                		switchAndCoordType2Coord.get("x2" + modeA + "HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
-		                	} else {
-								log.warn("No home activity coordinate for person " + personId);
-							}
-						}
-	                	
-	                	// mode --> x
-	                	
-	                	if (!mode1.equals(modeA) && mode0.equals(modeA)) {
-							String modeSwitchType = modeA + "2x";
-							bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-									+ stuck0 + ";" + stuck1 + ";"
-									+ mode0 + ";" + mode1 + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
-									);
-							bufferedWriter.get(modeSwitchType).newLine();
-							
-							Map<Id<Person>, Integer> mode2xAgents = switchType2agents.get(modeSwitchType);
-							
-							if (mode2xAgents.get(personId) == null) {
-								mode2xAgents.put(personId, 1);
-							} else {
-								mode2xAgents.put(personId, mode2xAgents.get(personId) + 1);
-							}
-							
-							switchAndCoordType2Coord.get(modeA + "2xOrigin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
-							switchAndCoordType2Coord.get(modeA + "2xDestination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
-		                	
-		                	if (personId2homeActCoord.get(personId) != null) {
-		                		switchAndCoordType2Coord.get(modeA + "2xHomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
-		                	} else {
-								log.warn("No home activity coordinate for person " + personId);
-							}
-						}
-	                	
-	                	// mode --> mode
-	                	                	
-	                	if (mode1.equals(modeA) && mode0.equals(modeA)) {
-							String modeSwitchType = modeA + "2" + modeA;
-							bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-									+ stuck0 + ";" + stuck1 + ";" 
-									+ mode0 + ";" + mode1 + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-									+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
-									);
-							bufferedWriter.get(modeSwitchType).newLine();
-							
-							double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-							switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
-							
-							if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
-								double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-								switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
-								
-								double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
-								switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
-							}
+						String mode1 = tripNr2legMode.get(tripNr);
 						
-							Map<Id<Person>, Integer> mode2modeAgents = switchType2agents.get(modeSwitchType);
-							
-							if (mode2modeAgents.get(personId) == null) {
-								mode2modeAgents.put(personId, 1);
-							} else {
-								mode2modeAgents.put(personId, mode2modeAgents.get(personId) + 1);
-							}
-	                	
-							switchAndCoordType2Coord.get(modeA + "2" + modeA + "Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
-							switchAndCoordType2Coord.get(modeA + "2" + modeA + "Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
-		                	
-		                	if (personId2homeActCoord.get(personId) != null) {
-		                		switchAndCoordType2Coord.get(modeA + "2" + modeA + "HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
-		                	} else {
-								log.warn("No home activity coordinate for person " + personId);
-							}
-	                	}
-	                	
-	                	// mode
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId) == null) {
+							throw new RuntimeException("Person " + personId + " from run directory1 " + analysisOutputDirectory + "doesn't exist in run directory0 " + analysisOutputDirectory + ". Are you comparing the same scenario? Aborting...");
+						}
 
-	    				if (mode1.equals(modeA) || mode0.equals(modeA)) {
-	    					// at least one trip was a car trip
-	    					bufferedWriter.get(modeA).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-			    				+ stuck0 + ";" + stuck1 + ";" 
-			    				+ mode0 + ";" + mode1 + ";"
-			    				+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-			    				+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-			    				+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-			    				+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
-			    				);
-	    					bufferedWriter.get(modeA).newLine();
-	    				}
+						String mode0 = "unknown";
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId).get(tripNr) == null) {
+							log.warn("Could not identify the trip mode of person " + personId + " and trip number " + tripNr + ". Setting mode to 'unknown'.");
+						} else {
+							mode0 = basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId).get(tripNr);
+						}
 						
-						for (String modeB : modes) {
-							if (!modeA.equals(modeB)) {
+						String stuck0 = "no";
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2stuckAbort().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2stuckAbort().get(personId).get(tripNr) != null) {
+							stuck0 = "yes";
+						}
+						
+						String stuck1 = "no";
+						if (basicHandler1.getPersonId2tripNumber2stuckAbort().get(personId) != null && basicHandler1.getPersonId2tripNumber2stuckAbort().get(personId).get(tripNr) != null) {
+							stuck1 = "yes";
+						}
+						
+						bufferedWriter.get("all").write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
+								+ stuck0 + ";" + stuck1 + ";"
+								+ mode0 + ";" + mode1 + ";" 
+								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
+								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
+								+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
+								+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+								);
+						bufferedWriter.get("all").newLine();
+						
+						
+						// mode-specific analysis
+						
+						for (String modeA : modes) {
+												
+							// x --> mode
+
+							if (mode1.equals(modeA) && !mode0.equals(modeA)) {
+								String modeSwitchType = "x2" + modeA;
+								bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
+										+ stuck0 + ";" + stuck1 + ";"
+										+ mode0 + ";" + mode1 + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+										);
+								bufferedWriter.get(modeSwitchType).newLine();
 								
-								if (modeA.equals(mode0) && modeB.equals(mode1)) {
-									// A --> B
-									String modeSwitchType = modeA + "2" + modeB;
-									bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-											+ stuck0 + ";" + stuck1 + ";" 
-											+ mode0 + ";" + mode1 + ";" 
-											+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-											+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-											+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-											+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
-											);
-									bufferedWriter.get(modeSwitchType).newLine();
+								Map<Id<Person>, Integer> x2modeAgents = switchType2agents.get(modeSwitchType);
+								
+								if (x2modeAgents.get(personId) == null) {
+									x2modeAgents.put(personId, 1);
+								} else {
+									x2modeAgents.put(personId, x2modeAgents.get(personId) + 1);
+								}
+								
+								switchAndCoordType2Coord.get("x2" + modeA + "Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
+								switchAndCoordType2Coord.get("x2" + modeA + "Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
+			                	
+			                	if (personId2homeActCoord.get(personId) != null) {
+			                		switchAndCoordType2Coord.get("x2" + modeA + "HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
+			                	} else {
+									log.warn("No home activity coordinate for person " + personId);
+								}
+							}
+		                	
+		                	// mode --> x
+		                	
+		                	if (!mode1.equals(modeA) && mode0.equals(modeA)) {
+								String modeSwitchType = modeA + "2x";
+								bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
+										+ stuck0 + ";" + stuck1 + ";"
+										+ mode0 + ";" + mode1 + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+										);
+								bufferedWriter.get(modeSwitchType).newLine();
+								
+								Map<Id<Person>, Integer> mode2xAgents = switchType2agents.get(modeSwitchType);
+								
+								if (mode2xAgents.get(personId) == null) {
+									mode2xAgents.put(personId, 1);
+								} else {
+									mode2xAgents.put(personId, mode2xAgents.get(personId) + 1);
+								}
+								
+								switchAndCoordType2Coord.get(modeA + "2xOrigin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
+								switchAndCoordType2Coord.get(modeA + "2xDestination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
+			                	
+			                	if (personId2homeActCoord.get(personId) != null) {
+			                		switchAndCoordType2Coord.get(modeA + "2xHomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
+			                	} else {
+									log.warn("No home activity coordinate for person " + personId);
+								}
+							}
+		                	
+		                	// mode --> mode
+		                	                	
+		                	if (mode1.equals(modeA) && mode0.equals(modeA)) {
+								String modeSwitchType = modeA + "2" + modeA;
+								bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
+										+ stuck0 + ";" + stuck1 + ";" 
+										+ mode0 + ";" + mode1 + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
+										+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+										);
+								bufferedWriter.get(modeSwitchType).newLine();
+								
+								double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+								switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
+								
+								if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
+									double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+									switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
 									
-									double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-									switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
+									double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
+									switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
+								}
+							
+								Map<Id<Person>, Integer> mode2modeAgents = switchType2agents.get(modeSwitchType);
+								
+								if (mode2modeAgents.get(personId) == null) {
+									mode2modeAgents.put(personId, 1);
+								} else {
+									mode2modeAgents.put(personId, mode2modeAgents.get(personId) + 1);
+								}
+		                	
+								switchAndCoordType2Coord.get(modeA + "2" + modeA + "Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
+								switchAndCoordType2Coord.get(modeA + "2" + modeA + "Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
+			                	
+			                	if (personId2homeActCoord.get(personId) != null) {
+			                		switchAndCoordType2Coord.get(modeA + "2" + modeA + "HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
+			                	} else {
+									log.warn("No home activity coordinate for person " + personId);
+								}
+		                	}
+		                	
+		                	// mode
+
+		    				if (mode1.equals(modeA) || mode0.equals(modeA)) {
+		    					// at least one trip was a car trip
+		    					bufferedWriter.get(modeA).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
+				    				+ stuck0 + ";" + stuck1 + ";" 
+				    				+ mode0 + ";" + mode1 + ";"
+				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
+				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
+				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
+				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+				    				);
+		    					bufferedWriter.get(modeA).newLine();
+		    				}
+							
+							for (String modeB : modes) {
+								if (!modeA.equals(modeB)) {
 									
-									if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
-										double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-										switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
+									if (modeA.equals(mode0) && modeB.equals(mode1)) {
+										// A --> B
+										String modeSwitchType = modeA + "2" + modeB;
+										bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
+												+ stuck0 + ";" + stuck1 + ";" 
+												+ mode0 + ";" + mode1 + ";" 
+												+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
+												+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
+												+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
+												+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+												);
+										bufferedWriter.get(modeSwitchType).newLine();
 										
-										double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
-										switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
-									}
-								}										
+										double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+										switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
+										
+										if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
+											double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+											switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
+											
+											double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
+											switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
+										}
+									}										
+								}
 							}
 						}
 					}
 					
-				
 					if (personCounter%100000 == 0) {
 						log.info("person #" + personCounter);
 					}
@@ -390,11 +399,103 @@ public class PersonTripScenarioComparison {
 		}
 		
 		log.info("Comparing the two scenarios for each trip and person... Done.");
+		        	
+		for (String modeSwitchType : switchAndCoordType2Coord.keySet()) {
+			printCoordinates(switchAndCoordType2Coord.get(modeSwitchType), analysisOutputDirectory  + "/modeSwitchAnalysis_actCoord_" + modeSwitchType + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+		}
+		
+		{
+			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysis_aggregated" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			aggregatedTripWriter.write("from;to;number of trips (with stucking agents, sample size);number of trips (without stucking agents, sample size);average change in trip travel time (with stucking agents) [sec];average change in trip travel time (without stucking agents) [sec];average change in beeline speed (without stucking agents) [m/s]");
+			aggregatedTripWriter.newLine();
+			
+			for (String switchType : switchType2tripTTwithStuckingAgents.keySet()) {
+		       
+				double tripsWithStuckingAgents = switchType2tripTTwithStuckingAgents.get(switchType).size();
+				double tripsWithoutStuckingAgents = switchType2tripTTwithoutStuckingAgents.get(switchType).size();
+				
+				double diffTTSumWithStuckingAgents = 0.;
+				for (Double ttDiff : switchType2tripTTwithStuckingAgents.get(switchType)) {
+	        		diffTTSumWithStuckingAgents += ttDiff;
+	        	}
+				
+				double diffTTSumWithoutStuckingAgents = 0.;
+				for (Double ttDiff : switchType2tripTTwithoutStuckingAgents.get(switchType)) {
+					diffTTSumWithoutStuckingAgents += ttDiff;
+	        	}
+				
+				double diffBeelineSpeedSumWithoutStuckingAgents = 0.;
+				for (Double beelineSpeedDiff : switchType2tripBeelineSpeedWithoutStuckingAgents.get(switchType)) {
+					diffBeelineSpeedSumWithoutStuckingAgents += beelineSpeedDiff;
+	        	}
+				
+				double avgDiffTTwithStuckingAgents = Double.NaN;
+				double avgDiffTTwithoutStuckingAgents = Double.NaN;
+				double avgDiffBeelineSpedWithoutStuckingAgents = Double.NaN;
+				
+				if (tripsWithStuckingAgents != 0.) avgDiffTTwithStuckingAgents = diffTTSumWithStuckingAgents / tripsWithStuckingAgents;
+				if (tripsWithoutStuckingAgents != 0.) {
+					avgDiffTTwithoutStuckingAgents = diffTTSumWithoutStuckingAgents / tripsWithoutStuckingAgents;
+					avgDiffBeelineSpedWithoutStuckingAgents = diffBeelineSpeedSumWithoutStuckingAgents / tripsWithoutStuckingAgents;
+				}
+				
+				aggregatedTripWriter.write(switchType.split("2")[0] +";" + switchType.split("2")[1] + ";" + tripsWithStuckingAgents + ";" + tripsWithoutStuckingAgents + ";" + avgDiffTTwithStuckingAgents + ";" + avgDiffTTwithoutStuckingAgents + ";" + avgDiffBeelineSpedWithoutStuckingAgents);
+				aggregatedTripWriter.newLine();
+			}
+			
+			aggregatedTripWriter.close();
+		}
+		
+
+		{
+			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysisMatrix_aggregated_numberOfTrips" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			BufferedWriter aggregatedDiffAvgTTWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysisMatrix_aggregated_diffAvgTT" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			for (String mode : modes) {
+				aggregatedTripWriter.write(";" + mode);
+				aggregatedDiffAvgTTWriter.write(";" + mode);
+		    }
+		    aggregatedTripWriter.newLine();
+		    aggregatedDiffAvgTTWriter.newLine();
+
+		    
+		    for (String modeA : modes) {
+		        aggregatedTripWriter.write(modeA);
+		        aggregatedDiffAvgTTWriter.write(modeA); 
+
+			    for (String modeB : modes) {
+			    	
+			    	double trips = 0;
+			        double diffTTSum = 0.;
+			        
+			    	for (String switchType : switchType2tripTTwithStuckingAgents.keySet()) {
+				        String fromMode = switchType.split("2")[0];
+				        String toMode = switchType.split("2")[1];
+				        
+				        if (fromMode.equals(modeA) && toMode.equals(modeB)) {
+				        	trips = switchType2tripTTwithStuckingAgents.get(switchType).size();
+				        	for (Double ttDiff : switchType2tripTTwithStuckingAgents.get(switchType)) {
+				        		diffTTSum += ttDiff;
+				        	}
+				        }
+					}
+			        aggregatedTripWriter.write(";" + trips);
+			        
+			        double avgDiffTT = 0.;
+			        if (trips != 0.) avgDiffTT = diffTTSum / trips;
+			        
+			        aggregatedDiffAvgTTWriter.write(";" + avgDiffTT); 
+			    }
+		        aggregatedTripWriter.newLine();
+		        aggregatedDiffAvgTTWriter.newLine();
+		    }
+		    aggregatedTripWriter.close();
+		    aggregatedDiffAvgTTWriter.close();
+		}
 		
 		log.info("Comparing the two scenarios for each person...");
 
 		{
-			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_all" + filter.toFileName() + ".csv");
+			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_all" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        writer.newLine();
 	       
@@ -404,7 +505,7 @@ public class PersonTripScenarioComparison {
 			for (Id<Person> personId : scenario1.getPopulation().getPersons().keySet()) {
 				
 				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
-				if (filter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
+				if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 					double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 					
@@ -459,7 +560,7 @@ public class PersonTripScenarioComparison {
 		}
 		
 		{
-			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_all-non-stucking-persons" + filter.toFileName() + ".csv");
+			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_all-non-stucking-persons" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;score0 [utils];score1 [utils];monetary payments 0 [EUR]; monetary payments 1 [EUR]");
 	        writer.newLine();
 	       
@@ -471,7 +572,7 @@ public class PersonTripScenarioComparison {
 			for (Id<Person> personId : scenario1.getPopulation().getPersons().keySet()) {
 				
 				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
-				if (filter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
+				if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 					boolean analyzePerson = true;
 					if (basicHandler1.getPersonId2tripNumber2stuckAbort().get(personId) != null) {
 						log.info("Person " + personId + " is stucking in policy case. Excluding person from score comparison.");
@@ -556,7 +657,7 @@ public class PersonTripScenarioComparison {
 		
 		{
 	        for (String modeA : modes) {
-				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_" + modeA + "2" +  modeA + filter.toFileName() + ".csv");
+				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_" + modeA + "2" +  modeA + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 				writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;mode2modeTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        	writer.newLine();
 	       
@@ -566,7 +667,7 @@ public class PersonTripScenarioComparison {
 	        	for (Id<Person> personId : switchType2agents.get(modeA + "2" + modeA).keySet()) {
 					
 	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
-					if (filter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
+					if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 						double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        
@@ -620,7 +721,7 @@ public class PersonTripScenarioComparison {
 		{
 	        for (String modeA : modes) {
 
-	        	BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_x2" + modeA + filter.toFileName()+ ".csv");
+	        	BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_x2" + modeA + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        	writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;x2modeTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        	writer.newLine();
 	       
@@ -630,7 +731,7 @@ public class PersonTripScenarioComparison {
 	        	for (Id<Person> personId : switchType2agents.get("x2" + modeA).keySet()) {
 	        		
 	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
-					if (filter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
+					if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 	        			double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 						
@@ -683,7 +784,7 @@ public class PersonTripScenarioComparison {
 		{
 	        for (String modeA : modes) {
 
-				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_" + modeA + "2x" + filter.toFileName() + ".csv");
+				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_" + modeA + "2x" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        	writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;mode2xTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        	writer.newLine();
 	       
@@ -693,7 +794,7 @@ public class PersonTripScenarioComparison {
 	        	for (Id<Person> personId : switchType2agents.get(modeA + "2x").keySet()) {
 					
 	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
-					if (filter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
+					if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 						double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 						
@@ -741,99 +842,7 @@ public class PersonTripScenarioComparison {
 	        	writer.close();
 	        }
 		}
-		        	
-		for (String modeSwitchType : switchAndCoordType2Coord.keySet()) {
-			printCoordinates(switchAndCoordType2Coord.get(modeSwitchType), analysisOutputDirectory  + "/modeSwitchAnalysis_actCoord_" + modeSwitchType + filter.toFileName() + ".csv");
-		}
 		
-		{
-			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysis_aggregated" + filter.toFileName() + ".csv");
-			aggregatedTripWriter.write("from;to;number of trips (with stucking agents, sample size);number of trips (without stucking agents, sample size);average change in trip travel time (with stucking agents) [sec];average change in trip travel time (without stucking agents) [sec];average change in beeline speed (without stucking agents) [m/s]");
-			aggregatedTripWriter.newLine();
-			
-			for (String switchType : switchType2tripTTwithStuckingAgents.keySet()) {
-		       
-				double tripsWithStuckingAgents = switchType2tripTTwithStuckingAgents.get(switchType).size();
-				double tripsWithoutStuckingAgents = switchType2tripTTwithoutStuckingAgents.get(switchType).size();
-				
-				double diffTTSumWithStuckingAgents = 0.;
-				for (Double ttDiff : switchType2tripTTwithStuckingAgents.get(switchType)) {
-	        		diffTTSumWithStuckingAgents += ttDiff;
-	        	}
-				
-				double diffTTSumWithoutStuckingAgents = 0.;
-				for (Double ttDiff : switchType2tripTTwithoutStuckingAgents.get(switchType)) {
-					diffTTSumWithoutStuckingAgents += ttDiff;
-	        	}
-				
-				double diffBeelineSpeedSumWithoutStuckingAgents = 0.;
-				for (Double beelineSpeedDiff : switchType2tripBeelineSpeedWithoutStuckingAgents.get(switchType)) {
-					diffBeelineSpeedSumWithoutStuckingAgents += beelineSpeedDiff;
-	        	}
-				
-				double avgDiffTTwithStuckingAgents = Double.NaN;
-				double avgDiffTTwithoutStuckingAgents = Double.NaN;
-				double avgDiffBeelineSpedWithoutStuckingAgents = Double.NaN;
-				
-				if (tripsWithStuckingAgents != 0.) avgDiffTTwithStuckingAgents = diffTTSumWithStuckingAgents / tripsWithStuckingAgents;
-				if (tripsWithoutStuckingAgents != 0.) {
-					avgDiffTTwithoutStuckingAgents = diffTTSumWithoutStuckingAgents / tripsWithoutStuckingAgents;
-					avgDiffBeelineSpedWithoutStuckingAgents = diffBeelineSpeedSumWithoutStuckingAgents / tripsWithoutStuckingAgents;
-				}
-				
-				aggregatedTripWriter.write(switchType.split("2")[0] +";" + switchType.split("2")[1] + ";" + tripsWithStuckingAgents + ";" + tripsWithoutStuckingAgents + ";" + avgDiffTTwithStuckingAgents + ";" + avgDiffTTwithoutStuckingAgents + ";" + avgDiffBeelineSpedWithoutStuckingAgents);
-				aggregatedTripWriter.newLine();
-			}
-			
-			aggregatedTripWriter.close();
-		}
-		
-
-		{
-			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysisMatrix_aggregated_numberOfTrips" + filter.toFileName() + ".csv");
-			BufferedWriter aggregatedDiffAvgTTWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysisMatrix_aggregated_diffAvgTT" + filter.toFileName() + ".csv");
-			for (String mode : modes) {
-				aggregatedTripWriter.write(";" + mode);
-				aggregatedDiffAvgTTWriter.write(";" + mode);
-		    }
-		    aggregatedTripWriter.newLine();
-		    aggregatedDiffAvgTTWriter.newLine();
-
-		    
-		    for (String modeA : modes) {
-		        aggregatedTripWriter.write(modeA);
-		        aggregatedDiffAvgTTWriter.write(modeA); 
-
-			    for (String modeB : modes) {
-			    	
-			    	double trips = 0;
-			        double diffTTSum = 0.;
-			        
-			    	for (String switchType : switchType2tripTTwithStuckingAgents.keySet()) {
-				        String fromMode = switchType.split("2")[0];
-				        String toMode = switchType.split("2")[1];
-				        
-				        if (fromMode.equals(modeA) && toMode.equals(modeB)) {
-				        	trips = switchType2tripTTwithStuckingAgents.get(switchType).size();
-				        	for (Double ttDiff : switchType2tripTTwithStuckingAgents.get(switchType)) {
-				        		diffTTSum += ttDiff;
-				        	}
-				        }
-					}
-			        aggregatedTripWriter.write(";" + trips);
-			        
-			        double avgDiffTT = 0.;
-			        if (trips != 0.) avgDiffTT = diffTTSum / trips;
-			        
-			        aggregatedDiffAvgTTWriter.write(";" + avgDiffTT); 
-			    }
-		        aggregatedTripWriter.newLine();
-		        aggregatedDiffAvgTTWriter.newLine();
-		    }
-		    aggregatedTripWriter.close();
-		    aggregatedDiffAvgTTWriter.close();
-		}
-
 		log.info("Comparing the two scenarios for each person... Done.");
     }
 
@@ -859,7 +868,7 @@ public class PersonTripScenarioComparison {
 		
 		for (Person person : this.scenario1.getPopulation().getPersons().values()) {
 			
-			if (filter.considerAgent(person)) {
+			if (agentFilter.considerAgent(person)) {
 				double score1 = person.getSelectedPlan().getScore();
 				double score0 = this.scenarioToCompareWith.getPopulation().getPersons().get(person.getId()).getSelectedPlan().getScore();
 				
@@ -879,9 +888,9 @@ public class PersonTripScenarioComparison {
 	
 		try {
 			
-			printCSVFile(sameScorePersons, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_same-score-persons_score-tolerance-" + scoreDifferenceTolerance + filter.toFileName() + ".csv");
-			printCSVFile(winners, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_winners_score-tolerance-" + scoreDifferenceTolerance + filter.toFileName() + ".csv");
-			printCSVFile(losers, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_losers_score-tolerance-" + scoreDifferenceTolerance + filter.toFileName() + ".csv");
+			printCSVFile(sameScorePersons, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_same-score-persons_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
+			printCSVFile(winners, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_winners_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
+			printCSVFile(losers, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_losers_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

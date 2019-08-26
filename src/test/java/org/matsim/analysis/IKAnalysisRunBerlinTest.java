@@ -82,34 +82,39 @@ public class IKAnalysisRunBerlinTest {
 		final Scenario scenario1 = loadScenario(runDirectory, runId);
 		final Scenario scenario0 = loadScenario(runDirectoryBaseCase, runIdBaseCase);
 		
-		final List<AgentAnalysisFilter> filters1 = new ArrayList<>();
+		final List<AgentAnalysisFilter> agentFilters1 = new ArrayList<>();
 		
 		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
 		filter1a.setPersonAttribute("berlin");
 		filter1a.setPersonAttributeName("home-activity-zone");
 		filter1a.preProcess(scenario1);
-		filters1.add(filter1a);
+		agentFilters1.add(filter1a);
 
 		AgentAnalysisFilter filter1b = new AgentAnalysisFilter();
 		filter1b.preProcess(scenario1);
-		filters1.add(filter1b);
+		agentFilters1.add(filter1b);
 		
 		AgentAnalysisFilter filter1c = new AgentAnalysisFilter();
 		filter1c.setSubpopulation("person_no-potential-sav-user");
 		filter1c.preProcess(scenario1);
-		filters1.add(filter1c);
+		agentFilters1.add(filter1c);
 		
-		final List<AgentAnalysisFilter> filters0 = new ArrayList<>();
+		final List<AgentAnalysisFilter> agentFilters0 = new ArrayList<>();
 		
 		AgentAnalysisFilter filter0a = new AgentAnalysisFilter();
 		filter0a.setPersonAttribute("berlin");
 		filter0a.setPersonAttributeName("home-activity-zone");
 		filter0a.preProcess(scenario0);
-		filters0.add(filter0a);
+		agentFilters0.add(filter0a);
 		
 		AgentAnalysisFilter filter0b = new AgentAnalysisFilter();
 		filter0b.preProcess(scenario0);
-		filters0.add(filter0b);
+		agentFilters0.add(filter0b);
+		
+		final List<TripAnalysisFilter> tripFilters1 = new ArrayList<>();	
+		TripAnalysisFilter tripAnalysisFilter1a = new TripAnalysisFilter();
+		tripAnalysisFilter1a.preProcess(scenario1);
+		tripFilters1.add(tripAnalysisFilter1a);
 		
 		final List<String> modes = new ArrayList<>();
 		modes.add(TransportMode.car);
@@ -124,8 +129,9 @@ public class IKAnalysisRunBerlinTest {
 		analysis.setScenario0(scenario0);
 		analysis.setHomeActivityPrefix(homeActivityPrefix);
 		analysis.setScalingFactor(scalingFactor);
-		analysis.setFilters1(filters1);
-		analysis.setFilters0(filters0);
+		analysis.setFilters1(agentFilters1);
+		analysis.setFilters0(agentFilters0);
+		analysis.setTripFilters1(tripFilters1);
 		analysis.setModes(modes);
 		analysis.run();
 	

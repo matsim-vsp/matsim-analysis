@@ -84,7 +84,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	// temporary information
 	private final Map<Id<Person>,Integer> personId2currentTripNumber = new HashMap<>();
 	private final Map<Id<Person>,Double> personId2distanceEnterValue = new HashMap<>();
-	private final Map<Id<Person>, Coord> personId2enterCoord = new HashMap<>();
 	private final Map<Id<Vehicle>,Double> ptVehicleId2totalDistance = new HashMap<>();
 	private final Map<Id<Vehicle>,Double> taxiVehicleId2totalDistance = new HashMap<>();
 	private final Map<Id<Vehicle>,Double> networkModeVehicleId2totalDistance = new HashMap<>();
@@ -96,8 +95,10 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	// analysis information to be stored
 	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2legMode = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Coord>> personId2tripNumber2originCoord = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2enterVehicleTime = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2arrivalTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Coord>> personId2tripNumber2destinationCoord = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2leaveVehicleTime = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2travelTime = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2waitingTime = new HashMap<>();
@@ -137,7 +138,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		personId2tripNumber2departureTime.clear();
 		personId2tripNumber2arrivalTime.clear();
 		personId2tripNumber2tripDistance.clear();
-		personId2enterCoord.clear();
 		personId2tripNumber2tripBeelineDistance.clear();
 		personId2tripNumber2travelTime.clear();
 		personId2tripNumber2payment.clear(); // negative amounts
@@ -163,6 +163,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		taxiVehicleId2totalDistance.clear();
 		networkModeVehicleId2totalDistance.clear();
 		personId2stuckAndAbortEvents.clear();
+		personId2tripNumber2originCoord.clear();
+		personId2tripNumber2destinationCoord.clear();
 	}
 	
 	@Override
@@ -313,12 +315,17 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					tripNumber2departureTime.put(personId2currentTripNumber.get(event.getPersonId()), event.getTime());
 					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
 					
+					Map<Integer,Coord> tripNumber2originCoord = personId2tripNumber2originCoord.get(event.getPersonId());
+					tripNumber2originCoord.put(personId2currentTripNumber.get(event.getPersonId()), this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord());
+					personId2tripNumber2originCoord.put(event.getPersonId(), tripNumber2originCoord);
+					
+					Map<Integer,Coord> tripNumber2destinationCoord = personId2tripNumber2destinationCoord.get(event.getPersonId());
+					tripNumber2destinationCoord.put(personId2currentTripNumber.get(event.getPersonId()), null);
+					personId2tripNumber2destinationCoord.put(event.getPersonId(), tripNumber2destinationCoord);
+					
 					Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getPersonId());
 					tripNumber2tripDistance.put(personId2currentTripNumber.get(event.getPersonId()), 0.0);
 					personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
-					
-					Coord coord = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-					personId2enterCoord.put(event.getPersonId(), coord );
 					
 					Map<Integer,Double> tripNumber2tripBeelineDistance = personId2tripNumber2tripBeelineDistance.get(event.getPersonId());
 					tripNumber2tripBeelineDistance.put(personId2currentTripNumber.get(event.getPersonId()), 0.0);
@@ -340,30 +347,35 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					// the following trip is the person's first trip
 					personId2currentTripNumber.put(event.getPersonId(), 1);
 					
-					Map<Integer,Double> tripNumber2departureTime = new HashMap<Integer, Double>();
+					Map<Integer,Double> tripNumber2departureTime = new HashMap<>();
 					tripNumber2departureTime.put(1, event.getTime());
 					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
 					
-					Map<Integer,Double> tripNumber2tripDistance = new HashMap<Integer, Double>();
+					Map<Integer,Coord> tripNumber2originCoord = new HashMap<>();
+					tripNumber2originCoord.put(1, this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord());
+					personId2tripNumber2originCoord.put(event.getPersonId(), tripNumber2originCoord);
+					
+					Map<Integer,Double> tripNumber2tripDistance = new HashMap<>();
 					tripNumber2tripDistance.put(1, 0.0);
 					personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
 					
-					Coord coord = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-					personId2enterCoord.put(event.getPersonId(), coord );
-					
-					Map<Integer,Double> tripNumber2tripBeelineDistance = new HashMap<Integer, Double>();
+					Map<Integer,Double> tripNumber2tripBeelineDistance = new HashMap<>();
 					tripNumber2tripBeelineDistance.put(1, 0.0);
 					personId2tripNumber2tripBeelineDistance.put(event.getPersonId(), tripNumber2tripBeelineDistance);
 					
-					Map<Integer,Double> tripNumber2payment = new HashMap<Integer, Double>();
+					Map<Integer,Coord> tripNumber2destinationCoord = new HashMap<>();
+					tripNumber2destinationCoord.put(1, null);
+					personId2tripNumber2destinationCoord.put(event.getPersonId(), tripNumber2destinationCoord);
+					
+					Map<Integer,Double> tripNumber2payment = new HashMap<>();
 					tripNumber2payment.put(1, 0.0);
 					personId2tripNumber2payment.put(event.getPersonId(), tripNumber2payment);
 					
-					Map<Integer,Double> tripNumber2reward = new HashMap<Integer, Double>();
+					Map<Integer,Double> tripNumber2reward = new HashMap<>();
 					tripNumber2reward.put(1, 0.0);
 					personId2tripNumber2reward.put(event.getPersonId(), tripNumber2reward);
 					
-					Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
+					Map<Integer,Double> tripNumber2amount = new HashMap<>();
 					tripNumber2amount.put(1, 0.0);
 					personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 				}
@@ -782,6 +794,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	public Map<Id<Person>, Integer> getPersonId2stuckAndAbortEvents() {
 		return personId2stuckAndAbortEvents;
 	}
+	
+	public Map<Id<Person>, Map<Integer, Coord>> getPersonId2tripNumber2originCoord() {
+		return personId2tripNumber2originCoord;
+	}
+
+	public Map<Id<Person>, Map<Integer, Coord>> getPersonId2tripNumber2destinationCoord() {
+		return personId2tripNumber2destinationCoord;
+	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
@@ -800,13 +820,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 				
 				Coord destinationCoord = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-				Coord originCoord = this.personId2enterCoord.get(event.getPersonId());
 				
-				double beelineDistance = NetworkUtils.getEuclideanDistance(originCoord, destinationCoord);
-
+				double beelineDistance = NetworkUtils.getEuclideanDistance(this.personId2tripNumber2originCoord.get(event.getPersonId()).get(tripNumber), destinationCoord);
 				Map<Integer,Double> tripNumber2beelinedistance = personId2tripNumber2tripBeelineDistance.get(event.getPersonId());
 				tripNumber2beelinedistance.put(tripNumber, beelineDistance);
 				
+				Map<Integer,Coord> tripNumber2destinationCoord = personId2tripNumber2destinationCoord.get(event.getPersonId());
+				tripNumber2destinationCoord.put(tripNumber, destinationCoord);
+					
 			}	
 		}
 	}
