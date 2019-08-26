@@ -89,7 +89,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		tripFilters1.add(tripFilter1a);
 		
 		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter();
-		tripFilter1b.setZoneFile(shapeFileZones);
+		tripFilter1b.setZoneInformation(shapeFileZones, zonesCRS);
 		tripFilter1b.preProcess(scenario1);
 		tripFilters1.add(tripFilter1b);
 				

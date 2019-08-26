@@ -45,6 +45,7 @@ public class TripAnalysisFilter implements TripFilter {
 	private final Map<String, Geometry> zoneFeatures = new HashMap<>();
 	
 	private String zoneFile = null;
+	private String zoneCRS = null;
 	
 	@Override
 	public boolean considerTrip(Coord origin, Coord destination) {
@@ -97,14 +98,28 @@ public class TripAnalysisFilter implements TripFilter {
 		return zoneFile;
 	}
 
-	public void setZoneFile(String zoneFile) {
+	public void setZoneInformation(String zoneFile, String zonesCRS) {
 		this.zoneFile = zoneFile;
+		this.zoneCRS  = zonesCRS;
 	}
 	
 	public void preProcess(Scenario scenario) {
 		this.dataPreprocessed = true;
 	    	    
-		if (scenario != null &&  zoneFile != null) {					
+		if (scenario != null &&  zoneFile != null) {
+			
+			if (scenario.getNetwork() != null && this.zoneCRS != null) {
+				String crsNetwork = (String) scenario.getNetwork().getAttributes().getAttribute("coordinateReferenceSystem");
+		        if (!this.zoneCRS.equalsIgnoreCase(crsNetwork)) {
+		        	if (this.zoneCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("GK4")) {
+		        		// should not cause any problems.
+		        	} else {
+		        		throw new RuntimeException("Coordinate transformation not yet implemented. Expecting shape file to have the following coordinate reference system: " + crsNetwork + " instead of " + this.zoneCRS);
+				        // TODO: add coordinate transformation
+		        	}
+				}
+			}
+			
 			log.info("Reading shape file...");
 			Collection<SimpleFeature> features = null;
 			if (zoneFile.startsWith("http")) {
