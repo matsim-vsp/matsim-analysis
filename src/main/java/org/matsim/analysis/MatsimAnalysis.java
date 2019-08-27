@@ -90,7 +90,10 @@ public class MatsimAnalysis {
 	private StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction", "taxi interaction");
 	private List<String> modes;	
 	private String visualizationScriptInputDirectory = "./visualization-scripts/";
-
+	private String analysisOutputDirectory;
+	private boolean printODSHPfiles = true;
+	private boolean printTripSHPfiles = false;
+	
 	// policy case
 	private Scenario scenario1;
 	private List<AgentAnalysisFilter> agentFilters1;
@@ -100,8 +103,6 @@ public class MatsimAnalysis {
 	private Scenario scenario0;
 	private List<AgentAnalysisFilter> filters0;
 	
-	private String analysisOutputDirectory;
-
 	private final String outputDirectoryName = "analysis-v2.1";
 	private final String stageActivitySubString = "interaction";
 
@@ -628,6 +629,8 @@ public class MatsimAnalysis {
 		// Print OD analysis
 		// #####################################
 		ODAnalysis odAnalysis = new ODAnalysis(analysisOutputDirectory, scenario.getNetwork(), scenario.getConfig().controler().getRunId(), this.shapeFileZones, this.zonesCRS, this.zoneId, this.modes, this.scalingFactor);
+		odAnalysis.setPrintODSHPfiles(printODSHPfiles);
+		odAnalysis.setPrintTripSHPfiles(printTripSHPfiles);
 		odAnalysis.process(odHandler);
 	}
 	
@@ -748,6 +751,14 @@ public class MatsimAnalysis {
 	public void setAnalysisOutputDirectory(String analysisOutputDirectory) {
 		if (!analysisOutputDirectory.endsWith("/")) analysisOutputDirectory = analysisOutputDirectory + "/";
 		this.analysisOutputDirectory = analysisOutputDirectory;
+	}
+
+	public void setPrintODSHPfiles(boolean printODSHPfiles) {
+		this.printODSHPfiles = printODSHPfiles;
+	}
+
+	public void setPrintTripSHPfiles(boolean printTripSHPfiles) {
+		this.printTripSHPfiles = printTripSHPfiles;
 	}
 
 }
