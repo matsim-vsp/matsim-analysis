@@ -112,9 +112,15 @@ public class IKAnalysisRunBerlinTest {
 		agentFilters0.add(filter0b);
 		
 		final List<TripAnalysisFilter> tripFilters1 = new ArrayList<>();	
-		TripAnalysisFilter tripAnalysisFilter1a = new TripAnalysisFilter();
+		TripAnalysisFilter tripAnalysisFilter1a = new TripAnalysisFilter("equi-zone");
+		tripAnalysisFilter1a.setZoneInformation(testUtils.getPackageInputDirectory() + "/equi-zone/equi-zone.shp", "EPSG:31468");
 		tripAnalysisFilter1a.preProcess(scenario1);
 		tripFilters1.add(tripAnalysisFilter1a);
+		
+		TripAnalysisFilter tripAnalysisFilter1b = new TripAnalysisFilter("equi-zone-B");
+		tripAnalysisFilter1b.setZoneInformation(testUtils.getPackageInputDirectory() + "/equi-zone-B/equi-zone-B.shp", "EPSG:31468");
+		tripAnalysisFilter1b.preProcess(scenario1);
+		tripFilters1.add(tripAnalysisFilter1b);
 		
 		final List<String> modes = new ArrayList<>();
 		modes.add(TransportMode.car);
@@ -125,6 +131,8 @@ public class IKAnalysisRunBerlinTest {
 		final int scalingFactor = 100;
 
 		MatsimAnalysis analysis = new MatsimAnalysis();
+		analysis.setScenarioCRS("EPSG:31468");
+		analysis.setPrintTripSHPfiles(true);
 		analysis.setScenario1(scenario1);
 		analysis.setScenario0(scenario0);
 		analysis.setHomeActivityPrefix(homeActivityPrefix);

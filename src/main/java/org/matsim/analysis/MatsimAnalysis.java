@@ -334,7 +334,7 @@ public class MatsimAnalysis {
 				try {
 					if (this.tripFilters1 == null) {
 						
-						TripAnalysisFilter tripFilter1 = new TripAnalysisFilter();
+						TripAnalysisFilter tripFilter1 = new TripAnalysisFilter("");
 						tripFilter1.preProcess(this.scenario1);
 						scenarioComparisonFiltered.analyzeByMode(tripFilter1);
 

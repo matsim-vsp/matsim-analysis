@@ -46,7 +46,17 @@ public class TripAnalysisFilter implements TripFilter {
 	
 	private String zoneFile = null;
 	private String zoneCRS = null;
+	private String filterName;
 	
+	public TripAnalysisFilter(String filterName) {
+		this.filterName = filterName;
+	}
+	
+	@Deprecated
+	public TripAnalysisFilter() {
+		this.filterName = "";
+	}
+
 	@Override
 	public boolean considerTrip(Coord origin, Coord destination) {
 		
@@ -76,14 +86,14 @@ public class TripAnalysisFilter implements TripFilter {
 				break;
 			}
 		}
-		if (originWithProvidedGeometry && destinationWithProvidedGeometry == false) return false;
+		if (originWithProvidedGeometry && destinationWithProvidedGeometry) return true;
 		
-		return true;
+		return false;
 	}
 
 	@Override
 	public String toFileName() {
-		String fileName = "_TRIPFILTER";
+		String fileName = "_TRIPFILTER-" + filterName;
 		
 		boolean atLeastOneFilterApplied = false;
 		
