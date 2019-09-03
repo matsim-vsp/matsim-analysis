@@ -35,8 +35,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class IKAnalysisRunTest {
-	private static final Logger log = Logger.getLogger(IKAnalysisRunTest.class);
+public class MatsimAnalysisRunTest {
+	private static final Logger log = Logger.getLogger(MatsimAnalysisRunTest.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
