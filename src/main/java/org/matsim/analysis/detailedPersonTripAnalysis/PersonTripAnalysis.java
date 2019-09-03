@@ -88,8 +88,15 @@ public class PersonTripAnalysis {
 			mode = "all_transport_modes";
 			ignoreModes = true;
 		}
+		
+		String agentFilterFileName;
+		if (agentFilter == null) {
+			agentFilterFileName = "";
+		} else {
+			agentFilterFileName = agentFilter.toFileName();
+		}	
 
-		String fileName = outputPath + "person_info_" + mode + agentFilter.toFileName() + ".csv";
+		String fileName = outputPath + "person_info_" + mode + agentFilterFileName + ".csv";
 		File file = new File(fileName);			
 
 		try {
@@ -228,8 +235,15 @@ public class PersonTripAnalysis {
 			mode = "all_transport_modes";
 			ignoreModes = true;
 		}
+		
+		String tripFilterFileName;
+		if (tripFilter == null) {
+			tripFilterFileName = "";
+		} else {
+			tripFilterFileName = tripFilter.toFileName();
+		}
 				
-		String fileName = outputPath + "trip_info_" + mode + tripFilter.toFileName() + ".csv";
+		String fileName = outputPath + "trip_info_" + mode + tripFilterFileName + ".csv";
 		File file = new File(fileName);			
 
 		try {
