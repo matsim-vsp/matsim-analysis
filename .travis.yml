@@ -6,8 +6,8 @@ env:
   global:
     - MAVEN_OPTS="-Xmx8g"
   matrix:
-    - TEST=IKAnalysisRunTest#testTest
-    - TEST=IKAnalysisRunTest#test1
+    - TEST=MatsimAnalysisRunTest#testTest
+    - TEST=MatsimAnalysisRunTest#test1
     - TEST=VTTSHandlerTest
     - TEST=ModeAnalysisTest
     - TEST=BasicPersonTripAnalysisTest
