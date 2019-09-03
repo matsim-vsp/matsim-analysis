@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.actDurations.ActDurationHandler;
 import org.matsim.analysis.detailedPersonTripAnalysis.PersonTripAnalysis;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
+import org.matsim.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
 import org.matsim.analysis.dynamicLinkDemand.DynamicLinkDemandEventHandler;
 import org.matsim.analysis.gisAnalysis.GISAnalyzer;
 import org.matsim.analysis.gisAnalysis.MoneyExtCostHandler;
@@ -96,12 +97,11 @@ public class MatsimAnalysis {
 	
 	// policy case
 	private Scenario scenario1;
-	private List<AgentAnalysisFilter> agentFilters1;
-	private List<TripAnalysisFilter> tripFilters1;
+	private List<AgentFilter> agentFilters;
+	private List<TripFilter> tripFilters1;
 	
 	// base case (optional)
 	private Scenario scenario0;
-	private List<AgentAnalysisFilter> filters0;
 	
 	private final String outputDirectoryName = "analysis-v2.1";
 	private final String stageActivitySubString = "interaction";
@@ -154,6 +154,7 @@ public class MatsimAnalysis {
 		EventsManager events1 = null;
 		
 		BasicPersonTripAnalysisHandler basicHandler1 = null;
+		NoiseAnalysisHandler noiseHandler1 = null;
 		DelayAnalysis delayAnalysis1 = null;
 
 		LinkDemandEventHandler trafficVolumeAnalysis1 = null;
@@ -166,6 +167,9 @@ public class MatsimAnalysis {
 		if (scenario1 != null) {
 			basicHandler1 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
 			basicHandler1.setScenario(scenario1);
+			
+			noiseHandler1 = new NoiseAnalysisHandler();
+			noiseHandler1.setBasicHandler(basicHandler1);
 
 			delayAnalysis1 = new DelayAnalysis();
 			delayAnalysis1.setScenario(scenario1);
@@ -183,6 +187,7 @@ public class MatsimAnalysis {
 			
 			events1 = EventsUtils.createEventsManager();
 			events1.addHandler(basicHandler1);
+			events1.addHandler(noiseHandler1);
 			events1.addHandler(delayAnalysis1);
 			events1.addHandler(trafficVolumeAnalysis1);
 			events1.addHandler(dynamicTrafficVolumeAnalysis1);
@@ -195,6 +200,7 @@ public class MatsimAnalysis {
 		EventsManager events0 = null;
 		
 		BasicPersonTripAnalysisHandler basicHandler0 = null;
+		NoiseAnalysisHandler noiseHandler0 = null;
 		DelayAnalysis delayAnalysis0 = null;
 		LinkDemandEventHandler trafficVolumeAnalysis0 = null;
 		DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis0 = null;
@@ -206,6 +212,9 @@ public class MatsimAnalysis {
 		if (scenario0 != null) {
 			basicHandler0 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
 			basicHandler0.setScenario(scenario0);
+			
+			noiseHandler0 = new NoiseAnalysisHandler();
+			noiseHandler0.setBasicHandler(basicHandler0);
 
 			delayAnalysis0 = new DelayAnalysis();
 			delayAnalysis0.setScenario(scenario0);
@@ -223,6 +232,7 @@ public class MatsimAnalysis {
 
 			events0 = EventsUtils.createEventsManager();
 			events0.addHandler(basicHandler0);
+			events0.addHandler(noiseHandler0);
 			events0.addHandler(delayAnalysis0);
 			events0.addHandler(trafficVolumeAnalysis0);
 			events0.addHandler(dynamicTrafficVolumeAnalysis0);
@@ -253,8 +263,8 @@ public class MatsimAnalysis {
 			
 			personId2userBenefit1 = getPersonId2UserBenefit(scenario1);
 			
-			if (agentFilters1 != null) {
-				for (AgentAnalysisFilter filter : agentFilters1) {
+			if (agentFilters != null) {
+				for (AgentFilter filter : agentFilters) {
 					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter, stageActivities);
 					modeAnalysis1.run();
 					modeAnalysisList1.add(modeAnalysis1);
@@ -268,8 +278,8 @@ public class MatsimAnalysis {
 			
 			personId2userBenefit0 = getPersonId2UserBenefit(scenario0);
 			
-			if (filters0 != null) {
-				for (AgentAnalysisFilter filter : filters0) {
+			if (agentFilters != null) {
+				for (AgentFilter filter : agentFilters) {
 					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter, stageActivities);
 					modeAnalysis0.run();
 					modeAnalysisList0.add(modeAnalysis0);
@@ -287,7 +297,7 @@ public class MatsimAnalysis {
 		if (scenario1 != null) printResults(
 				scenario1,
 				outputDirectoryForAnalysisFiles,
-				personId2userBenefit1, basicHandler1,
+				personId2userBenefit1, basicHandler1, noiseHandler1,
 				delayAnalysis1,
 				trafficVolumeAnalysis1,
 				dynamicTrafficVolumeAnalysis1,
@@ -296,13 +306,14 @@ public class MatsimAnalysis {
 				modeAnalysisList1,
 				vttsHandler1,
 				modes,
-				odHandler1);
+				odHandler1,
+				tripFilters1);
 		
 		log.info("Printing results...");
 		if (scenario0 != null) printResults(scenario0,
 				outputDirectoryForAnalysisFiles,
 				personId2userBenefit0,
-				basicHandler0,
+				basicHandler0, noiseHandler0,
 				delayAnalysis0,
 				trafficVolumeAnalysis0,
 				dynamicTrafficVolumeAnalysis0,
@@ -311,7 +322,8 @@ public class MatsimAnalysis {
 				modeAnalysisList0,
 				vttsHandler0,
 				modes,
-				odHandler0);
+				odHandler0,
+				tripFilters1);
 
 		// #####################################
 		// Scenario comparison
@@ -324,22 +336,20 @@ public class MatsimAnalysis {
 			personTripScenarioComparisonOutputDirectory = outputDirectoryForAnalysisFiles + "scenario-comparison_" + runId + "-vs-" + runIdToCompareWith + "/";
 			createDirectory(personTripScenarioComparisonOutputDirectory);
 
-			for (AgentAnalysisFilter agentFilter : this.agentFilters1) {
+			for (AgentFilter agentFilter : this.agentFilters) {
 				
 				log.info("Person trip scenario comparison: " + agentFilter.toFileName());
-				
 				
 				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, agentFilter);
 				
 				try {
-					if (this.tripFilters1 == null) {
-						
+					if (this.tripFilters1 == null) {					
 						TripAnalysisFilter tripFilter1 = new TripAnalysisFilter("");
 						tripFilter1.preProcess(this.scenario1);
 						scenarioComparisonFiltered.analyzeByMode(tripFilter1);
 
 					} else {
-						for (TripAnalysisFilter tripFilter : this.tripFilters1) {
+						for (TripFilter tripFilter : this.tripFilters1) {
 							scenarioComparisonFiltered.analyzeByMode(tripFilter);
 						}
 					}
@@ -444,6 +454,7 @@ public class MatsimAnalysis {
 			String analysisOutputDirectory,
 			Map<Id<Person>, Double> personId2userBenefit,
 			BasicPersonTripAnalysisHandler basicHandler,
+			NoiseAnalysisHandler noiseHandler,
 			DelayAnalysis delayAnalysis,
 			LinkDemandEventHandler trafficVolumeAnalysis,
 			DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis,
@@ -452,7 +463,8 @@ public class MatsimAnalysis {
 			List<ModeAnalysis> modeAnalysisList,
 			VTTSHandler vttsHandler,
 			List<String> modes,
-			ODEventAnalysisHandler odHandler
+			ODEventAnalysisHandler odHandler,
+			List<TripFilter> tripFilters
 			) {
 		
 		// #####################################
@@ -466,23 +478,29 @@ public class MatsimAnalysis {
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
 
 		// trip-based analysis
-		analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, basicHandler, null);
-		for (String mode : modes) {
-			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, basicHandler, null);
+		for (TripFilter tripFilter : tripFilters) {
+			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, basicHandler, noiseHandler, tripFilter);
+			for (String mode : modes) {
+				analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, basicHandler, noiseHandler, tripFilter);
+			}
 		}
 
 		// person-based analysis
-		analysis.printPersonInformation(personTripAnalysisOutputDirectoryWithPrefix, null, personId2userBenefit, basicHandler, null);
-		for (String mode : modes) {
-			analysis.printPersonInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, personId2userBenefit, basicHandler, null);	
+		for (AgentFilter agentFilter : agentFilters) {
+			analysis.printPersonInformation(personTripAnalysisOutputDirectoryWithPrefix, null, personId2userBenefit, basicHandler, noiseHandler, agentFilter);
+			for (String mode : modes) {
+				analysis.printPersonInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, personId2userBenefit, basicHandler, noiseHandler, agentFilter);	
+			}
 		}
+		
+		// TODO: Add combined agent and trip filters...
 
 		// aggregated analysis
-		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, personId2userBenefit, basicHandler, null);
+		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, personId2userBenefit, basicHandler, noiseHandler);
 		for (String mode : modes) {
-			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, personId2userBenefit, basicHandler, null);
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, personId2userBenefit, basicHandler, noiseHandler);
 		}
-		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, personId2userBenefit, basicHandler, null, delayAnalysis);
+		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, personId2userBenefit, basicHandler, noiseHandler, delayAnalysis);
 		
 		// time-specific trip distance analysis
 		for (String mode : modes) {
@@ -726,20 +744,16 @@ public class MatsimAnalysis {
 		this.scenario1 = scenario1;
 	}
 
-	public void setAgentFilters1(List<AgentAnalysisFilter> filters1) {
-		this.agentFilters1 = filters1;
+	public void setAgentFilters(List<AgentFilter> filters) {
+		this.agentFilters = filters;
 	}
 
-	public void setTripFilters1(List<TripAnalysisFilter> tripFilters1) {
+	public void setTripFilters(List<TripFilter> tripFilters1) {
 		this.tripFilters1 = tripFilters1;
 	}
 
 	public void setScenario0(Scenario scenario0) {
 		this.scenario0 = scenario0;
-	}
-
-	public void setAgentFilters0(List<AgentAnalysisFilter> filters0) {
-		this.filters0 = filters0;
 	}
 
 	public void setZoneInformation(String shapeFileZones, String zonesCRS, String zoneId) {

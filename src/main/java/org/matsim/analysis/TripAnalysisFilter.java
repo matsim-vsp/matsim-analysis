@@ -46,7 +46,7 @@ public class TripAnalysisFilter implements TripFilter {
 	
 	private String zoneFile = null;
 	private String zoneCRS = null;
-	private String filterName;
+	private final String filterName;
 	
 	public TripAnalysisFilter(String filterName) {
 		this.filterName = filterName;

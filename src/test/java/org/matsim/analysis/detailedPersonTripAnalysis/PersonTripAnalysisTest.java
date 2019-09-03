@@ -107,9 +107,9 @@ public class PersonTripAnalysisTest {
 		}
 		
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
-		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler);
+		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler, null);
 		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
-		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
+		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler, null);
 		
 	}
 	

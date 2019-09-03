@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.AgentAnalysisFilter;
-import org.matsim.analysis.TripAnalysisFilter;
+import org.matsim.analysis.AgentFilter;
+import org.matsim.analysis.TripFilter;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -57,7 +57,7 @@ public class PersonTripScenarioComparison {
 	private final Map<Id<Person>, Map<Integer, Coord>> personId2actNr2coord;
 	private final Map<Id<Person>, Coord> personId2homeActCoord;
 	private final List<String> modes;
-	private final AgentAnalysisFilter agentFilter;
+	private final AgentFilter agentFilter;
 	
     public PersonTripScenarioComparison(
     		String homeActivity,
@@ -67,7 +67,7 @@ public class PersonTripScenarioComparison {
     		Scenario scenarioToCompareWith,
     		BasicPersonTripAnalysisHandler basicHandlerToCompareWith,
     		List<String> modes,
-    		AgentAnalysisFilter agentFilter) {
+    		AgentFilter agentFilter) {
     	
 		this.analysisOutputDirectory = analysisOutputDirectory;
 		this.scenario1 = scenario1;
@@ -109,7 +109,7 @@ public class PersonTripScenarioComparison {
     	log.info("Getting activity coordinates from plans... Done.");
 	}
 
-	public void analyzeByMode(TripAnalysisFilter tripFilter) throws IOException {
+	public void analyzeByMode(TripFilter tripFilter) throws IOException {
     	
 		Map<String, Map<String, Coord>> switchAndCoordType2Coord = new HashMap<>();
 		Map<String, Map<Id<Person>, Integer>> switchType2agents = new HashMap<>();

@@ -56,6 +56,17 @@ public class AgentAnalysisFilter implements AgentFilter {
 	private boolean dataPreprocessed = false;
 	private final Map<String, Geometry> zoneFeatures = new HashMap<>();
 	private final Map<Id<Person>, Coord> personId2homeCoord = new HashMap<>();
+
+	private final String filterName;
+	
+	public AgentAnalysisFilter(String filterName) {
+		this.filterName = filterName;
+	}
+	
+	@Deprecated
+	public AgentAnalysisFilter() {
+		this.filterName = "";
+	}
 	
 	public String getSubpopulation() {
 		return subpopulation;
@@ -170,7 +181,7 @@ public class AgentAnalysisFilter implements AgentFilter {
 	
 	@Override
 	public String toFileName() {
-		String fileName = "_PERSONFILTER";
+		String fileName = "_PERSONFILTER-" + filterName;
 		
 		boolean atLeastOneFilterApplied = false;
 		

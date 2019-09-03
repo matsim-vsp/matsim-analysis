@@ -59,7 +59,7 @@ public class ModeAnalysis {
 	private double totalTripsFiltered = 0.;
 	private final StageActivityTypes stageActivities;
 
-	public ModeAnalysis(Scenario scenario, AgentAnalysisFilter filter, StageActivityTypes stageActivities) {
+	public ModeAnalysis(Scenario scenario, AgentFilter filter, StageActivityTypes stageActivities) {
 		this.scenario = scenario;
 		this.filter = filter;
 		this.stageActivities = stageActivities;

@@ -40,8 +40,8 @@ public class AnalysisRunExample {
 		
 		Scenario scenario1 = loadScenario(runDirectory, runId);
 		
-		List<AgentAnalysisFilter> filters1 = new ArrayList<>();
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
+		List<AgentFilter> filters1 = new ArrayList<>();
+		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("A");
 		filter1a.preProcess(scenario1);
 		filters1.add(filter1a);
 				
@@ -52,7 +52,7 @@ public class AnalysisRunExample {
 		
 		MatsimAnalysis analysis = new MatsimAnalysis();
 		analysis.setScenario1(scenario1);
-		analysis.setAgentFilters1(filters1);
+		analysis.setAgentFilters(filters1);
 		analysis.setModes(modes);
 		analysis.run();
 	}

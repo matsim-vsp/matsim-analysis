@@ -230,7 +230,7 @@ public final class ODAnalysis {
 			double from = timeBin.getFirst() * 3600.;
 			double to = timeBin.getSecond() * 3600.;
 
-			TripFilter hourFilter = new TripFilter(from, to, "", modes);
+			ODTripFilter hourFilter = new ODTripFilter(from, to, "", modes);
 			log.info("###### " + from + " to " + to);
 			log.info("total number of trips (sample size): " + odTrips.size());
 

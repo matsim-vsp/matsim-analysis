@@ -34,6 +34,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.AgentFilter;
+import org.matsim.analysis.TripFilter;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import org.matsim.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
 import org.matsim.api.core.v01.Id;
@@ -78,7 +80,8 @@ public class PersonTripAnalysis {
 			String mode,
 			Map<Id<Person>, Double> personId2userBenefit,
 			BasicPersonTripAnalysisHandler basicHandler,
-			NoiseAnalysisHandler noiseHandler) {
+			NoiseAnalysisHandler noiseHandler,
+			AgentFilter agentFilter) {
 		
 		boolean ignoreModes = false;
 		if (mode == null) {
@@ -86,7 +89,7 @@ public class PersonTripAnalysis {
 			ignoreModes = true;
 		}
 
-		String fileName = outputPath + "person_info_" + mode + ".csv";
+		String fileName = outputPath + "person_info_" + mode + agentFilter.toFileName() + ".csv";
 		File file = new File(fileName);			
 
 		try {
@@ -110,90 +113,99 @@ public class PersonTripAnalysis {
 			
 			for (Id<Person> id : basicHandler.getScenario().getPopulation().getPersons().keySet()) {
 				
-				double userBenefit = Double.NEGATIVE_INFINITY;
-				if (personId2userBenefit.containsKey(id)) {
-					userBenefit = personId2userBenefit.get(id);
+				boolean considerPerson;
+				if (agentFilter == null) {
+					considerPerson = true;
+				} else {
+					considerPerson = agentFilter.considerAgent(basicHandler.getScenario().getPopulation().getPersons().get(id));
 				}
-				int mode_trips = 0;
-				String mode_stuckAbort = "no";
-				int numberOfStuckAndAbortEvents = 0;
-				double mode_travelTime = 0.;
-				double mode_inVehTime = 0.;
-				double mode_waitingTime = 0.;
-				double mode_travelDistance = 0.;
 				
-				double tollPayments = 0.;
-				double causedNoiseCost = 0.;
-				double affectedNoiseCost = 0.;
-				
-				if (noiseHandler != null) {
-					if (noiseHandler.getPersonId2affectedNoiseCost().containsKey(id)) {
-						affectedNoiseCost = affectedNoiseCost + noiseHandler.getPersonId2affectedNoiseCost().get(id);
+				if (considerPerson) {
+					double userBenefit = Double.NEGATIVE_INFINITY;
+					if (personId2userBenefit.containsKey(id)) {
+						userBenefit = personId2userBenefit.get(id);
 					}
-				}
-				
-				if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
-					for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
-						
-						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
-							tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2payment().get(id).get(trip);
+					int mode_trips = 0;
+					String mode_stuckAbort = "no";
+					int numberOfStuckAndAbortEvents = 0;
+					double mode_travelTime = 0.;
+					double mode_inVehTime = 0.;
+					double mode_waitingTime = 0.;
+					double mode_travelDistance = 0.;
+					
+					double tollPayments = 0.;
+					double causedNoiseCost = 0.;
+					double affectedNoiseCost = 0.;
+					
+					if (noiseHandler != null) {
+						if (noiseHandler.getPersonId2affectedNoiseCost().containsKey(id)) {
+							affectedNoiseCost = affectedNoiseCost + noiseHandler.getPersonId2affectedNoiseCost().get(id);
 						}
-						
-						if (noiseHandler != null) {
-							if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
-								causedNoiseCost = causedNoiseCost + noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
+					}
+					
+					if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
+						for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
+							
+							if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
+								tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2payment().get(id).get(trip);
 							}
-						}
-						
-						if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
 							
-							mode_trips++;
-							
-							if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
-								if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
-									mode_stuckAbort = "yes";
+							if (noiseHandler != null) {
+								if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
+									causedNoiseCost = causedNoiseCost + noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
 								}
 							}
 							
-							if (basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id)) {
-								numberOfStuckAndAbortEvents = basicHandler.getPersonId2stuckAndAbortEvents().get(id);
+							if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+								
+								mode_trips++;
+								
+								if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
+									if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
+										mode_stuckAbort = "yes";
+									}
+								}
+								
+								if (basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id)) {
+									numberOfStuckAndAbortEvents = basicHandler.getPersonId2stuckAndAbortEvents().get(id);
+								}
+								
+								if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
+									mode_travelTime = mode_travelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
+								}
+								
+								if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+									mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
+								}
+								
+								if (basicHandler.getPersonId2tripNumber2waitingTime().containsKey(id) && basicHandler.getPersonId2tripNumber2waitingTime().get(id).containsKey(trip)) {
+									mode_waitingTime = mode_waitingTime + basicHandler.getPersonId2tripNumber2waitingTime().get(id).get(trip);
+								}
+								
+								if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
+									mode_travelDistance = mode_travelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
+								}			
 							}
-							
-							if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
-								mode_travelTime = mode_travelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
-							}
-							
-							if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
-								mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
-							}
-							
-							if (basicHandler.getPersonId2tripNumber2waitingTime().containsKey(id) && basicHandler.getPersonId2tripNumber2waitingTime().get(id).containsKey(trip)) {
-								mode_waitingTime = mode_waitingTime + basicHandler.getPersonId2tripNumber2waitingTime().get(id).get(trip);
-							}
-							
-							if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
-								mode_travelDistance = mode_travelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
-							}			
 						}
 					}
+					
+					bw.write(id + ";"
+							+ mode_trips + ";"
+							+ mode_stuckAbort + ";"
+							+ numberOfStuckAndAbortEvents + ";"
+							+ mode_travelTime + ";"
+							+ mode_inVehTime + ";"
+							+ mode_waitingTime + ";"
+							+ mode_travelDistance + ";"
+							
+							+ userBenefit + ";"
+							+ tollPayments + ";"
+							+ causedNoiseCost + ";"
+							+ affectedNoiseCost
+							);
+					
+					bw.newLine();		
 				}
-				
-				bw.write(id + ";"
-						+ mode_trips + ";"
-						+ mode_stuckAbort + ";"
-						+ numberOfStuckAndAbortEvents + ";"
-						+ mode_travelTime + ";"
-						+ mode_inVehTime + ";"
-						+ mode_waitingTime + ";"
-						+ mode_travelDistance + ";"
-						
-						+ userBenefit + ";"
-						+ tollPayments + ";"
-						+ causedNoiseCost + ";"
-						+ affectedNoiseCost
-						);
-				
-						bw.newLine();		
 			}
 			
 			log.info("Output written to " + fileName);
@@ -208,7 +220,8 @@ public class PersonTripAnalysis {
 	public void printTripInformation(String outputPath,
 			String mode,
 			BasicPersonTripAnalysisHandler basicHandler,
-			NoiseAnalysisHandler noiseHandler) {
+			NoiseAnalysisHandler noiseHandler,
+			TripFilter tripFilter) {
 		
 		boolean ignoreModes = false;
 		if (mode == null) {
@@ -216,7 +229,7 @@ public class PersonTripAnalysis {
 			ignoreModes = true;
 		}
 				
-		String fileName = outputPath + "trip_info_" + mode + ".csv";
+		String fileName = outputPath + "trip_info_" + mode + tripFilter.toFileName() + ".csv";
 		File file = new File(fileName);			
 
 		try {
@@ -242,86 +255,94 @@ public class PersonTripAnalysis {
 			for (Id<Person> id : basicHandler.getPersonId2tripNumber2legMode().keySet()) {
 				
 				for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
-										
-					if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
-						
-						String transportModeThisTrip = basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip);
-						
-						String stuckAbort = "no";
-						if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
-							if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
-								stuckAbort = "yes";
+							
+					boolean considerTrip;
+					if (tripFilter == null) {
+						considerTrip = true;
+					} else {
+						considerTrip = tripFilter.considerTrip(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip), basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip));
+					}
+					if (considerTrip) {
+						if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+							
+							String transportModeThisTrip = basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip);
+							
+							String stuckAbort = "no";
+							if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
+								if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
+									stuckAbort = "yes";
+								}
 							}
-						}
-						
-						String departureTime = "unknown";
-						if (basicHandler.getPersonId2tripNumber2departureTime().containsKey(id) && basicHandler.getPersonId2tripNumber2departureTime().get(id).containsKey(trip)) {
-							departureTime = String.valueOf(basicHandler.getPersonId2tripNumber2departureTime().get(id).get(trip));
-						}
-						
-						String enterVehicleTime = "unknown";
-						if (basicHandler.getPersonId2tripNumber2enterVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2enterVehicleTime().get(id).containsKey(trip)) {
-							enterVehicleTime = String.valueOf(basicHandler.getPersonId2tripNumber2enterVehicleTime().get(id).get(trip));
-						}
-						
-						String leaveVehicleTime = "unknown";
-						if (basicHandler.getPersonId2tripNumber2leaveVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2leaveVehicleTime().get(id).containsKey(trip)) {
-							leaveVehicleTime = String.valueOf(basicHandler.getPersonId2tripNumber2leaveVehicleTime().get(id).get(trip));
-						}
-						
-						String arrivalTime = "unknown";
-						if (basicHandler.getPersonId2tripNumber2arrivalTime().containsKey(id) && basicHandler.getPersonId2tripNumber2arrivalTime().get(id).containsKey(trip)){
-							arrivalTime = String.valueOf(basicHandler.getPersonId2tripNumber2arrivalTime().get(id).get(trip));
-						}
-						
-						String travelTime = "unknown";
-						if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
-							travelTime = String.valueOf(basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip));
-						}
-						
-						String inVehTime = "unknown";
-						if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
-							inVehTime = String.valueOf(basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip));
-						}
-						
-						String waitingTime = "unknown";
-						if (basicHandler.getPersonId2tripNumber2waitingTime().containsKey(id) && basicHandler.getPersonId2tripNumber2waitingTime().get(id).containsKey(trip)) {
-							waitingTime = String.valueOf(basicHandler.getPersonId2tripNumber2waitingTime().get(id).get(trip));
-						}
-						
-						String travelDistance = "unknown";
-						if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
-							travelDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip));
-						}
-						
-						String tollPayment = "unknown";
-						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
-							tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
-						}
-						
-						String causedNoiseCost = "unknown";
-						if (noiseHandler != null) {
-							if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
-								causedNoiseCost = String.valueOf(noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip));
+							
+							String departureTime = "unknown";
+							if (basicHandler.getPersonId2tripNumber2departureTime().containsKey(id) && basicHandler.getPersonId2tripNumber2departureTime().get(id).containsKey(trip)) {
+								departureTime = String.valueOf(basicHandler.getPersonId2tripNumber2departureTime().get(id).get(trip));
 							}
+							
+							String enterVehicleTime = "unknown";
+							if (basicHandler.getPersonId2tripNumber2enterVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2enterVehicleTime().get(id).containsKey(trip)) {
+								enterVehicleTime = String.valueOf(basicHandler.getPersonId2tripNumber2enterVehicleTime().get(id).get(trip));
+							}
+							
+							String leaveVehicleTime = "unknown";
+							if (basicHandler.getPersonId2tripNumber2leaveVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2leaveVehicleTime().get(id).containsKey(trip)) {
+								leaveVehicleTime = String.valueOf(basicHandler.getPersonId2tripNumber2leaveVehicleTime().get(id).get(trip));
+							}
+							
+							String arrivalTime = "unknown";
+							if (basicHandler.getPersonId2tripNumber2arrivalTime().containsKey(id) && basicHandler.getPersonId2tripNumber2arrivalTime().get(id).containsKey(trip)){
+								arrivalTime = String.valueOf(basicHandler.getPersonId2tripNumber2arrivalTime().get(id).get(trip));
+							}
+							
+							String travelTime = "unknown";
+							if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
+								travelTime = String.valueOf(basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip));
+							}
+							
+							String inVehTime = "unknown";
+							if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+								inVehTime = String.valueOf(basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip));
+							}
+							
+							String waitingTime = "unknown";
+							if (basicHandler.getPersonId2tripNumber2waitingTime().containsKey(id) && basicHandler.getPersonId2tripNumber2waitingTime().get(id).containsKey(trip)) {
+								waitingTime = String.valueOf(basicHandler.getPersonId2tripNumber2waitingTime().get(id).get(trip));
+							}
+							
+							String travelDistance = "unknown";
+							if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
+								travelDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip));
+							}
+							
+							String tollPayment = "unknown";
+							if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
+								tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
+							}
+							
+							String causedNoiseCost = "unknown";
+							if (noiseHandler != null) {
+								if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
+									causedNoiseCost = String.valueOf(noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip));
+								}
+							}
+							
+							bw.write(id + ";"
+							+ trip + ";"
+							+ transportModeThisTrip + ";"
+							+ stuckAbort + ";"
+							+ departureTime + ";"
+							+ enterVehicleTime + ";"
+							+ leaveVehicleTime + ";"
+							+ arrivalTime + ";"
+							+ travelTime + ";"
+							+ inVehTime + ";"
+							+ waitingTime + ";"
+							+ travelDistance + ";"
+							+ tollPayment + ";"
+							+ causedNoiseCost
+							);
+							bw.newLine();						
 						}
-						
-						bw.write(id + ";"
-						+ trip + ";"
-						+ transportModeThisTrip + ";"
-						+ stuckAbort + ";"
-						+ departureTime + ";"
-						+ enterVehicleTime + ";"
-						+ leaveVehicleTime + ";"
-						+ arrivalTime + ";"
-						+ travelTime + ";"
-						+ inVehTime + ";"
-						+ waitingTime + ";"
-						+ travelDistance + ";"
-						+ tollPayment + ";"
-						+ causedNoiseCost
-						);
-						bw.newLine();						
 					}
 				}
 			}

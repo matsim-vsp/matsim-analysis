@@ -25,14 +25,14 @@ import java.util.List;
 * @author ikaddoura
 */
 
-public class TripFilter {
+public class ODTripFilter {
 	
 	private final double timeStart;
 	private final double timeEnd;
 	private final String personIdPrefix;
 	private final List<String> modes;
 	
-	public TripFilter(double consideredTimeStart, double consideredTimeEnd, String consideredPersonIdPrefix, List<String> consideredModes) {
+	public ODTripFilter(double consideredTimeStart, double consideredTimeEnd, String consideredPersonIdPrefix, List<String> consideredModes) {
 		this.timeStart = consideredTimeStart;
 		this.timeEnd = consideredTimeEnd;
 		this.personIdPrefix = consideredPersonIdPrefix;

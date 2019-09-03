@@ -82,45 +82,33 @@ public class MatsimAnalysisRunTest {
 		final Scenario scenario1 = loadScenario(runDirectory, runId);
 		final Scenario scenario0 = loadScenario(runDirectoryBaseCase, runIdBaseCase);
 		
-		final List<AgentAnalysisFilter> agentFilters1 = new ArrayList<>();
+		final List<AgentFilter> agentFilters = new ArrayList<>();
 		
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
+		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("A");
 		filter1a.setPersonAttribute("berlin");
 		filter1a.setPersonAttributeName("home-activity-zone");
 		filter1a.preProcess(scenario1);
-		agentFilters1.add(filter1a);
+		agentFilters.add(filter1a);
 
-		AgentAnalysisFilter filter1b = new AgentAnalysisFilter();
+		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("B");
 		filter1b.preProcess(scenario1);
-		agentFilters1.add(filter1b);
+		agentFilters.add(filter1b);
 		
-		AgentAnalysisFilter filter1c = new AgentAnalysisFilter();
+		AgentAnalysisFilter filter1c = new AgentAnalysisFilter("C");
 		filter1c.setSubpopulation("person_no-potential-sav-user");
 		filter1c.preProcess(scenario1);
-		agentFilters1.add(filter1c);
+		agentFilters.add(filter1c);
 		
-		final List<AgentAnalysisFilter> agentFilters0 = new ArrayList<>();
-		
-		AgentAnalysisFilter filter0a = new AgentAnalysisFilter();
-		filter0a.setPersonAttribute("berlin");
-		filter0a.setPersonAttributeName("home-activity-zone");
-		filter0a.preProcess(scenario0);
-		agentFilters0.add(filter0a);
-		
-		AgentAnalysisFilter filter0b = new AgentAnalysisFilter();
-		filter0b.preProcess(scenario0);
-		agentFilters0.add(filter0b);
-		
-		final List<TripAnalysisFilter> tripFilters1 = new ArrayList<>();	
+		final List<TripFilter> tripFilters = new ArrayList<>();	
 		TripAnalysisFilter tripAnalysisFilter1a = new TripAnalysisFilter("equi-zone");
 		tripAnalysisFilter1a.setZoneInformation(testUtils.getPackageInputDirectory() + "/equi-zone/equi-zone.shp", "EPSG:31468");
 		tripAnalysisFilter1a.preProcess(scenario1);
-		tripFilters1.add(tripAnalysisFilter1a);
+		tripFilters.add(tripAnalysisFilter1a);
 		
 		TripAnalysisFilter tripAnalysisFilter1b = new TripAnalysisFilter("equi-zone-B");
 		tripAnalysisFilter1b.setZoneInformation(testUtils.getPackageInputDirectory() + "/equi-zone-B/equi-zone-B.shp", "EPSG:31468");
 		tripAnalysisFilter1b.preProcess(scenario1);
-		tripFilters1.add(tripAnalysisFilter1b);
+		tripFilters.add(tripAnalysisFilter1b);
 		
 		final List<String> modes = new ArrayList<>();
 		modes.add(TransportMode.car);
@@ -137,9 +125,8 @@ public class MatsimAnalysisRunTest {
 		analysis.setScenario0(scenario0);
 		analysis.setHomeActivityPrefix(homeActivityPrefix);
 		analysis.setScalingFactor(scalingFactor);
-		analysis.setAgentFilters1(agentFilters1);
-		analysis.setAgentFilters0(agentFilters0);
-		analysis.setTripFilters1(tripFilters1);
+		analysis.setAgentFilters(agentFilters);
+		analysis.setTripFilters(tripFilters);
 		analysis.setModes(modes);
 		analysis.run();
 	

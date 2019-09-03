@@ -60,38 +60,36 @@ public class AnalysisRunExampleOpenBerlinScenario {
 
 		final String visualizationScriptInputDirectory = "./visualization-scripts/";
 
-		final List<AgentAnalysisFilter> agentFilters1 = new ArrayList<>();
+		final List<AgentFilter> agentFilters = new ArrayList<>();
 
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter();
+		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("A");
 		filter1a.setSubpopulation("person");
 		filter1a.setPersonAttribute("berlin");
 		filter1a.setPersonAttributeName("home-activity-zone");
 		filter1a.preProcess(scenario1);
-		agentFilters1.add(filter1a);
+		agentFilters.add(filter1a);
 		
-		AgentAnalysisFilter filter1b = new AgentAnalysisFilter();
+		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("B");
 		filter1b.preProcess(scenario1);
-		agentFilters1.add(filter1b);
+		agentFilters.add(filter1b);
 		
-		AgentAnalysisFilter filter1c = new AgentAnalysisFilter();
+		AgentAnalysisFilter filter1c = new AgentAnalysisFilter("C");
 		filter1c.setSubpopulation("person");
 		filter1c.setPersonAttribute("brandenburg");
 		filter1c.setPersonAttributeName("home-activity-zone");
 		filter1c.preProcess(scenario1);
-		agentFilters1.add(filter1c);
+		agentFilters.add(filter1c);
+				
+		final List<TripFilter> tripFilters = new ArrayList<>();
 		
-		final List<AgentAnalysisFilter> agentFilters0 = null;
-		
-		final List<TripAnalysisFilter> tripFilters1 = new ArrayList<>();
-		
-		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter();
+		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("A");
 		tripFilter1a.preProcess(scenario1);
-		tripFilters1.add(tripFilter1a);
+		tripFilters.add(tripFilter1a);
 		
-		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter();
+		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("B");
 		tripFilter1b.setZoneInformation(shapeFileZones, zonesCRS);
 		tripFilter1b.preProcess(scenario1);
-		tripFilters1.add(tripFilter1b);
+		tripFilters.add(tripFilter1b);
 				
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
@@ -100,12 +98,11 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		
 		MatsimAnalysis analysis = new MatsimAnalysis();
 		
-		analysis.setScenario1(scenario1);
-		analysis.setAgentFilters1(agentFilters1);
-		analysis.setTripFilters1(tripFilters1);
-		
+		analysis.setScenario1(scenario1);	
 		analysis.setScenario0(scenario0);
-		analysis.setAgentFilters0(agentFilters0);
+		
+		analysis.setAgentFilters(agentFilters);
+		analysis.setTripFilters(tripFilters);
 		
 		analysis.setScenarioCRS(scenarioCRS);
 		analysis.setZoneInformation(shapeFileZones, zonesCRS, zoneId);
