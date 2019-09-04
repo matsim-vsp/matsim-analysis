@@ -69,6 +69,11 @@ public class TripAnalysisFilter implements TripFilter {
 			return false;
 		}
 		
+		if (zoneFeatures.size() == 0) {
+			// no zoneFeatures loaded --> consider all trips
+			return true;
+		}
+		
 		// assuming the same CRS!
 		boolean originWithProvidedGeometry = false;
 		for (Geometry geometry : zoneFeatures.values()) {
