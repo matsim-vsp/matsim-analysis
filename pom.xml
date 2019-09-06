@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.ikaddoura</groupId>
 	<artifactId>matsim-analysis</artifactId>
-	<version>v2.2-2019-09-04</version>
+	<version>v2.3-2019-09-04</version>
 
 	<name>MATSim analysis project</name>
 	<description>MATSim analysis project</description>
