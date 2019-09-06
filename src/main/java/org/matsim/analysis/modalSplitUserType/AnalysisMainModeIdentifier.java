@@ -41,43 +41,21 @@ public final class AnalysisMainModeIdentifier implements MainModeIdentifier {
 			throw new RuntimeException("This main mode identifier processes trip elements only. The first plan element must not be an instance of Activity. " + tripElements);
 		}
 		
-		String mode = ((Leg) tripElements.get( 0 )).getMode();
-		if ( mode.equals( TransportMode.transit_walk ) ) {
-			return TransportMode.transit_walk ;
-			// in case no transit stop is found and for backward compatibility because earlier versions of the SBB raptor
-			// returned transit_walk for direct walk trips between two activities. ihab aug'19
+		if (tripElements.size() == 1) {
+			String mode = ((Leg) tripElements.get( 0 )).getMode();
+			return mode;
 		}
 		
 		for ( PlanElement pe : tripElements ) {
 			if ( pe instanceof Leg ) {
 				Leg leg = (Leg) pe ;
-				String mode2 = leg.getMode() ;
-				if ( !mode2.contains( TransportMode.non_network_walk ) &&
-						!mode2.contains( TransportMode.access_walk ) && // for backward compatibility
-						!mode2.contains( TransportMode.egress_walk ) && // for backward compatibility
-						!mode2.contains( TransportMode.transit_walk ) ) {
-					return mode2 ;
+				String mode = leg.getMode() ;
+				if ( !mode.contains( TransportMode.non_network_walk ) &&
+						!mode.contains( "access_walk") && // for backward compatibility
+						!mode.contains( "egress_walk" ) && // for backward compatibility
+						!mode.contains( "transit_walk" ) ) {
+					return mode ;
 				}
-			}
-		}
-		
-		// There might be the case that no pt route is found between two activity locations. In such cases, the fork of the SBB raptor router which we use
-		// returns the following: *non_network_walk* --> *pt interaction* --> *non_network_walk*.
-		// The following checks this specific case and then returns pt as the main mode. ihab aug'19
-		if (tripElements.size() == 3 && tripElements.get(0) instanceof Leg && tripElements.get(1) instanceof Activity && tripElements.get(2) instanceof Leg) {
-			Leg leg0 = (Leg) tripElements.get(0);
-			Activity act = (Activity) tripElements.get(1);
-			Leg leg1 = (Leg) tripElements.get(2);
-			
-			if (leg0.getMode().equals(TransportMode.non_network_walk) &&
-					act.getType().contains("interaction") &&
-					leg1.getMode().equals(TransportMode.non_network_walk)) {
-				String firstPart = act.getType().split("interaction")[0];
-				String mainMode = firstPart.trim();
-				if (mainMode.equals(TransportMode.pt)) {
-					mainMode = TransportMode.non_network_walk + "_instead-of-" + mainMode;
-				}
-				return mainMode;
 			}
 		}
 		
