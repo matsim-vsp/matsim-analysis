@@ -64,7 +64,7 @@ public class ModeAnalysisTest {
 		
 		Scenario scenario = loadScenario(runDirectory, runId, personAttributesFile);
 		
-		AgentAnalysisFilter filter = new AgentAnalysisFilter();
+		AgentAnalysisFilter filter = new AgentAnalysisFilter("A");
 		
 		filter.setSubpopulation("person");
 		
@@ -98,7 +98,7 @@ public class ModeAnalysisTest {
 		analysis.writeTripEuclideanDistances(outputDirectory, distanceGroups);
 				
 		Assert.assertEquals("wrong number of trips", 1, analysis.getMode2TripCounterFiltered().get(TransportMode.car), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong number of trips", 2, analysis.getMode2TripCounterFiltered().get("access_walk"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong number of trips", 2, analysis.getMode2TripCounterFiltered().get("pt"), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong number of trips", 1, analysis.getMode2TripCounterFiltered().get(TransportMode.transit_walk), MatsimTestUtils.EPSILON);
 	}
 	
