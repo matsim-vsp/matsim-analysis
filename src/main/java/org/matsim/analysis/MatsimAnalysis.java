@@ -55,8 +55,6 @@ import org.matsim.contrib.noise.personLinkMoneyEvents.CombinedPersonLinkMoneyEve
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -88,7 +86,6 @@ public class MatsimAnalysis {
 	private String homeActivityPrefix = "home";
 	private int scalingFactor;
 	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
-	private StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction", "taxi interaction");
 	private List<String> modes;	
 	private String visualizationScriptInputDirectory = "./visualization-scripts/";
 	private String analysisOutputDirectory;
@@ -265,7 +262,7 @@ public class MatsimAnalysis {
 			
 			if (agentFilters != null) {
 				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter, stageActivities);
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter);
 					modeAnalysis1.run();
 					modeAnalysisList1.add(modeAnalysis1);
 				}
@@ -280,7 +277,7 @@ public class MatsimAnalysis {
 			
 			if (agentFilters != null) {
 				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter, stageActivities);
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter);
 					modeAnalysis0.run();
 					modeAnalysisList0.add(modeAnalysis0);
 				}
@@ -726,10 +723,6 @@ public class MatsimAnalysis {
 
 	public void setHelpLegModes(String[] helpLegModes) {
 		this.helpLegModes = helpLegModes;
-	}
-
-	public void setStageActivities(StageActivityTypes stageActivities) {
-		this.stageActivities = stageActivities;
 	}
 
 	public void setModes(List<String> modes) {

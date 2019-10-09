@@ -30,12 +30,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.AgentAnalysisFilter;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.collections.Tuple;
@@ -57,12 +55,10 @@ public class ModeAnalysis {
 	private Map<String, List<Double>> mode2TripEuclideanDistancesFiltered = new HashMap<>();		
 
 	private double totalTripsFiltered = 0.;
-	private final StageActivityTypes stageActivities;
 
-	public ModeAnalysis(Scenario scenario, AgentFilter filter, StageActivityTypes stageActivities) {
+	public ModeAnalysis(Scenario scenario, AgentFilter filter) {
 		this.scenario = scenario;
 		this.filter = filter;
-		this.stageActivities = stageActivities;
 	}
 
 	public void run() {
@@ -76,7 +72,7 @@ public class ModeAnalysis {
 			
 			if (filter == null || filter.considerAgent(person)) {
 												
-				for (Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan().getPlanElements(), stageActivities)) {
+				for (Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan().getPlanElements())) {
 					totalTripsFiltered++;
 
 					double routeDistance = 0.;

@@ -35,8 +35,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
@@ -76,8 +74,7 @@ public class ModeAnalysisTest {
 		
 		filter.preProcess(scenario);
 				
-		final StageActivityTypes stageActivities = new StageActivityTypesImpl("pt interaction", "car interaction", "ride interaction", "bike interaction", "bicycle interaction", "drt interaction");
-		ModeAnalysis analysis = new ModeAnalysis(scenario, filter, stageActivities);
+		ModeAnalysis analysis = new ModeAnalysis(scenario, filter);
 		analysis.run();
 		
 		File directory = new File(outputDirectory);

@@ -2,19 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.ikaddoura</groupId>
+	<groupId>com.github.matsim-vsp</groupId>
 	<artifactId>matsim-analysis</artifactId>
-	<version>v2.3-2019-09-06</version>
+	<version>v2.4-2019-10-09</version>
 
 	<name>MATSim analysis project</name>
 	<description>MATSim analysis project</description>
 
 	<properties>
 	  <!-- release> -->
-	  <!--<matsim.version>11.0</matsim.version>-->
+	  <matsim.version>12.0-SNAPSHOT</matsim.version>
 
 	  <!--weekly "release":-->
-	  <matsim.version>12.0-2019w34-SNAPSHOT</matsim.version>
+	  <!-- <matsim.version>12.0-2019w34-SNAPSHOT</matsim.version>  -->
 	</properties>
 
 	<repositories>
