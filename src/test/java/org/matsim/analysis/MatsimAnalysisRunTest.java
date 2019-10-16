@@ -99,7 +99,12 @@ public class MatsimAnalysisRunTest {
 		filter1c.preProcess(scenario1);
 		agentFilters.add(filter1c);
 		
-		final List<TripFilter> tripFilters = new ArrayList<>();	
+		final List<TripFilter> tripFilters = new ArrayList<>();
+		
+		TripAnalysisFilter tripAnalysisFilter0 = new TripAnalysisFilter("no-filter");
+		tripAnalysisFilter0.preProcess(scenario1);
+		tripFilters.add(tripAnalysisFilter0);
+		
 		TripAnalysisFilter tripAnalysisFilter1a = new TripAnalysisFilter("equi-zone");
 		tripAnalysisFilter1a.setZoneInformation(testUtils.getPackageInputDirectory() + "/equi-zone/equi-zone.shp", "EPSG:31468");
 		tripAnalysisFilter1a.preProcess(scenario1);
@@ -178,7 +183,6 @@ public class MatsimAnalysisRunTest {
 			}
 
 			config.plans().setInputFile(populationFile);
-			config.plans().setInputPersonAttributeFile(null);
 			config.network().setInputFile(networkFile);
 			config.vehicles().setVehiclesFile(null);
 			config.transit().setTransitScheduleFile(null);

@@ -261,6 +261,11 @@ public class PersonTripAnalysis {
 					+ "in-vehicle time (trip) [sec];"
 					+ "waiting time (for taxi/pt) (trip) [sec];"
 					+ "travel distance (trip) [m];"
+					+ "origin X coordinate (trip);"
+					+ "origin Y coordinate (trip);"
+					+ "destination X coordinate (trip);"
+					+ "destination Y coordinate (trip);"
+					+ "beeline distance (trip) [m];"
 					+ "toll payments (trip) [monetary units];"
 					+ "approximate caused noise cost (trip) [monetary units]"); // TODO make this accurate?!
 			
@@ -328,6 +333,31 @@ public class PersonTripAnalysis {
 								travelDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip));
 							}
 							
+							String tripOriginCoordinateX = "unknown";
+							if (basicHandler.getPersonId2tripNumber2originCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2originCoord().get(id).containsKey(trip)) {
+								tripOriginCoordinateX = String.valueOf(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip).getX());
+							}
+							
+							String tripOriginCoordinateY = "unknown";
+							if (basicHandler.getPersonId2tripNumber2originCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2originCoord().get(id).containsKey(trip)) {
+								tripOriginCoordinateY = String.valueOf(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip).getY());
+							}
+							
+							String tripDestinationCoordinateX = "unknown";
+							if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
+								tripDestinationCoordinateX = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getX());
+							}
+							
+							String tripDestinationCoordinateY = "unknown";
+							if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
+								tripDestinationCoordinateY = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getY());
+							}
+							
+							String beelineDistance = "unknown";
+							if (basicHandler.getPersonId2tripNumber2tripBeelineDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripBeelineDistance().get(id).containsKey(trip)) {
+								beelineDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripBeelineDistance().get(id).get(trip));
+							}
+							
 							String tollPayment = "unknown";
 							if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
 								tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
@@ -352,6 +382,11 @@ public class PersonTripAnalysis {
 							+ inVehTime + ";"
 							+ waitingTime + ";"
 							+ travelDistance + ";"
+							+ tripOriginCoordinateX + ";"
+							+ tripOriginCoordinateY + ";"
+							+ tripDestinationCoordinateX + ";"
+							+ tripDestinationCoordinateY + ";"
+							+ beelineDistance + ";"
 							+ tollPayment + ";"
 							+ causedNoiseCost
 							);

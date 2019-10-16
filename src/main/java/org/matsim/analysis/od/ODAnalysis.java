@@ -142,11 +142,20 @@ public final class ODAnalysis {
                 features = ShapeFileReader.getAllFeatures(shapeFile);
             }
         	
-    		for (SimpleFeature feature : features) {
-    			String id = feature.getAttribute(zoneId).toString();
-    			Geometry geometry = (Geometry) feature.getDefaultGeometry();
-    			zones.put(id, geometry);
-    		}
+        	if (zoneId == null || zoneId == "") {
+        		int idCounter = 0;
+        		for (SimpleFeature feature : features) {
+        			Geometry geometry = (Geometry) feature.getDefaultGeometry();
+        			zones.put(String.valueOf(idCounter), geometry);
+        			idCounter++;
+        		}
+        	} else {
+        		for (SimpleFeature feature : features) {
+        			String id = feature.getAttribute(zoneId).toString();
+        			Geometry geometry = (Geometry) feature.getDefaultGeometry();
+        			zones.put(id, geometry);
+        		}
+        	}
         }
 
 		List<ODTrip> odTrips = new ArrayList<>();
@@ -232,7 +241,7 @@ public final class ODAnalysis {
 
 			ODTripFilter hourFilter = new ODTripFilter(from, to, "", modes);
 			log.info("###### " + from + " to " + to);
-			log.info("total number of trips (sample size): " + odTrips.size());
+			log.info("total number of trips (sample size) " + odTrips.size());
 
 			for (ODTrip trip : odTrips) {
 				if (hourFilter.considerTrip(trip)) {
@@ -250,7 +259,7 @@ public final class ODAnalysis {
 					// skip trip
 				}
 			}
-			log.info("filtered trips (sample size): " + filteredTripCounter);
+			log.info("filtered (considered mode, time bin, ...) trips (sample size): " + filteredTripCounter);
 			try {
 				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".csv");
 				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + "_from-to-format.csv");

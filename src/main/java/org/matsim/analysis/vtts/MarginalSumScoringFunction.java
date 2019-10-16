@@ -33,7 +33,6 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class MarginalSumScoringFunction {
-//	private final static Logger log = Logger.getLogger(MarginalSumScoringFunction.class);
 	
 	CharyparNagelActivityScoring activityScoringA;
 	CharyparNagelActivityScoring activityScoringB;
@@ -119,10 +118,6 @@ public class MarginalSumScoringFunction {
 		
 		Activity activityEveningWithoutDelay = PopulationUtils.createActivity(activityEvening);
 		activityEveningWithoutDelay.setStartTime(activityEvening.getStartTime() - delay);
-		
-//		log.info("activityMorning: " + activityMorning.toString());
-//		log.info("activityEvening: " + activityEvening.toString());
-//		log.info("activityEveningWithoutDelay: " + activityEveningWithoutDelay.toString());
 
 		delegateA.handleActivity(activityEvening);
 		delegateB.handleActivity(activityEveningWithoutDelay);

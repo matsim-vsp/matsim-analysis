@@ -100,7 +100,7 @@ public class MatsimAnalysis {
 	// base case (optional)
 	private Scenario scenario0;
 	
-	private final String outputDirectoryName = "analysis-v2.3";
+	private final String outputDirectoryName = "analysis-v2.4";
 	private final String stageActivitySubString = "interaction";
 
 	public void run() {
@@ -434,7 +434,7 @@ public class MatsimAnalysis {
 		// externality-specific toll payments
 		{
 			String visScriptTemplateFile = visualizationScriptInputDirectory + "extCostPerTimeOfDay-cne_percentages.R";
-			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "person-trip-welfare-analysis/" + "extCostPerTimeOfDay-cne_percentages_" + runId + ".R";
+			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "person-trip-data/" + "extCostPerTimeOfDay-cne_percentages_" + runId + ".R";
 					
 			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
 			script.setRunId(runId);
@@ -468,7 +468,7 @@ public class MatsimAnalysis {
 		// Print results: person / trip analysis
 		// #####################################
 		
-		String personTripAnalysOutputDirectory = analysisOutputDirectory + "person-trip-welfare-analysis/";
+		String personTripAnalysOutputDirectory = analysisOutputDirectory + "person-trip-data/";
 		createDirectory(personTripAnalysOutputDirectory);
 		String personTripAnalysisOutputDirectoryWithPrefix = personTripAnalysOutputDirectory + scenario.getConfig().controler().getRunId() + ".";
 		
@@ -573,22 +573,36 @@ public class MatsimAnalysis {
 		
 		String modeAnalysisOutputDirectory = analysisOutputDirectory + "mode-statistics/";
 		createDirectory(modeAnalysisOutputDirectory);
-		for (ModeAnalysis modeAnalysis : modeAnalysisList) {
-			
+		
+		for (ModeAnalysis modeAnalysis : modeAnalysisList) {		
 			modeAnalysis.writeModeShares(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".");
 			modeAnalysis.writeTripRouteDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".");
 			modeAnalysis.writeTripEuclideanDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".");
 			
-			final List<Tuple<Double, Double>> distanceGroups = new ArrayList<>();
-			distanceGroups.add(new Tuple<>(0., 1000.));
-			distanceGroups.add(new Tuple<>(1000., 3000.));
-			distanceGroups.add(new Tuple<>(3000., 5000.));
-			distanceGroups.add(new Tuple<>(5000., 10000.));
-			distanceGroups.add(new Tuple<>(10000., 20000.));
-			distanceGroups.add(new Tuple<>(20000., 100000.));
-			distanceGroups.add(new Tuple<>(100000., 999999999999.));
-			modeAnalysis.writeTripRouteDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".", distanceGroups);
-			modeAnalysis.writeTripEuclideanDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".", distanceGroups);
+			final List<Tuple<Double, Double>> distanceGroups1 = new ArrayList<>();
+			distanceGroups1.add(new Tuple<>(0., 1000.));
+			distanceGroups1.add(new Tuple<>(1000., 3000.));
+			distanceGroups1.add(new Tuple<>(3000., 5000.));
+			distanceGroups1.add(new Tuple<>(5000., 10000.));
+			distanceGroups1.add(new Tuple<>(10000., 20000.));
+			distanceGroups1.add(new Tuple<>(20000., 100000.));
+			distanceGroups1.add(new Tuple<>(100000., 999999999999.));
+			modeAnalysis.writeTripRouteDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".1-3-5-10-xxx.", distanceGroups1);
+			modeAnalysis.writeTripEuclideanDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".1-3-5-10-xxx.", distanceGroups1);
+			
+			final List<Tuple<Double, Double>> distanceGroups2 = new ArrayList<>();
+			distanceGroups2.add(new Tuple<>(0., 1000.));
+			distanceGroups2.add(new Tuple<>(1000., 2000.));
+			distanceGroups2.add(new Tuple<>(2000., 3000.));
+			distanceGroups2.add(new Tuple<>(3000., 4000.));
+			distanceGroups2.add(new Tuple<>(4000., 5000.));
+			distanceGroups2.add(new Tuple<>(5000., 6000.));
+			distanceGroups2.add(new Tuple<>(6000., 7000.));
+			distanceGroups2.add(new Tuple<>(7000., 8000.));
+			distanceGroups2.add(new Tuple<>(8000., 9000.));
+			distanceGroups2.add(new Tuple<>(9000., 999999999999.));
+			modeAnalysis.writeTripRouteDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".1-2-3-4-xxx.", distanceGroups2);
+			modeAnalysis.writeTripEuclideanDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".1-2-3-4-xxx.", distanceGroups2);
 		}
 		
 		// #####################################
@@ -599,19 +613,15 @@ public class MatsimAnalysis {
 		createDirectory(vttsOutputDirectory);
 
 		vttsHandler.printVTTS(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_allTrips.csv");
-		vttsHandler.printCarVTTS(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_carTrips.csv");
 		vttsHandler.printAvgVTTSperPerson(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_avgPerPerson.csv"); 
-		
 		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_all-modes.csv", null, null);
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car.csv", "car", null);
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_pt.csv", "pt", null);
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_walk.csv", "walk", null);
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_bicycle.csv", "bicycle", null);
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_ride.csv", "ride", null);
-
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_7-9.csv", "car", new Tuple<Double, Double>(7.0 * 3600., 9. * 3600.));
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_11-13.csv", "car", new Tuple<Double, Double>(11.0 * 3600., 13. * 3600.));
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_16-18.csv", "car", new Tuple<Double, Double>(16.0 * 3600., 18. * 3600.));
+		
+		for (String mode : modes) {
+			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_" + mode + ".csv", mode, null);
+			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_7-9.csv", "car", new Tuple<Double, Double>(7.0 * 3600., 9. * 3600.));
+			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_11-13.csv", "car", new Tuple<Double, Double>(11.0 * 3600., 13. * 3600.));
+			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_16-18.csv", "car", new Tuple<Double, Double>(16.0 * 3600., 18. * 3600.));
+		}
 		
 		// #####################################
 		// Print leg histogram videos
