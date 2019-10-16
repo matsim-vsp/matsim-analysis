@@ -243,7 +243,7 @@ public class NoiseAnalysisTest {
 	
 	public NoiseAnalysisHandler analyseScenario(String eventsFile, Scenario scenario) {
 
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.access_walk, TransportMode.egress_walk};
+		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
 		final String stageActivitySubString = "interaction";
 		
 		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(helpLegModes, stageActivitySubString);	
