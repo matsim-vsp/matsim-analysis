@@ -59,7 +59,7 @@ public class ODAnalysisTest {
             final String runDirectory = testUtils.getPackageInputDirectory() + "test_runDirectory/";
             final String runId = "berlin-drtA-v5.2-1pct";
             final String shapeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/berlin-sav-v5.2-10pct/input/shp-bezirke/bezirke_berlin.shp";
-            final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.access_walk, TransportMode.egress_walk};
+            final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
             final String stageActivitySubString = "interaction";
 
             final String zoneId = "SCHLUESSEL";
