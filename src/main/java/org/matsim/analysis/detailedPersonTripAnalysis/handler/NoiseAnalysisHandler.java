@@ -30,10 +30,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.events.NoiseEventAffected;
-import org.matsim.contrib.noise.events.NoiseEventCaused;
-import org.matsim.contrib.noise.handler.NoiseEventAffectedHandler;
-import org.matsim.contrib.noise.handler.NoiseEventCausedHandler;
+import org.matsim.contrib.noise.NoiseEventAffected;
+import org.matsim.contrib.noise.NoiseEventAffectedHandler;
+import org.matsim.contrib.noise.NoiseEventCaused;
+import org.matsim.contrib.noise.NoiseEventCausedHandler;
 
 import com.google.inject.Inject;
 

@@ -21,7 +21,7 @@ package org.matsim.analysis.detailedPersonTripAnalysis;
 
 import java.util.Stack;
 
-import org.matsim.contrib.noise.events.NoiseEventsReader;
+import org.matsim.contrib.noise.NoiseEventsReader;
 import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
