@@ -396,20 +396,39 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				
 				if (tripNumber2legMode.get(tripNumber) == null) {
 					// save the help leg mode (better than to have nothing; there may be transit_walk trips without any main mode leg)
-					tripNumber2legMode.put(personId2currentTripNumber.get(event.getPersonId()), event.getLegMode());
+					tripNumber2legMode.put(tripNumber, event.getLegMode());
 					personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
 				
 				} else {
 					// there is already a mode stored for the current trip, only overwrite help leg modes
-					boolean isHelpLeg = false;
+					boolean currentModeIsHelpLeg = false;
 					for (String helpLegMode : helpLegModes) {
-						if(event.getLegMode().toString().equals(helpLegMode)) {
-							isHelpLeg = true;
+						if(event.getLegMode().equals(helpLegMode)) {
+							currentModeIsHelpLeg = true;
 						}
 					}
-					if (!isHelpLeg) {
+					if (!currentModeIsHelpLeg) {
 						// no help leg -> save the leg mode
-						tripNumber2legMode.put(personId2currentTripNumber.get(event.getPersonId()), event.getLegMode());
+						
+						boolean previousModeIsHelpLeg = false;
+						String previousMode = tripNumber2legMode.get(tripNumber);
+						for (String helpLegMode : helpLegModes) {
+							if(previousMode.equals(helpLegMode)) {
+								previousModeIsHelpLeg = true;
+							}
+						}
+						
+						String tripMode;
+						if (!previousModeIsHelpLeg) {
+							// intermodal trip
+							tripMode = previousMode +","+ event.getLegMode();
+							log.warn("Analysis is not tested for intermodal trips: Modes: " + tripMode + " / Person: " + event.getPersonId() + " / Trip number: " + tripNumber);			
+						} else {
+							// no intermodal trip
+							tripMode = event.getLegMode();
+						}
+						
+						tripNumber2legMode.put(tripNumber, tripMode);
 						personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);	
 					}
 				}
