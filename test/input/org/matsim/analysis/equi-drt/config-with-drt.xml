@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="controler" >
+		<param name="lastIteration" value="10" />
+		<param name="outputDirectory" value="will-be-set-via-code" />
+		<param name="runId" value="test1" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+	</module>
+	<module name="global" >
+		<param name="numberOfThreads" value="1" />
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="EPSG:31468" />
+	</module>
+	<module name="multiModeDrt">
+		<parameterset type="drt">
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+			<param name="estimatedBeelineDistanceFactor" value="1.3"/>
+			<param name="estimatedDrtSpeed" value="8.333333333333334"/>
+			<param name="idleVehiclesReturnToDepots" value="false"/>
+			<param name="maxTravelTimeAlpha" value="1.7"/>
+			<param name="maxTravelTimeBeta" value="120.0"/>
+			<param name="maxWaitTime" value="300.0"/>
+			<param name="maxWalkDistance" value="20000.0"/>
+			<param name="mode" value="drt"/>
+			<param name="numberOfThreads" value="1"/>
+			<param name="operationalScheme" value="serviceAreaBased"/>
+			<param name="drtServiceAreaShapeFile" value="./equil-zone/equi-zone.shp" />
+			<param name="plotDetailedWarnings" value="true"/>
+			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
+			<param name="stopDuration" value="60.0"/>
+			<param name="transitStopFile" value="null"/>
+			<param name="useModeFilteredSubnetwork" value="false"/>
+			<param name="vehiclesFile" value="./drtVehicles.xml"/>
+			<param name="writeDetailedCustomerStats" value="true"/>
+			<parameterset type="minCostFlowRebalancing">
+				<param name="cellSize" value="2000.0"/>
+				<param name="targetAlpha" value="0.5"/>
+				<param name="targetBeta" value="0.5"/>
+			</parameterset>
+		</parameterset>
+	</module>
+	<module name="drtfares" >
+		<parameterset type="drtfare" >
+			<!-- drt fare per meter (fee = positive value) -->
+			<param name="distanceFare_m" value="0.0015" />
+			<!-- Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value). -->
+			<param name="minFarePerTrip" value="4.0" />
+			<!-- transport mode for which the fare applies. Default: drt -->
+			<param name="mode" value="drt" />
+		</parameterset>
+	</module>
+	<module name="dvrp" >
+		<!-- Mode of which the network will be used for throwing events and hence calculating travel times. Default is car. -->
+		<param name="mobsimMode" value="car" />
+		<!-- Set of modes of which the network will be used for DVRP travel time estimation and routing DVRP vehicles. Each specific DVRP mode may use a subnetwork of this network for routing vehicles (e.g. DRT buses travelling only along a specified links or serving a limited area). Default is "car" (i.e. single-element set of modes), i.e. the car network is used. Empty value "" (i.e. empty set of modes) means no network filtering, i.e. the original scenario.network is used -->
+		<param name="networkModes" value="car" />
+		<!-- Used for OFFLINE estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates -->
+		<param name="travelTimeEstimationAlpha" value="0.05" />
+		<!-- Used for ONLINE estimation of travel times for VrpOptimizer by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator. The beta coefficient is provided in seconds and should be either 0 (no online estimation) or positive (mixed online-offline estimation). For 'beta = 0', only the offline estimate is used: 'onlineTT(t) = offlineTT(t)', where 'offlineTT(t)' in the offline estimate for TT at time 't', For 'beta > 0', estimating future TTs at time 't', uses the currently observed TT to correct the offline estimates is made: where 'currentTT' is the currently observed TT, and 'correction = min(1, max(0, 1 - (time - currentTime) / beta))' The rule is that correction decreases linearly from 1 (when 'time = currentTime') to 0 (when 'time = currentTime + beta' For 'time > currentTime + beta' correction is 0, whereas if 'time < currentTime' it is 1. If beta is sufficiently large, 'beta >> 0', only the currently observed TT is used. -->
+		<param name="travelTimeEstimationBeta" value="0.0" />
+	</module>
+	<module name="network" >
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+	<module name="planCalcScore" >
+		<!-- logit model scale parameter. default: 1.  Has name and default value for historical reasons (see Bryan Raney's phd thesis). -->
+		<param name="BrainExpBeta" value="2.0" />
+		<parameterset type="scoringParameters" >
+			<param name="lateArrival" value="0.0" />
+			<parameterset type="activityParams" >
+				<param name="activityType" value="dummy" />
+				<!-- typical duration of activity.  needs to be defined and non-zero.  in sec. -->
+				<param name="typicalDuration" value="02:00:00" />
+			</parameterset>
+			<parameterset type="activityParams" >
+				<param name="activityType" value="h" />
+				<param name="typicalDuration" value="12:00:00" />
+			</parameterset>
+			<parameterset type="activityParams" >
+				<param name="activityType" value="w" />
+				<param name="latestStartTime" value="09:00:00" />
+				<param name="typicalDuration" value="08:00:00" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="car" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="pt" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="walk" />
+			</parameterset>
+			<parameterset type="modeParams" >
+				<param name="mode" value="drt" />
+			</parameterset>
+		</parameterset>
+	</module>
+	<module name="plans" >
+		<param name="inputPlansFile" value="plans-drt.xml" />
+	</module>
+	<module name="qsim" >
+		<param name="endTime" value="00:00:00" />
+		<!-- Options: maxOfStarttimeAndEarliestActivityEnd onlyUseStarttime  -->
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
+		<param name="startTime" value="00:00:00" />
+	</module>
+	<module name="strategy" >
+		<parameterset type="strategysettings" >
+			<!-- strategyName of strategy.  Possible default names: SelectRandomBestScoreKeepLastSelectedChangeExpBetaSelectExpBetaSelectPathSizeLogit (selectors), ReRouteTimeAllocationMutatorTimeAllocationMutator_ReRouteChangeSingleTripModeChangeTripModeSubtourModeChoice (innovative strategies). -->
+			<param name="strategyName" value="BestScore" />
+			<!-- weight of a strategy: for each agent, a strategy will be selected with a probability proportional to its weight -->
+			<param name="weight" value="0.9" />
+		</parameterset>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ReRoute" />
+			<param name="weight" value="0.1" />
+		</parameterset>
+	</module>
+
+</config>

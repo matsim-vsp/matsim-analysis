@@ -24,41 +24,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
+import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
+import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.drt.routing.DrtRouteFactory;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class MatsimAnalysisRunTest {
-	private static final Logger log = Logger.getLogger(MatsimAnalysisRunTest.class);
+public class MatsimAnalysisRunDrtTest {
+	private static final Logger log = Logger.getLogger(MatsimAnalysisRunDrtTest.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-
-	@Test
-	public final void testTest() {
-		log.info( "Hello world." );
-		Assert.assertTrue( true );
-	}
 	
 	@Test
 	public final void test1() {
 		
 		{
-			Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "equi/config.xml");
+			Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "equi-drt/config-with-drt.xml", new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new DrtFaresConfigGroup());
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output1");
 			config.controler().setRunId("run1");
-			config.strategy().setFractionOfIterationsToDisableInnovation(1.0);
 			config.controler().setLastIteration(1);
-			config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
-			Scenario scenario = ScenarioUtils.loadScenario(config) ;
-			Controler controler = new Controler( scenario ) ;
+
+			DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(), config.plansCalcRoute());
+			
+			Scenario scenario = ScenarioUtils.loadScenario(config);
+			RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
+			routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+			
+			Controler controler = new Controler(scenario);		
+			controler.addOverridingModule(new MultiModeDrtModule());
+			controler.addOverridingModule(new DvrpModule());
+			controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(controler.getConfig())));				
+			controler.addOverridingModule(new DrtFareModule());
+						
 			controler.run();
 		}
 		
@@ -84,36 +97,15 @@ public class MatsimAnalysisRunTest {
 		
 		final List<AgentFilter> agentFilters = new ArrayList<>();
 		
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("A");
-		filter1a.setPersonAttribute("berlin");
-		filter1a.setPersonAttributeName("home-activity-zone");
-		filter1a.preProcess(scenario1);
-		agentFilters.add(filter1a);
-
 		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("B");
 		filter1b.preProcess(scenario1);
 		agentFilters.add(filter1b);
-		
-		AgentAnalysisFilter filter1c = new AgentAnalysisFilter("C");
-		filter1c.setSubpopulation("person_no-potential-sav-user");
-		filter1c.preProcess(scenario1);
-		agentFilters.add(filter1c);
 		
 		final List<TripFilter> tripFilters = new ArrayList<>();
 		
 		TripAnalysisFilter tripAnalysisFilter0 = new TripAnalysisFilter("no-filter");
 		tripAnalysisFilter0.preProcess(scenario1);
 		tripFilters.add(tripAnalysisFilter0);
-		
-		TripAnalysisFilter tripAnalysisFilter1a = new TripAnalysisFilter("equi-zone");
-		tripAnalysisFilter1a.setZoneInformation(testUtils.getPackageInputDirectory() + "/equi-zone/equi-zone.shp", "EPSG:31468");
-		tripAnalysisFilter1a.preProcess(scenario1);
-		tripFilters.add(tripAnalysisFilter1a);
-		
-		TripAnalysisFilter tripAnalysisFilter1b = new TripAnalysisFilter("equi-zone-B");
-		tripAnalysisFilter1b.setZoneInformation(testUtils.getPackageInputDirectory() + "/equi-zone-B/equi-zone-B.shp", "EPSG:31468");
-		tripAnalysisFilter1b.preProcess(scenario1);
-		tripFilters.add(tripAnalysisFilter1b);
 		
 		final List<String> modes = new ArrayList<>();
 		modes.add(TransportMode.car);

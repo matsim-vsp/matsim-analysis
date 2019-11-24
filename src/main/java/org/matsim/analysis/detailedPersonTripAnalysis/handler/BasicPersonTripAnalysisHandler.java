@@ -405,6 +405,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					for (String helpLegMode : helpLegModes) {
 						if(event.getLegMode().equals(helpLegMode)) {
 							currentModeIsHelpLeg = true;
+							break;
 						}
 					}
 					if (!currentModeIsHelpLeg) {
@@ -415,14 +416,15 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 						for (String helpLegMode : helpLegModes) {
 							if(previousMode.equals(helpLegMode)) {
 								previousModeIsHelpLeg = true;
+								break;
 							}
 						}
 						
 						String tripMode;
-						if (!previousModeIsHelpLeg) {
+						if (!previousModeIsHelpLeg && !event.getLegMode().equals(previousMode)) {
 							// intermodal trip
 							tripMode = previousMode +","+ event.getLegMode();
-							log.warn("Analysis is not tested for intermodal trips: Modes: " + tripMode + " / Person: " + event.getPersonId() + " / Trip number: " + tripNumber);			
+							throw new RuntimeException("Analysis is not tested for intermodal trips: Modes: " + tripMode + " / Person: " + event.getPersonId() + " / Trip number: " + tripNumber);			
 						} else {
 							// no intermodal trip
 							tripMode = event.getLegMode();

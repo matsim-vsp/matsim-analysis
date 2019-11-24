@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans xml:lang="de-CH">
+<person id="1">
+	<plan>
+		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+		<leg mode="drt">
+		</leg>
+		<act type="w" x="10000" y="0" link="20" start_time="16:00" end_time="16:00" />
+		<leg mode="car">
+		</leg>
+		<act type="w" x="10000" y="0" link="20" start_time="17:00" end_time="18:00" />
+		<leg mode="car">
+			<route>13 14 15 1</route>
+		</leg>
+		<act type="h" x="-25000" y="0" link="1" start_time="19:00" />
+	</plan>
+</person>
+
+</plans>
