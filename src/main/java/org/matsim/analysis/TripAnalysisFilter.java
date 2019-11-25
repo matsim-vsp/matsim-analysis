@@ -135,6 +135,8 @@ public class TripAnalysisFilter implements TripFilter {
 		        			|| (this.zoneCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("DHDN_GK4"))
 		        			|| (this.zoneCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("EPSG:31468"))
 		        			|| (this.zoneCRS.equalsIgnoreCase("EPSG:31468") && crsNetwork.equalsIgnoreCase("GK4"))
+		        			|| (this.zoneCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("EPSG:31468"))
+		        			|| (this.zoneCRS.equalsIgnoreCase("EPSG:31468") && crsNetwork.equalsIgnoreCase("DHDN_GK4"))
 		        			) {
 		        		// should not cause any problems.
 		        	} else {
