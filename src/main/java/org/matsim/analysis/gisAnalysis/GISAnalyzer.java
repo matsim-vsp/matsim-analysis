@@ -49,6 +49,7 @@ import org.matsim.core.utils.gis.PolygonFeatureFactory.Builder;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -198,7 +199,15 @@ public class GISAnalyzer {
 		log.info("Writing shape file...");
 		
 		Builder featureFactoryBuilder = new PolygonFeatureFactory.Builder();
-		featureFactoryBuilder.setCrs(MGC.getCRS(zonesCRS));
+		CoordinateReferenceSystem crs;
+		try {
+			crs = MGC.getCRS(zonesCRS);
+			featureFactoryBuilder.setCrs(crs);
+		} catch (Exception e) {
+			crs = null;
+			log.warn("Assuming all coordinates to be in the correct coordinate reference system.");
+		}
+		
 		featureFactoryBuilder.setName("zone");
 		featureFactoryBuilder.addAttribute("ID", Integer.class);
 		featureFactoryBuilder.addAttribute("HomeAct", Integer.class);
