@@ -549,7 +549,11 @@ public class MatsimAnalysis {
 		if (scenarioCRS != null) {
 			String networkOutputDirectory = analysisOutputDirectory + "network-shp/";
 			String outputDirectoryWithPrefix = networkOutputDirectory + scenario.getConfig().controler().getRunId() + ".";
-			Network2Shape.exportNetwork2Shp(scenario, outputDirectoryWithPrefix, scenarioCRS, TransformationFactory.getCoordinateTransformation(scenarioCRS, scenarioCRS));
+			try {
+				Network2Shape.exportNetwork2Shp(scenario, outputDirectoryWithPrefix, scenarioCRS, TransformationFactory.getCoordinateTransformation(scenarioCRS, scenarioCRS));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		// #####################################

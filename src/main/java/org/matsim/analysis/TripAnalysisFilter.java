@@ -131,7 +131,11 @@ public class TripAnalysisFilter implements TripFilter {
 			if (scenario.getNetwork() != null && this.zoneCRS != null) {
 				String crsNetwork = (String) scenario.getNetwork().getAttributes().getAttribute("coordinateReferenceSystem");
 		        if (!this.zoneCRS.equalsIgnoreCase(crsNetwork)) {
-		        	if ((this.zoneCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("GK4") ) || this.zoneCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("EPSG:31468")) {
+		        	if ( (this.zoneCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("GK4"))
+		        			|| (this.zoneCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("DHDN_GK4"))
+		        			|| (this.zoneCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("EPSG:31468"))
+		        			|| (this.zoneCRS.equalsIgnoreCase("EPSG:31468") && crsNetwork.equalsIgnoreCase("GK4"))
+		        			) {
 		        		// should not cause any problems.
 		        	} else {
 		        		throw new RuntimeException("Coordinate transformation not yet implemented. Expecting shape file to have the following coordinate reference system: " + crsNetwork + " instead of " + this.zoneCRS);

@@ -59,8 +59,9 @@ public class Network2Shape {
 			crs = MGC.getCRS(scenarioCrs);
 			featureFactoryBuilder.setCrs(crs);
 		} catch (Exception e) {
-			crs = null;
+			e.printStackTrace();
 			log.warn("Assuming all coordinates to be in the correct coordinate reference system.");
+			crs = null;
 		}
 		
 		featureFactoryBuilder.setName("Link");
