@@ -63,7 +63,7 @@ public class Network2Shape {
 			log.warn("Assuming all coordinates to be in the correct coordinate reference system.");
 			crs = null;
 		}
-		
+				
 		featureFactoryBuilder.setName("Link");
 		featureFactoryBuilder.addAttribute("Id", String.class);
 		featureFactoryBuilder.addAttribute("Length", Double.class);
@@ -71,7 +71,7 @@ public class Network2Shape {
 		featureFactoryBuilder.addAttribute("lanes", Double.class);
 		featureFactoryBuilder.addAttribute("Freespeed", Double.class);
 		featureFactoryBuilder.addAttribute("Modes", String.class);
-
+		
 		PolylineFeatureFactory featureFactory = featureFactoryBuilder.create();
 
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
@@ -83,12 +83,12 @@ public class Network2Shape {
 			
 			Coordinate[] coordinates = new Coordinate[]{ new Coordinate(MGC.coord2Coordinate(fromCoord)), new Coordinate(MGC.coord2Coordinate(toCoord))};
 			Map<String, Object> attributes = new LinkedHashMap<String, Object>();
-			attributes.put("Id", link.getId());
+			attributes.put("Id", link.getId().toString());
 			attributes.put("Length", link.getLength());
 			attributes.put("capacity", link.getCapacity());
 			attributes.put("lanes", link.getNumberOfLanes());
 			attributes.put("Freespeed", link.getFreespeed());
-			attributes.put("Modes", link.getAllowedModes());
+			attributes.put("Modes", String.join(",", link.getAllowedModes()));
 
 			SimpleFeature feature = featureFactory.createPolyline(coordinates , attributes , link.getId().toString());
 			features.add(feature);
