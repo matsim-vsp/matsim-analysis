@@ -125,6 +125,7 @@ public class MatsimAnalysisRunDrtTest {
 		analysis.setAgentFilters(agentFilters);
 		analysis.setTripFilters(tripFilters);
 		analysis.setModes(modes);
+		analysis.setVisualizationScriptInputDirectory("./visualization-scripts/");
 		analysis.run();
 	
 		log.info("Done.");

@@ -87,7 +87,7 @@ public class MatsimAnalysis {
 	private int scalingFactor;
 	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
 	private List<String> modes;	
-	private String visualizationScriptInputDirectory = "./visualization-scripts/";
+	private String visualizationScriptInputDirectory = null;
 	private String analysisOutputDirectory;
 	private boolean printODSHPfiles = true;
 	private boolean printTripSHPfiles = false;
@@ -366,83 +366,84 @@ public class MatsimAnalysis {
 		// #####################################
 		// Write the visualization scripts
 		// #####################################
-
-		// traffic volumes
-		if (scenario1 != null & scenario0 != null) {
-			String visScriptTemplateFile = visualizationScriptInputDirectory + "traffic-volume_absolute-difference_noCRS.qgs";
-			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "link-volume-analysis/" + "traffic-volume_absolute-difference_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
+		if (visualizationScriptInputDirectory != null) {
+			// traffic volumes
+			if (scenario1 != null & scenario0 != null) {
+				String visScriptTemplateFile = visualizationScriptInputDirectory + "traffic-volume_absolute-difference_noCRS.qgs";
+				String visScriptOutputFile = outputDirectoryForAnalysisFiles + "link-volume-analysis/" + "traffic-volume_absolute-difference_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
+				
+				VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
+				script.setRunId(runId);
+				script.setRunIdToCompareWith(runIdToCompareWith);
+				script.setScalingFactor(String.valueOf(this.scalingFactor));
+				script.setCRS(this.scenarioCRS);
+				script.write();
+			}
 			
-			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(runId);
-			script.setRunIdToCompareWith(runIdToCompareWith);
-			script.setScalingFactor(String.valueOf(this.scalingFactor));
-			script.setCRS(this.scenarioCRS);
-			script.write();
-		}
+			// absolute traffic volumes policy case
+			if (scenario1 != null) {
+				String visScriptTemplateFile = visualizationScriptInputDirectory + "traffic-volume_absolute_noCRS.qgs";
+				String visScriptOutputFile = outputDirectoryForAnalysisFiles + "link-volume-analysis/" + runId + ".traffic-volume_absolute.qgs";
+				
+				VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
+				script.setRunId(runId);
+				script.setScalingFactor(String.valueOf(this.scalingFactor));
+				script.setCRS(this.scenarioCRS);
+				script.write();
+			}
+			
+			// spatial zone-based analysis
+			if (scenario1 != null & scenario0 != null) {
+				String visScriptTemplateFile = visualizationScriptInputDirectory + "zone-based-analysis_welfare_modes.qgs";
+				String visScriptOutputFile = outputDirectoryForAnalysisFiles + "zone-based-analysis_welfare_modes/" + "zone-based-analysis_welfare_modes_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
+				
+				VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
+				script.setRunId(runId);
+				script.setRunIdToCompareWith(runIdToCompareWith);
+				script.setScalingFactor(String.valueOf(this.scalingFactor));
+				script.setCRS(this.zonesCRS);
+				script.write();
+			}
+			
+			// scenario comparison: person-specific mode-shift effects
+			if (scenario1 != null & scenario0 != null) {
+				String visScriptTemplateFile = visualizationScriptInputDirectory + "scenario-comparison_person-specific-mode-switch-effects.qgs";
+				String visScriptOutputFile = personTripScenarioComparisonOutputDirectory + "scenario-comparison_person-specific-mode-switch-effects_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
+				
+				VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
+				script.setRunId(runId);
+				script.setRunIdToCompareWith(runIdToCompareWith);
+				script.setScalingFactor(String.valueOf(this.scalingFactor));
+				script.setCRS(this.scenarioCRS);
+				script.write();
+			}
+			
+			// scenario comparison: person-specific winner-loser analysis
+			if (scenario1 != null & scenario0 != null) {
+				String visScriptTemplateFile = visualizationScriptInputDirectory + "scenario-comparison_person-specific-winner-loser.qgs";
+				String visScriptOutputFile = personTripScenarioComparisonOutputDirectory + "scenario-comparison_person-specific-winner-loser_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
+				
+				VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
+				script.setRunId(runId);
+				script.setRunIdToCompareWith(runIdToCompareWith);
+				script.setScalingFactor(String.valueOf(this.scalingFactor));
+				script.setCRS(this.scenarioCRS);
+				script.write();
+			}
 		
-		// absolute traffic volumes policy case
-		if (scenario1 != null) {
-			String visScriptTemplateFile = visualizationScriptInputDirectory + "traffic-volume_absolute_noCRS.qgs";
-			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "link-volume-analysis/" + runId + ".traffic-volume_absolute.qgs";
-			
-			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(runId);
-			script.setScalingFactor(String.valueOf(this.scalingFactor));
-			script.setCRS(this.scenarioCRS);
-			script.write();
+			// externality-specific toll payments
+			{
+				String visScriptTemplateFile = visualizationScriptInputDirectory + "extCostPerTimeOfDay-cne_percentages.R";
+				String visScriptOutputFile = outputDirectoryForAnalysisFiles + "person-trip-data/" + "extCostPerTimeOfDay-cne_percentages_" + runId + ".R";
+						
+				VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
+				script.setRunId(runId);
+				script.setRunIdToCompareWith(runIdToCompareWith);
+				script.setScalingFactor(String.valueOf(this.scalingFactor));
+				script.setCRS(this.scenarioCRS);
+				script.write();
+			} 
 		}
-		
-		// spatial zone-based analysis
-		if (scenario1 != null & scenario0 != null) {
-			String visScriptTemplateFile = visualizationScriptInputDirectory + "zone-based-analysis_welfare_modes.qgs";
-			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "zone-based-analysis_welfare_modes/" + "zone-based-analysis_welfare_modes_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
-			
-			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(runId);
-			script.setRunIdToCompareWith(runIdToCompareWith);
-			script.setScalingFactor(String.valueOf(this.scalingFactor));
-			script.setCRS(this.zonesCRS);
-			script.write();
-		}
-		
-		// scenario comparison: person-specific mode-shift effects
-		if (scenario1 != null & scenario0 != null) {
-			String visScriptTemplateFile = visualizationScriptInputDirectory + "scenario-comparison_person-specific-mode-switch-effects.qgs";
-			String visScriptOutputFile = personTripScenarioComparisonOutputDirectory + "scenario-comparison_person-specific-mode-switch-effects_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
-			
-			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(runId);
-			script.setRunIdToCompareWith(runIdToCompareWith);
-			script.setScalingFactor(String.valueOf(this.scalingFactor));
-			script.setCRS(this.scenarioCRS);
-			script.write();
-		}
-		
-		// scenario comparison: person-specific winner-loser analysis
-		if (scenario1 != null & scenario0 != null) {
-			String visScriptTemplateFile = visualizationScriptInputDirectory + "scenario-comparison_person-specific-winner-loser.qgs";
-			String visScriptOutputFile = personTripScenarioComparisonOutputDirectory + "scenario-comparison_person-specific-winner-loser_" + runId + "-vs-" + runIdToCompareWith + ".qgs";
-			
-			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(runId);
-			script.setRunIdToCompareWith(runIdToCompareWith);
-			script.setScalingFactor(String.valueOf(this.scalingFactor));
-			script.setCRS(this.scenarioCRS);
-			script.write();
-		}
-	
-		// externality-specific toll payments
-		{
-			String visScriptTemplateFile = visualizationScriptInputDirectory + "extCostPerTimeOfDay-cne_percentages.R";
-			String visScriptOutputFile = outputDirectoryForAnalysisFiles + "person-trip-data/" + "extCostPerTimeOfDay-cne_percentages_" + runId + ".R";
-					
-			VisualizationScriptAdjustment script = new VisualizationScriptAdjustment(visScriptTemplateFile, visScriptOutputFile);
-			script.setRunId(runId);
-			script.setRunIdToCompareWith(runIdToCompareWith);
-			script.setScalingFactor(String.valueOf(this.scalingFactor));
-			script.setCRS(this.scenarioCRS);
-			script.write();
-		} 
 		
 		log.info("Analysis completed.");
 	}
