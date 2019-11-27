@@ -42,13 +42,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -106,10 +106,10 @@ public final class ODAnalysis {
 	        	if (
 	        			(shapeFileCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("GK4")) ||
 	        			(shapeFileCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("DHDN_GK4")) ||
-	        			(shapeFileCRS.equalsIgnoreCase("EPSG:3148") && crsNetwork.equalsIgnoreCase("DHDN_GK4")) ||
-	        			(shapeFileCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("EPSG:3148")) ||
-	        			(shapeFileCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("EPSG:3148")) ||
-	        			(shapeFileCRS.equalsIgnoreCase("EPSG:3148") && crsNetwork.equalsIgnoreCase("GK4"))
+	        			(shapeFileCRS.equalsIgnoreCase("EPSG:31468") && crsNetwork.equalsIgnoreCase("DHDN_GK4")) ||
+	        			(shapeFileCRS.equalsIgnoreCase("DHDN_GK4") && crsNetwork.equalsIgnoreCase("EPSG:31468")) ||
+	        			(shapeFileCRS.equalsIgnoreCase("GK4") && crsNetwork.equalsIgnoreCase("EPSG:31468")) ||
+	        			(shapeFileCRS.equalsIgnoreCase("EPSG:31468") && crsNetwork.equalsIgnoreCase("GK4"))
 	        			) {
 	        		// should not cause any problems.
 	        	} else {
@@ -395,8 +395,15 @@ public final class ODAnalysis {
 
 	private void printODLines(Map<String, Map<String, ODRelation>> time2odRelations, Map<String, Geometry> zones, String fileName) throws IOException {
 
+		CoordinateReferenceSystem crs;
+		if (this.shapeFileCRS != null) {
+			crs = MGC.getCRS(this.shapeFileCRS);
+		} else {
+			crs = null;
+		}
+		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-        		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+        		.setCrs(crs)
         		.setName("OD")
         		.addAttribute("OD_ID", String.class)
         		.addAttribute("O", String.class)
@@ -460,8 +467,15 @@ public final class ODAnalysis {
 
 	private void printODLinesForEachAgent(List<ODTrip> filteredTrips, String fileName) throws IOException {
 
+		CoordinateReferenceSystem crs;
+		if (this.shapeFileCRS != null) {
+			crs = MGC.getCRS(this.shapeFileCRS);
+		} else {
+			crs = null;
+		}
+		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-        		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+        		.setCrs(crs)
         		.setName("trip")
         		.addAttribute("personId", String.class)
         		.addAttribute("O", String.class)
