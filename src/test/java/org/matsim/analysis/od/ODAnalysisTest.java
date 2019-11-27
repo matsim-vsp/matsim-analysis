@@ -84,7 +84,7 @@ public class ODAnalysisTest {
 			config.controler().setOutputDirectory(outputDirectory);
 			Network network = ScenarioUtils.loadScenario(config).getNetwork();
 			
-			ODAnalysis odAnalysis = new ODAnalysis(outputDirectory, network, runId, shapeFile, "GK4" , zoneId, modes, scaleFactor);
+			ODAnalysis odAnalysis = new ODAnalysis(outputDirectory, network, runId, shapeFile, "EPSG:31468" , zoneId, modes, scaleFactor);
 			odAnalysis.process(handler1);
 
             String csvFilename = outputDirectory+ "/od-analysis/" + runId + ".od-analysis_0.0-36.0_drt.csv";
