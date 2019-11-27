@@ -771,7 +771,7 @@ public class MatsimAnalysis {
 	}
 
 	public void setAnalysisOutputDirectory(String analysisOutputDirectory) {
-		if (!analysisOutputDirectory.endsWith("/")) analysisOutputDirectory = analysisOutputDirectory + "/";
+		if (analysisOutputDirectory != null && !analysisOutputDirectory.endsWith("/")) analysisOutputDirectory = analysisOutputDirectory + "/";
 		this.analysisOutputDirectory = analysisOutputDirectory;
 	}
 
