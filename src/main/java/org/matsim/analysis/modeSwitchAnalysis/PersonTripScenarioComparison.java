@@ -172,15 +172,15 @@ public class PersonTripScenarioComparison {
 		}
 	        
 		// mode switch analysis
-		log.info("Comparing the two scenarios for each trip and person... (total number of persons: " + basicHandler1.getPersonId2tripNumber2legMode().size() + ")");
+		log.info("Comparing the two scenarios for each trip and person... (total number of persons: " + basicHandler1.getPersonId2tripNumber2tripMainMode().size() + ")");
 	
 		int personCounter = 0;
-		for (Id<Person> personId : basicHandler1.getPersonId2tripNumber2legMode().keySet()) {
+		for (Id<Person> personId : basicHandler1.getPersonId2tripNumber2tripMainMode().keySet()) {
 			
 			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 						
 			if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
-				Map<Integer, String> tripNr2legMode = basicHandler1.getPersonId2tripNumber2legMode().get(personId);
+				Map<Integer, String> tripNr2legMode = basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId);
 				
 				for (Integer tripNr : tripNr2legMode.keySet()) {
 					
@@ -193,15 +193,15 @@ public class PersonTripScenarioComparison {
 					} else {
 						String mode1 = tripNr2legMode.get(tripNr);
 						
-						if (basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId) == null) {
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripMainMode().get(personId) == null) {
 							throw new RuntimeException("Person " + personId + " from run directory1 " + analysisOutputDirectory + "doesn't exist in run directory0 " + analysisOutputDirectory + ". Are you comparing the same scenario? Aborting...");
 						}
 
 						String mode0 = "unknown";
-						if (basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId).get(tripNr) == null) {
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripMainMode().get(personId).get(tripNr) == null) {
 							log.warn("Could not identify the trip mode of person " + personId + " and trip number " + tripNr + ". Setting mode to 'unknown'.");
 						} else {
-							mode0 = basicHandlerToCompareWith.getPersonId2tripNumber2legMode().get(personId).get(tripNr);
+							mode0 = basicHandlerToCompareWith.getPersonId2tripNumber2tripMainMode().get(personId).get(tripNr);
 						}
 						
 						String stuck0 = "no";
@@ -510,8 +510,8 @@ public class PersonTripScenarioComparison {
 			        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 					
 			        int numberOfTrips = 0;
-			        if (basicHandler1.getPersonId2tripNumber2legMode().get(personId) != null) {
-			        		numberOfTrips = basicHandler1.getPersonId2tripNumber2legMode().get(personId).size();
+			        if (basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId) != null) {
+			        		numberOfTrips = basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId).size();
 			        }
 			        
 			        double homeX = 0.;
@@ -602,8 +602,8 @@ public class PersonTripScenarioComparison {
 				        }
 				        
 				        int numberOfTrips = 0;
-				        if (basicHandler1.getPersonId2tripNumber2legMode().get(personId) != null) {
-				        		numberOfTrips = basicHandler1.getPersonId2tripNumber2legMode().get(personId).size();
+				        if (basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId) != null) {
+				        		numberOfTrips = basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId).size();
 				        }
 				        
 				        double homeX = 0.;
@@ -694,7 +694,7 @@ public class PersonTripScenarioComparison {
 				        writer.write(personId + ";" + subpopulationOfPerson + ";"
 					    	    + homeX + ";"
 					    		+ homeY + ";"
-					        	+ basicHandler1.getPersonId2tripNumber2legMode().get(personId).size() + ";"
+					        	+ basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId).size() + ";"
 					        	+ switchType2agents.get(modeA + "2" + modeA).get(personId) + ";"
 								+ score0 + ";"
 								+ score1 + ";"
@@ -758,7 +758,7 @@ public class PersonTripScenarioComparison {
 				        writer.write(personId + ";" + subpopulationOfPerson + ";"
 					    	    + homeX + ";"
 					    		+ homeY + ";"
-					        	+ basicHandler1.getPersonId2tripNumber2legMode().get(personId).size() + ";"
+					        	+ basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId).size() + ";"
 					        	+ switchType2agents.get("x2" + modeA).get(personId) + ";"
 					        	+ score0 + ";"
 					        	+ score1 + ";"
@@ -821,7 +821,7 @@ public class PersonTripScenarioComparison {
 				        writer.write(personId + ";" + subpopulationOfPerson + ";"
 					    	    + homeX + ";"
 					    		+ homeY + ";"
-					        	+ basicHandler1.getPersonId2tripNumber2legMode().get(personId).size() + ";"
+					        	+ basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId).size() + ";"
 					        	+ switchType2agents.get(modeA + "2x").get(personId) + ";"
 					        	+ score0 + ";"
 					        	+ score1 + ";"

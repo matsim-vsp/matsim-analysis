@@ -197,7 +197,7 @@ public class BasicPersonTripAnalysisTest {
 			System.out.println("tripNumber2amount: " + basicHandler.getPersonId2tripNumber2payment().get(person.getId()));
 			System.out.println("tripNumber2arrivalTime: " + basicHandler.getPersonId2tripNumber2arrivalTime().get(person.getId()));
 			System.out.println("tripNumber2departureTime: " + basicHandler.getPersonId2tripNumber2departureTime().get(person.getId()));
-			System.out.println("tripNumber2legMode: " + basicHandler.getPersonId2tripNumber2legMode().get(person.getId()));
+			System.out.println("tripNumber2legMode: " + basicHandler.getPersonId2tripNumber2tripMainMode().get(person.getId()));
 			System.out.println("tripNumber2stuckAbort: " + basicHandler.getPersonId2tripNumber2stuckAbort().get(person.getId()));
 			System.out.println("tripNumber2travelTime: " + basicHandler.getPersonId2tripNumber2travelTime().get(person.getId()));
 			System.out.println("tripNumber2tripDistance: " + basicHandler.getPersonId2tripNumber2tripDistance().get(person.getId()));

@@ -150,8 +150,8 @@ public class PersonTripAnalysis {
 						}
 					}
 					
-					if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
-						for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
+					if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
+						for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
 							
 							if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
 								tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2payment().get(id).get(trip);
@@ -163,7 +163,7 @@ public class PersonTripAnalysis {
 								}
 							}
 							
-							if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+							if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
 								
 								mode_trips++;
 								
@@ -251,7 +251,8 @@ public class PersonTripAnalysis {
 			
 			bw.write( "person Id;"
 					+ "trip no.;"
-					+ "mode;"
+					+ "trip main mode;"
+					+ "trip modes (excl. help leg modes);"
 					+ "stuck and abort trip (yes/no);"
 					+ "departure time (trip) [sec];"
 					+ "enter vehicle time (trip) [sec];"
@@ -271,9 +272,9 @@ public class PersonTripAnalysis {
 			
 			bw.newLine();
 			
-			for (Id<Person> id : basicHandler.getPersonId2tripNumber2legMode().keySet()) {
+			for (Id<Person> id : basicHandler.getPersonId2tripNumber2tripMainMode().keySet()) {
 				
-				for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
+				for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
 							
 					boolean considerTrip;
 					if (tripFilter == null) {
@@ -282,10 +283,12 @@ public class PersonTripAnalysis {
 						considerTrip = tripFilter.considerTrip(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip), basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip));
 					}
 					if (considerTrip) {
-						if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+						if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
 							
-							String transportModeThisTrip = basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip);
+							String tripMainMode = basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip);
 							
+							String nonHelpLegModesThisTrip = basicHandler.getPersonId2tripNumber2tripModes().get(id).get(trip);
+	
 							String stuckAbort = "no";
 							if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
 								if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
@@ -372,7 +375,8 @@ public class PersonTripAnalysis {
 							
 							bw.write(id + ";"
 							+ trip + ";"
-							+ transportModeThisTrip + ";"
+							+ tripMainMode + ";"
+							+ nonHelpLegModesThisTrip + ";"
 							+ stuckAbort + ";"
 							+ departureTime + ";"
 							+ enterVehicleTime + ";"
@@ -444,13 +448,13 @@ public class PersonTripAnalysis {
 					}
 				}
 				
-				if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
+				if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
 					
-					for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
+					for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
 						
 						// only for the predefined mode
 						
-						if (ignoreModes || basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+						if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
 							
 							mode_trips++;
 							
@@ -555,13 +559,13 @@ public class PersonTripAnalysis {
 				
 				for (Id<Person> id : basicHandler.getScenario().getPopulation().getPersons().keySet()) {
 					
-					if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
+					if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
 						
-						for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
+						for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
 														
 							// only for the predefined mode
 							
-							if (basicHandler.getPersonId2tripNumber2legMode().get(id).get(trip).equals(mode)) {
+							if (basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
 								
 								mode_trips++;
 								
@@ -671,9 +675,9 @@ public class PersonTripAnalysis {
 					}
 				}
 				
-				if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
+				if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
 					
-					for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
+					for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
 						
 						// for all modes
 						
@@ -801,7 +805,7 @@ public class PersonTripAnalysis {
 			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2value,
 			double intervalLength, double finalInterval) {
 		
-		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
+		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2tripMainMode();
 		
 		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
 		Map<Integer, List<Double>> nr2values = new HashMap<>();
@@ -862,7 +866,7 @@ public class PersonTripAnalysis {
 			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2value,
 			double intervalLength, double finalInterval) {
 		
-		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
+		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2tripMainMode();
 		
 		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
 		Map<Integer, List<Double>> nr2values = new HashMap<>();

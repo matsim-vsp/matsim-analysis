@@ -23,8 +23,10 @@
  */
 package org.matsim.analysis.detailedPersonTripAnalysis.handler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -87,13 +89,15 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private final Map<Id<Vehicle>,Double> ptVehicleId2totalDistance = new HashMap<>();
 	private final Map<Id<Vehicle>,Double> taxiVehicleId2totalDistance = new HashMap<>();
 	private final Map<Id<Vehicle>,Double> networkModeVehicleId2totalDistance = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2currentLegModeNonHelpLeg = new HashMap<>();
 
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> ptVehicles = new HashSet<>();
 	private final Set<Id<Person>> taxiDrivers = new HashSet<Id<Person>>();
 
 	// analysis information to be stored
-	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2legMode = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2tripModes = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2tripMainMode = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Coord>> personId2tripNumber2originCoord = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2enterVehicleTime = new HashMap<>();
@@ -144,7 +148,9 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		personId2tripNumber2reward.clear(); // positive amounts
 		personId2tripNumber2amount.clear(); // all amounts
 		personId2tripNumber2stuckAbort.clear();
-		personId2tripNumber2legMode.clear();
+		personId2tripNumber2currentLegModeNonHelpLeg.clear();
+		personId2tripNumber2tripModes.clear();
+		personId2tripNumber2tripMainMode.clear();
 		personId2tripNumber2enterVehicleTime.clear();
 		personId2tripNumber2leaveVehicleTime.clear();
 		personId2tripNumber2inVehicleTime.clear();
@@ -389,18 +395,44 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			// no normal person
 			
 		} else {
-			if (personId2tripNumber2legMode.containsKey(event.getPersonId())) {
+			
+			if (!personId2tripNumber2currentLegModeNonHelpLeg.containsKey(event.getPersonId())) {				
+				// the person's first trip
+				Map<Integer,String> tripNumber2legMode = new HashMap<Integer,String>();
+				tripNumber2legMode.put(1, event.getLegMode());
+				personId2tripNumber2currentLegModeNonHelpLeg.put(event.getPersonId(), tripNumber2legMode);
+				
+				Map<Integer,String> tripNumber2tripMode = new HashMap<Integer,String>();
+				tripNumber2tripMode.put(1, event.getLegMode());
+				personId2tripNumber2tripModes.put(event.getPersonId(), tripNumber2tripMode);
+				
+				Map<Integer,String> tripNumber2tripMainMode = new HashMap<Integer,String>();
+				tripNumber2tripMainMode.put(1, event.getLegMode());
+				personId2tripNumber2tripMainMode.put(event.getPersonId(), tripNumber2tripMainMode);
+			
+			} else {
 				// at least the person's second trip
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
-				Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
+				Map<Integer,String> tripNumber2legMode = personId2tripNumber2currentLegModeNonHelpLeg.get(event.getPersonId());
+				Map<Integer,String> tripNumber2tripModes = personId2tripNumber2tripModes.get(event.getPersonId());
+				Map<Integer,String> tripNumber2tripMainMode = personId2tripNumber2tripMainMode.get(event.getPersonId());
 				
 				if (tripNumber2legMode.get(tripNumber) == null) {
-					// save the help leg mode (better than to have nothing; there may be transit_walk trips without any main mode leg)
+					// store the mode even though it might be a help leg mode (e.g. non_network_walk)
 					tripNumber2legMode.put(tripNumber, event.getLegMode());
-					personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
+					personId2tripNumber2currentLegModeNonHelpLeg.put(event.getPersonId(), tripNumber2legMode);
+					
+					tripNumber2tripModes.put(tripNumber, event.getLegMode());
+					personId2tripNumber2tripModes.put(event.getPersonId(), tripNumber2tripModes);
+					
+					tripNumber2tripMainMode.put(tripNumber, event.getLegMode());
+					personId2tripNumber2tripMainMode.put(event.getPersonId(), tripNumber2tripMainMode);
 				
 				} else {
-					// there is already a mode stored for the current trip, only overwrite help leg modes
+					// there is already a leg mode stored for this trip
+					String previousMode = tripNumber2legMode.get(tripNumber);
+					String currentLegMode = event.getLegMode();
+
 					boolean currentModeIsHelpLeg = false;
 					for (String helpLegMode : helpLegModes) {
 						if(event.getLegMode().equals(helpLegMode)) {
@@ -408,42 +440,65 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 							break;
 						}
 					}
-					if (!currentModeIsHelpLeg) {
-						// no help leg -> save the leg mode
-						
-						boolean previousModeIsHelpLeg = false;
-						String previousMode = tripNumber2legMode.get(tripNumber);
-						for (String helpLegMode : helpLegModes) {
-							if(previousMode.equals(helpLegMode)) {
-								previousModeIsHelpLeg = true;
-								break;
-							}
+					
+					boolean previousModeIsHelpLeg = false;
+					for (String helpLegMode : helpLegModes) {
+						if(previousMode.equals(helpLegMode)) {
+							previousModeIsHelpLeg = true;
+							break;
 						}
+					}
+					
+					if (!currentModeIsHelpLeg) {
+						// current mode is not a help leg mode
 						
-						String tripMode;
-						if (!previousModeIsHelpLeg && !event.getLegMode().equals(previousMode)) {
+						tripNumber2legMode.put(tripNumber, currentLegMode);
+						personId2tripNumber2currentLegModeNonHelpLeg.put(event.getPersonId(), tripNumber2legMode);
+						
+						String tripModes;
+						String tripMainMode;
+						if (!previousModeIsHelpLeg && !currentLegMode.equals(previousMode)) {
 							// intermodal trip
-							tripMode = previousMode +","+ event.getLegMode();
-							throw new RuntimeException("Analysis is not tested for intermodal trips: Modes: " + tripMode + " / Person: " + event.getPersonId() + " / Trip number: " + tripNumber);			
+							tripModes = previousMode +","+ currentLegMode;
+							tripMainMode = getMainMode(currentLegMode, tripModes);
 						} else {
 							// no intermodal trip
-							tripMode = event.getLegMode();
+							tripModes = currentLegMode;
+							tripMainMode = currentLegMode;
 						}
 						
-						tripNumber2legMode.put(tripNumber, tripMode);
-						personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);	
+						tripNumber2tripModes.put(tripNumber, tripModes);
+						personId2tripNumber2tripModes.put(event.getPersonId(), tripNumber2tripModes);
+						
+						tripNumber2tripMainMode.put(tripNumber, tripMainMode);
+						personId2tripNumber2tripMainMode.put(event.getPersonId(), tripNumber2tripMainMode);
 					}
 				}
-				
-			} else {
-				// the person's first trip
-				Map<Integer,String> tripNumber2legMode = new HashMap<Integer,String>();
-				tripNumber2legMode.put(1, event.getLegMode());
-				personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
 			}
 		}		
 	}
 	
+	private String getMainMode(String... modes) {
+		
+		List<String> allSplitModes = new ArrayList<>();
+		for (String mode : modes) {
+			String[] splitModes = mode.split(",");
+			for (String mode1 : splitModes) {
+				allSplitModes.add(mode1);
+			}
+		}
+		
+		for (String splitMode : allSplitModes) {
+			if (splitMode.equals(TransportMode.pt)) {
+				return TransportMode.pt;
+			}
+		}
+		
+		// intermodal trip without pt
+		throw new RuntimeException("Intermodal trip without pt leg: " + modes + ". Can't identify the main mode.");
+		// TODO: Account for some mode hierarchy
+	}
+
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 	
@@ -476,7 +531,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 			// distance
 			
-			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
+			Map<Integer,String> tripNumber2legMode = personId2tripNumber2currentLegModeNonHelpLeg.get(event.getPersonId());
 			
 			double distanceTravelled = 0.;
 			
@@ -553,7 +608,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 			// distance
 			
-			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
+			Map<Integer,String> tripNumber2legMode = personId2tripNumber2currentLegModeNonHelpLeg.get(event.getPersonId());
 			
 			if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.pt)){
 				personId2distanceEnterValue.put(event.getPersonId(), ptVehicleId2totalDistance.get(event.getVehicleId()));
@@ -686,10 +741,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		return personId2distanceEnterValue;
 	}
 
-	public Map<Id<Person>, Map<Integer, String>> getPersonId2tripNumber2legMode() {
-		return personId2tripNumber2legMode;
+	public Map<Id<Person>, Map<Integer, String>> getPersonId2tripNumber2tripMainMode() {
+		return personId2tripNumber2tripMainMode;
 	}
-
+	
+	public Map<Id<Person>, Map<Integer, String>> getPersonId2tripNumber2tripModes() {
+		return personId2tripNumber2tripModes;
+	}
+	
 	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2departureTime() {
 		return personId2tripNumber2departureTime;
 	}

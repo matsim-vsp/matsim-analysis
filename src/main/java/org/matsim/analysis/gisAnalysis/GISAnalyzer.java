@@ -163,9 +163,9 @@ public class GISAnalyzer {
 
 		Map<String, Map<Id<Person>, Double>> mode2personId2trips = new HashMap<>();
 		
-		for (Id<Person> personId : basicHandler.getPersonId2tripNumber2legMode().keySet()) {
-			for (Integer tripNr : basicHandler.getPersonId2tripNumber2legMode().get(personId).keySet()) {
-				String mode = basicHandler.getPersonId2tripNumber2legMode().get(personId).get(tripNr);
+		for (Id<Person> personId : basicHandler.getPersonId2tripNumber2tripMainMode().keySet()) {
+			for (Integer tripNr : basicHandler.getPersonId2tripNumber2tripMainMode().get(personId).keySet()) {
+				String mode = basicHandler.getPersonId2tripNumber2tripMainMode().get(personId).get(tripNr);
 				if(mode2personId2trips.get(mode) == null) {
 					Map<Id<Person>, Double> personId2trips = new HashMap<>();
 					personId2trips.put(personId, 1.0);
