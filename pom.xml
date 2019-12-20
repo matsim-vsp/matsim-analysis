@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.matsim-vsp</groupId>
 	<artifactId>matsim-analysis</artifactId>
-	<version>v2.5</version>
+	<version>v2.6</version>
 
 	<name>MATSim analysis project</name>
 	<description>MATSim analysis project</description>
@@ -14,7 +14,7 @@
 	  <!-- <matsim.version>12.0-SNAPSHOT</matsim.version>  -->
 
 	  <!--weekly "release":-->
-	  <matsim.version>12.0-2019w45-SNAPSHOT</matsim.version>
+	  <matsim.version>12.0-2019w49-SNAPSHOT</matsim.version>
 	</properties>
 
 	<repositories>
@@ -110,11 +110,11 @@
  			<artifactId>jcodec-javase</artifactId>
  			<version>0.1.9</version>
 		</dependency>
-	
+
 		<dependency>
-    		<groupId>org.apache.commons</groupId>
-    		<artifactId>commons-io</artifactId>
-    		<version>1.3.2</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
 		</dependency>
 		
 		<dependency>

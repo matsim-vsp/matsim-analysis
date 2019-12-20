@@ -26,7 +26,6 @@
 			<param name="numberOfThreads" value="1"/>
 			<param name="operationalScheme" value="serviceAreaBased"/>
 			<param name="drtServiceAreaShapeFile" value="./equil-zone/equi-zone.shp" />
-			<param name="plotDetailedWarnings" value="true"/>
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="stopDuration" value="60.0"/>
 			<param name="transitStopFile" value="null"/>
