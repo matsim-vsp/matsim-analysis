@@ -495,7 +495,11 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		}
 		
 		// intermodal trip without pt
-		throw new RuntimeException("Intermodal trip without pt leg: " + modes + ". Can't identify the main mode.");
+		log.warn("Intermodal trip without pt leg:");
+		for (String mode : modes) {
+			log.warn(mode);
+		}
+		throw new RuntimeException("See previous warning. Can't identify the main mode. Aborting...");
 		// TODO: Account for some mode hierarchy
 	}
 
