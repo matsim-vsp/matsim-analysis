@@ -85,7 +85,7 @@ public class MatsimAnalysis {
 	private String zoneId;
 	private String homeActivityPrefix = "home";
 	private int scalingFactor;
-	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
+	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, TransportMode.walk};
 	private List<String> modes;	
 	private String visualizationScriptInputDirectory = null;
 	private String analysisOutputDirectory;
