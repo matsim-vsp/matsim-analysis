@@ -105,9 +105,8 @@ public class PersonTripAnalysis {
 					+ mode + " total travel time (day) [sec];"
 					+ mode + " total in-vehicle time (day) [sec];"
 					+ mode + " total travel distance (day) [m];"
-					
 					+ "travel related user benefits (based on the selected plans score) [monetary units];"
-					+ "total money payments (day) [monetary units];"
+					+ "total money payments (day) [monetary units]"
 					);
 			bw.newLine();
 			
@@ -234,7 +233,7 @@ public class PersonTripAnalysis {
 					+ "destination X coordinate (trip);"
 					+ "destination Y coordinate (trip);"
 					+ "beeline distance (trip) [m];"
-					+ "toll payments (trip) [monetary units];");
+					+ "toll payments (trip) [monetary units]");
 			
 			bw.newLine();
 			

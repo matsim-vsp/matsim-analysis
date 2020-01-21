@@ -64,8 +64,12 @@ public class ActDurationHandler implements ActivityStartEventHandler, ActivityEn
 	private boolean dataProcessed = false;
 	
 	private final double endOfDay = 24 * 3600.;
-	private final String[] activityTypesToBeIgnored = {"pt interaction"};
+	private final String stageActivitySubString;
 	
+	public ActDurationHandler(String stageActivitySubString) {
+		this.stageActivitySubString  = stageActivitySubString;
+	}
+
 	@Override
 	public void reset(int iteration) {
 		this.personId2startTime.clear();
@@ -79,7 +83,7 @@ public class ActDurationHandler implements ActivityStartEventHandler, ActivityEn
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
-		if(!isActivityToBeIgnored(event.getActType())) {
+		if(event.getActType().contains(stageActivitySubString)) {
 		
 			personId2startTime.put(event.getPersonId(), event.getTime());
 			personId2currentActivity.put(event.getPersonId(), event.getActType());
@@ -100,18 +104,9 @@ public class ActDurationHandler implements ActivityStartEventHandler, ActivityEn
 			}
 		}
 	}
-	
-	private boolean isActivityToBeIgnored(String actType) {
-		for (String subString : this.activityTypesToBeIgnored) {
-			if (actType.equals(subString)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	public void handleEvent(ActivityEndEvent event) {
-		if(!isActivityToBeIgnored(event.getActType())) {
+		if(event.getActType().contains(stageActivitySubString)) {
 			
 			if (personId2startTime.get(event.getPersonId()) != null ) {
 				

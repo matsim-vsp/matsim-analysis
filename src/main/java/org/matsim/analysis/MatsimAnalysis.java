@@ -171,7 +171,7 @@ public class MatsimAnalysis {
 			
 			personMoneyHandler1 = new MoneyExtCostHandler();
 			
-			actHandler1 = new ActDurationHandler();
+			actHandler1 = new ActDurationHandler(this.stageActivitySubString);
 			
 			vttsHandler1 = new VTTSHandler(scenario1, helpLegModes, stageActivitySubString);
 			
@@ -211,7 +211,7 @@ public class MatsimAnalysis {
 			
 			personMoneyHandler0 = new MoneyExtCostHandler();
 			
-			actHandler0 = new ActDurationHandler();
+			actHandler0 = new ActDurationHandler(this.stageActivitySubString);
 			
 			vttsHandler0 = new VTTSHandler(scenario0, helpLegModes, stageActivitySubString);
 			
