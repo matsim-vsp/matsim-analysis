@@ -50,10 +50,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
-import org.matsim.contrib.noise.personLinkMoneyEvents.CombinedPersonLinkMoneyEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -693,18 +693,18 @@ public class MatsimAnalysis {
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
-			new CombinedPersonLinkMoneyEventsReader(events).readURL(eventsFileURL);
+			new MatsimEventsReader(events).readURL(eventsFileURL);
 		} else {
 			if (new File(runDirectory + runId + ".output_events.xml.gz").exists()) {
 				String eventsFile = runDirectory + runId + ".output_events.xml.gz";
 				log.info("Trying to read " + eventsFile + "...");
-				new CombinedPersonLinkMoneyEventsReader(events).readFile(eventsFile);
+				new MatsimEventsReader(events).readFile(eventsFile);
 
 			} else if (new File(runDirectory + "output_events.xml.gz").exists()){
 				log.info(runDirectory + runId + ".output_events.xml.gz not found. Trying to read file without runId prefix...");
 				String eventsFile = runDirectory + "output_events.xml.gz";
 				log.info("Trying to read " + eventsFile + "...");
-				new CombinedPersonLinkMoneyEventsReader(events).readFile(eventsFile);
+				new MatsimEventsReader(events).readFile(eventsFile);
 				
 			} else {
 				throw new RuntimeException("Events file not found for runDirectory: " + runDirectory + " and runId: " + runId + ". Aborting...");
