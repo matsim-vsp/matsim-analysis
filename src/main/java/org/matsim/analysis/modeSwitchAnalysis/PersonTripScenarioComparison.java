@@ -31,7 +31,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.analysis.TripFilter;
-import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
+import org.matsim.analysis.detailedPersonTripAnalysis.BasicPersonTripAnalysisHandler;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

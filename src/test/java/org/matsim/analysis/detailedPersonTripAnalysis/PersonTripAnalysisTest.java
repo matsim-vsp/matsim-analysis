@@ -14,14 +14,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
-import org.matsim.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
 import org.matsim.analysis.vtts.VTTSHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -69,13 +66,10 @@ public class PersonTripAnalysisTest {
 		basicHandler.setScenario(scenario);
 
 		VTTSHandler vttsHandler = new VTTSHandler(scenario, helpLegModes, stageActivitySubString);
-		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler();
-		noiseHandler.setBasicHandler(basicHandler);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);
 		events.addHandler(vttsHandler);
-		events.addHandler(noiseHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -92,24 +86,12 @@ public class PersonTripAnalysisTest {
 		}
 
 		
-		// noise events analysis
-	
-		if (noiseHandler.isCaughtNoiseEvent()) {
-			log.info("Noise events have already been analyzed based on the standard events file.");
-		} else {
-			EventsManager eventsNoise = EventsUtils.createEventsManager();
-			eventsNoise.addHandler(noiseHandler);
-					
-			log.info("Reading noise events file...");
-			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
-			noiseEventReader.readFile(eventsFile);
-			log.info("Reading noise events file... Done.");	
-		}
+		
 		
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
-		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler, null);
-		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
-		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler, null);
+		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, null);
+		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler);
+		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, null);
 		
 	}
 	
