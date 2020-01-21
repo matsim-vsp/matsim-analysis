@@ -99,7 +99,7 @@ public class MatsimAnalysis {
 	// base case (optional)
 	private Scenario scenario0;
 	
-	private final String outputDirectoryName = "analysis-v2.5";
+	private final String outputDirectoryName = "analysis-v2.6";
 	private final String stageActivitySubString = "interaction";
 
 	public void run() {
