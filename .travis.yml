@@ -6,12 +6,12 @@ env:
   global:
     - MAVEN_OPTS="-Xmx8g"
   matrix:
-    - TEST=MatsimAnalysisRunTest#testTest
-    - TEST=MatsimAnalysisRunTest#test1
+    - TEST=MatsimAnalysisRunTest
+    - TEST=MatsimAnalysisRunDrtTest
+    - TEST=MatsimAnalysisRunIntermodalTest
     - TEST=VTTSHandlerTest
     - TEST=ModeAnalysisTest
     - TEST=BasicPersonTripAnalysisTest
-    - TEST=NoiseAnalysisTest
     - TEST=PersonTripAnalysisTest
     - TEST=ODAnalysisTest
    
