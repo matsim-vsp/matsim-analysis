@@ -19,6 +19,8 @@
 
 package org.matsim.analysis;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -167,7 +169,7 @@ public class AgentAnalysisFilter implements AgentFilter {
 	    	    
 		if (scenario != null &&  zoneFile != null) {					
 			log.info("Reading shape file...");
-			Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(zoneFile);
+			Collection<SimpleFeature> features = getFeatures(zoneFile);
 			int counter = 0;
 			for (SimpleFeature feature : features) {
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
@@ -179,6 +181,26 @@ public class AgentAnalysisFilter implements AgentFilter {
 		
 	}
 	
+	private Collection<SimpleFeature> getFeatures(String shapeFile) {
+        if (shapeFile != null) {
+            Collection<SimpleFeature> features;
+        	if (shapeFile.startsWith("http")) {
+                URL shapeFileAsURL = null;
+    			try {
+    				shapeFileAsURL = new URL(shapeFile);
+    			} catch (MalformedURLException e) {
+    				e.printStackTrace();
+    			}
+                features = ShapeFileReader.getAllFeatures(shapeFileAsURL);
+            } else {
+                features = ShapeFileReader.getAllFeatures(shapeFile);
+            }
+        	return features;
+        } else {
+        	return null;
+        }
+	}
+
 	@Override
 	public String toFileName() {
 		String fileName = "_PERSONFILTER-" + filterName;
