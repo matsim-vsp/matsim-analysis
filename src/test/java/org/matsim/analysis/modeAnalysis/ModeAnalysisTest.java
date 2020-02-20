@@ -30,11 +30,13 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.AgentAnalysisFilter;
+import org.matsim.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.analysis.modalSplitUserType.ModeAnalysis;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
@@ -48,6 +50,7 @@ public class ModeAnalysisTest {
 		
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	private AnalysisMainModeIdentifier mainModeIdentifier = new DefaultAnalysisMainModeIdentifier();
 
 	@Test
 	public final void test1() {
@@ -74,7 +77,7 @@ public class ModeAnalysisTest {
 		
 		filter.preProcess(scenario);
 				
-		ModeAnalysis analysis = new ModeAnalysis(scenario, filter);
+		ModeAnalysis analysis = new ModeAnalysis(scenario, filter, mainModeIdentifier);
 		analysis.run();
 		
 		File directory = new File(outputDirectory);

@@ -54,6 +54,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -84,6 +85,7 @@ public class MatsimAnalysis {
 	private String zoneId;
 	private String homeActivityPrefix = "home";
 	private int scalingFactor;
+	private AnalysisMainModeIdentifier mainModeIdentifier = new DefaultAnalysisMainModeIdentifier();
 	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, TransportMode.walk};
 	private List<String> modes;	
 	private String visualizationScriptInputDirectory = null;
@@ -251,7 +253,7 @@ public class MatsimAnalysis {
 			
 			if (agentFilters != null) {
 				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter);
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter, mainModeIdentifier);
 					modeAnalysis1.run();
 					modeAnalysisList1.add(modeAnalysis1);
 				}
@@ -266,7 +268,7 @@ public class MatsimAnalysis {
 			
 			if (agentFilters != null) {
 				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter);
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter, mainModeIdentifier);
 					modeAnalysis0.run();
 					modeAnalysisList0.add(modeAnalysis0);
 				}
@@ -726,6 +728,10 @@ public class MatsimAnalysis {
 
 	public void setHelpLegModes(String[] helpLegModes) {
 		this.helpLegModes = helpLegModes;
+	}
+
+	public void setMainModeIdentifier(AnalysisMainModeIdentifier mainModeIdentifier) {
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	public void setModes(List<String> modes) {

@@ -34,6 +34,7 @@ import org.matsim.analysis.AgentFilter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.collections.Tuple;
@@ -47,8 +48,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class ModeAnalysis {
 	
 	private static final Logger log = Logger.getLogger(ModeAnalysis.class);	
-	private Scenario scenario;
-	private AgentFilter filter;
+	private final Scenario scenario;
+	private final AgentFilter filter;
+	private final AnalysisMainModeIdentifier modeIdentifier;
 	
 	private Map<String, Integer> mode2TripCounterFiltered = new HashMap<>();		
 	private Map<String, List<Double>> mode2TripRouteDistancesFiltered = new HashMap<>();
@@ -56,9 +58,10 @@ public class ModeAnalysis {
 
 	private double totalTripsFiltered = 0.;
 
-	public ModeAnalysis(Scenario scenario, AgentFilter filter) {
+	public ModeAnalysis(Scenario scenario, AgentFilter filter, AnalysisMainModeIdentifier modeIdentifier) {
 		this.scenario = scenario;
 		this.filter = filter;
+		this.modeIdentifier = modeIdentifier;
 	}
 
 	public void run() {
@@ -80,7 +83,6 @@ public class ModeAnalysis {
 						routeDistance += leg.getRoute().getDistance();
 					}
 					
-					AnalysisMainModeIdentifier modeIdentifier = new AnalysisMainModeIdentifier();
 					String currentLegMode = modeIdentifier.identifyMainMode(trip.getTripElements());
 					
 					if (mode2TripCounterFiltered.containsKey(currentLegMode)) {
