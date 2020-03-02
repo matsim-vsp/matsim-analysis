@@ -11,10 +11,10 @@
 
 	<properties>
 	  <!-- release> -->
-	  <!-- <matsim.version>12.0-SNAPSHOT</matsim.version>  -->
+	  <matsim.version>12.0-SNAPSHOT</matsim.version>
 
 	  <!--weekly "release":-->
-	  <matsim.version>12.0-2020w03-SNAPSHOT</matsim.version>
+	  <!-- <matsim.version>12.0-2020w09-SNAPSHOT</matsim.version>  -->
 	</properties>
 
 	<repositories>
