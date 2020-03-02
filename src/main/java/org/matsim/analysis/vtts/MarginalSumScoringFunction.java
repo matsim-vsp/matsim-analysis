@@ -98,13 +98,13 @@ public class MarginalSumScoringFunction {
 		SumScoringFunction delegateB = new SumScoringFunction() ;
 		delegateB.addScoringFunction(activityScoringB);
 		
-        if (activityMorning.getStartTime().isDefined() && activityMorning.getEndTime().isDefined()) {
+        if (activityMorning.getStartTime().isUndefined() && activityMorning.getEndTime().isDefined()) {
         	// 'morningActivity' is the first activity
         } else {
         	throw new RuntimeException("activityMorning is not the first activity. Or why does it have a start time? Aborting...");
         }
         
-        if (activityEvening.getStartTime().isDefined() && activityEvening.getEndTime().isDefined()) {
+        if (activityEvening.getStartTime().isDefined() && activityEvening.getEndTime().isUndefined()) {
         	// 'eveningActivity' is the last activity
         } else {
         	throw new RuntimeException("activityEvening is not the last activity. Or why does it have an end time? Aborting...");
