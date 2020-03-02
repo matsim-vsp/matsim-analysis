@@ -19,16 +19,6 @@
 
 package org.matsim.analysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.actDurations.ActDurationHandler;
 import org.matsim.analysis.detailedPersonTripAnalysis.BasicPersonTripAnalysisHandler;
@@ -56,6 +46,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 /**
  * 
@@ -85,49 +81,48 @@ public class MatsimAnalysis {
 	private String homeActivityPrefix = "home";
 	private int scalingFactor;
 	private String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, TransportMode.walk};
-	private List<String> modes;	
+	private List<String> modes;
 	private String visualizationScriptInputDirectory = null;
 	private String analysisOutputDirectory;
 	private boolean printODSHPfiles = true;
 	private boolean printTripSHPfiles = false;
-	
+
 	// policy case
 	private Scenario scenario1;
-	private List<AgentFilter> agentFilters;
-	private List<TripFilter> tripFilters1;
-	
+	private static final String OUTPUT_DIRECTORY_NAME = "analysis-v2.6";
+	private static final String STAGE_ACTIVITY_SUB_STRING = "interaction";
+
 	// base case (optional)
 	private Scenario scenario0;
-	
-	private final String outputDirectoryName = "analysis-v2.6";
-	private final String stageActivitySubString = "interaction";
+	private List<AgentFilter> agentFilters = new ArrayList<>();
+	private List<TripFilter> tripFilters1 = new ArrayList<>();
 
 	public void run() {
-		
-		String outputDirectoryName = this.outputDirectoryName;
-	
+
+		String outputDirectoryName = OUTPUT_DIRECTORY_NAME;
+
 		final String runId = scenario1.getConfig().controler().getRunId();
 		String runDirectory = scenario1.getConfig().controler().getOutputDirectory();
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
-		
-		String runIdToCompareWith = null;
-		String runDirectoryToCompareWith = null;
+
+		String runIdToCompareWith = "";
+		String runDirectoryToCompareWith = "";
 		if (scenario0 != null) {
 			runIdToCompareWith = scenario0.getConfig().controler().getRunId();
 			runDirectoryToCompareWith = scenario0.getConfig().controler().getOutputDirectory();
 			if (!runDirectoryToCompareWith.endsWith("/")) runDirectoryToCompareWith = runDirectoryToCompareWith + "/";
-			outputDirectoryName = this.outputDirectoryName + "-comparison";
+			outputDirectoryName = OUTPUT_DIRECTORY_NAME + "-comparison";
 		}
-		
-		String outputDirectoryForAnalysisFiles = null;
+
+		String outputDirectoryForAnalysisFiles;
 		if (this.analysisOutputDirectory == null) {
 			outputDirectoryForAnalysisFiles = runDirectory + outputDirectoryName + "/";
 		} else {
 			outputDirectoryForAnalysisFiles = this.analysisOutputDirectory + outputDirectoryName + "/";
 		}
-		File folder = new File(outputDirectoryForAnalysisFiles);			
+		File folder = new File(outputDirectoryForAnalysisFiles);
 		folder.mkdirs();
-		
+
 		OutputDirectoryLogging.catchLogEntries();
 		try {
 			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectoryForAnalysisFiles);
@@ -160,23 +155,23 @@ public class MatsimAnalysis {
 		ODEventAnalysisHandler odHandler1 = null;
 
 		if (scenario1 != null) {
-			basicHandler1 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
+			basicHandler1 = new BasicPersonTripAnalysisHandler(this.helpLegModes, STAGE_ACTIVITY_SUB_STRING);
 			basicHandler1.setScenario(scenario1);
 
 			delayAnalysis1 = new DelayAnalysis();
 			delayAnalysis1.setScenario(scenario1);
-			
+
 			trafficVolumeAnalysis1 = new LinkDemandEventHandler(scenario1.getNetwork());
 			dynamicTrafficVolumeAnalysis1 = new DynamicLinkDemandEventHandler(scenario1.getNetwork());
-			
+
 			personMoneyHandler1 = new MoneyExtCostHandler();
-			
-			actHandler1 = new ActDurationHandler(this.stageActivitySubString);
-			
-			vttsHandler1 = new VTTSHandler(scenario1, helpLegModes, stageActivitySubString);
-			
-			odHandler1 = new ODEventAnalysisHandler(helpLegModes, stageActivitySubString);
-			
+
+			actHandler1 = new ActDurationHandler(STAGE_ACTIVITY_SUB_STRING);
+
+			vttsHandler1 = new VTTSHandler(scenario1, helpLegModes, STAGE_ACTIVITY_SUB_STRING);
+
+			odHandler1 = new ODEventAnalysisHandler(helpLegModes, STAGE_ACTIVITY_SUB_STRING);
+
 			events1 = EventsUtils.createEventsManager();
 			events1.addHandler(basicHandler1);
 			events1.addHandler(delayAnalysis1);
@@ -200,7 +195,7 @@ public class MatsimAnalysis {
 		ODEventAnalysisHandler odHandler0 = null;
 		
 		if (scenario0 != null) {
-			basicHandler0 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
+			basicHandler0 = new BasicPersonTripAnalysisHandler(this.helpLegModes, STAGE_ACTIVITY_SUB_STRING);
 			basicHandler0.setScenario(scenario0);
 
 			delayAnalysis0 = new DelayAnalysis();
@@ -208,14 +203,14 @@ public class MatsimAnalysis {
 
 			trafficVolumeAnalysis0 = new LinkDemandEventHandler(scenario0.getNetwork());
 			dynamicTrafficVolumeAnalysis0 = new DynamicLinkDemandEventHandler(scenario0.getNetwork());
-			
+
 			personMoneyHandler0 = new MoneyExtCostHandler();
-			
-			actHandler0 = new ActDurationHandler(this.stageActivitySubString);
-			
-			vttsHandler0 = new VTTSHandler(scenario0, helpLegModes, stageActivitySubString);
-			
-			odHandler0 = new ODEventAnalysisHandler(helpLegModes, stageActivitySubString);
+
+			actHandler0 = new ActDurationHandler(STAGE_ACTIVITY_SUB_STRING);
+
+			vttsHandler0 = new VTTSHandler(scenario0, helpLegModes, STAGE_ACTIVITY_SUB_STRING);
+
+			odHandler0 = new ODEventAnalysisHandler(helpLegModes, STAGE_ACTIVITY_SUB_STRING);
 
 			events0 = EventsUtils.createEventsManager();
 			events0.addHandler(basicHandler0);
