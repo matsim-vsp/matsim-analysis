@@ -22,23 +22,19 @@
  */
 package org.matsim.analysis.detailedPersonTripAnalysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.analysis.TripFilter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author ikaddoura
@@ -61,8 +57,8 @@ public class PersonTripAnalysis {
 					sum = sum + value;
 					counter++;
 				}
-				
-				bw.write(String.valueOf(parameter) + ";" + sum / counter);
+
+				bw.write(parameter + ";" + sum / counter);
 				bw.newLine();
 			}
 			log.info("Output written to " + fileName);
@@ -234,13 +230,18 @@ public class PersonTripAnalysis {
 					+ "destination Y coordinate (trip);"
 					+ "beeline distance (trip) [m];"
 					+ "toll payments (trip) [monetary units]");
-			
+
 			bw.newLine();
-			
-			for (Id<Person> id : basicHandler.getPersonId2tripNumber2tripMainMode().keySet()) {
-				
+
+			Set<Id<Person>> persons = basicHandler.getPersonId2tripNumber2tripMainMode().keySet().stream()
+					.filter(id -> !basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id))
+					.collect(Collectors.toSet());
+
+
+			//for (Id<Person> id : basicHandler.getPersonId2tripNumber2tripMainMode().keySet()) {
+			for (Id<Person> id : persons) {
 				for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
-							
+
 					boolean considerTrip;
 					if (tripFilter == null) {
 						considerTrip = true;
@@ -249,92 +250,103 @@ public class PersonTripAnalysis {
 					}
 					if (considerTrip) {
 						if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
-							
+
 							String tripMainMode = basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip);
-							
+
 							String nonHelpLegModesThisTrip = basicHandler.getPersonId2tripNumber2tripModes().get(id).get(trip);
-	
-							String stuckAbort = "no";
-							if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
-								if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
-									stuckAbort = "yes";
+
+							try {
+								String stuckAbort = "no";
+								if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
+									if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
+										stuckAbort = "yes";
+									}
 								}
+
+								String departureTime = "unknown";
+								if (basicHandler.getPersonId2tripNumber2departureTime().containsKey(id) && basicHandler.getPersonId2tripNumber2departureTime().get(id).containsKey(trip)) {
+									departureTime = String.valueOf(basicHandler.getPersonId2tripNumber2departureTime().get(id).get(trip));
+								}
+
+
+								String arrivalTime = "unknown";
+								if (basicHandler.getPersonId2tripNumber2arrivalTime().containsKey(id) && basicHandler.getPersonId2tripNumber2arrivalTime().get(id).containsKey(trip)) {
+									arrivalTime = String.valueOf(basicHandler.getPersonId2tripNumber2arrivalTime().get(id).get(trip));
+								}
+
+								String travelTime = "unknown";
+								if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
+									travelTime = String.valueOf(basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip));
+								}
+
+								String inVehTime = "unknown";
+								if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+									inVehTime = String.valueOf(basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip));
+								}
+
+								String travelDistance = "unknown";
+								if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
+									travelDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip));
+								}
+
+								String tripOriginCoordinateX = "unknown";
+								if (basicHandler.getPersonId2tripNumber2originCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2originCoord().get(id).containsKey(trip)) {
+									tripOriginCoordinateX = String.valueOf(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip).getX());
+								}
+
+								String tripOriginCoordinateY = "unknown";
+								if (basicHandler.getPersonId2tripNumber2originCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2originCoord().get(id).containsKey(trip)) {
+									tripOriginCoordinateY = String.valueOf(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip).getY());
+								}
+
+								String tripDestinationCoordinateX = "unknown";
+								if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
+									try {
+										tripDestinationCoordinateX = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getX());
+									} catch (Exception e) {
+										e.printStackTrace();
+										log.error(e);
+									}
+								}
+
+								String tripDestinationCoordinateY = "unknown";
+								if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
+									tripDestinationCoordinateY = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getY());
+								}
+
+								String beelineDistance = "unknown";
+								if (basicHandler.getPersonId2tripNumber2tripBeelineDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripBeelineDistance().get(id).containsKey(trip)) {
+									beelineDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripBeelineDistance().get(id).get(trip));
+								}
+
+								String tollPayment = "unknown";
+								if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
+									tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
+								}
+
+
+								bw.write(id + ";"
+										+ trip + ";"
+										+ tripMainMode + ";"
+										+ nonHelpLegModesThisTrip + ";"
+										+ stuckAbort + ";"
+										+ departureTime + ";"
+										+ arrivalTime + ";"
+										+ travelTime + ";"
+										+ inVehTime + ";"
+										+ travelDistance + ";"
+										+ tripOriginCoordinateX + ";"
+										+ tripOriginCoordinateY + ";"
+										+ tripDestinationCoordinateX + ";"
+										+ tripDestinationCoordinateY + ";"
+										+ beelineDistance + ";"
+										+ tollPayment
+								);
+								bw.newLine();
+							} catch (Exception e) {
+								e.printStackTrace();
+								log.error(e);
 							}
-							
-							String departureTime = "unknown";
-							if (basicHandler.getPersonId2tripNumber2departureTime().containsKey(id) && basicHandler.getPersonId2tripNumber2departureTime().get(id).containsKey(trip)) {
-								departureTime = String.valueOf(basicHandler.getPersonId2tripNumber2departureTime().get(id).get(trip));
-							}
-							
-							
-							String arrivalTime = "unknown";
-							if (basicHandler.getPersonId2tripNumber2arrivalTime().containsKey(id) && basicHandler.getPersonId2tripNumber2arrivalTime().get(id).containsKey(trip)){
-								arrivalTime = String.valueOf(basicHandler.getPersonId2tripNumber2arrivalTime().get(id).get(trip));
-							}
-							
-							String travelTime = "unknown";
-							if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
-								travelTime = String.valueOf(basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip));
-							}
-							
-							String inVehTime = "unknown";
-							if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
-								inVehTime = String.valueOf(basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip));
-							}
-							
-							String travelDistance = "unknown";
-							if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
-								travelDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip));
-							}
-							
-							String tripOriginCoordinateX = "unknown";
-							if (basicHandler.getPersonId2tripNumber2originCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2originCoord().get(id).containsKey(trip)) {
-								tripOriginCoordinateX = String.valueOf(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip).getX());
-							}
-							
-							String tripOriginCoordinateY = "unknown";
-							if (basicHandler.getPersonId2tripNumber2originCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2originCoord().get(id).containsKey(trip)) {
-								tripOriginCoordinateY = String.valueOf(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip).getY());
-							}
-							
-							String tripDestinationCoordinateX = "unknown";
-							if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
-								tripDestinationCoordinateX = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getX());
-							}
-							
-							String tripDestinationCoordinateY = "unknown";
-							if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
-								tripDestinationCoordinateY = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getY());
-							}
-							
-							String beelineDistance = "unknown";
-							if (basicHandler.getPersonId2tripNumber2tripBeelineDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripBeelineDistance().get(id).containsKey(trip)) {
-								beelineDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripBeelineDistance().get(id).get(trip));
-							}
-							
-							String tollPayment = "unknown";
-							if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
-								tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
-							}
-							
-							bw.write(id + ";"
-							+ trip + ";"
-							+ tripMainMode + ";"
-							+ nonHelpLegModesThisTrip + ";"
-							+ stuckAbort + ";"
-							+ departureTime + ";"
-							+ arrivalTime + ";"
-							+ travelTime + ";"
-							+ inVehTime + ";"
-							+ travelDistance + ";"
-							+ tripOriginCoordinateX + ";"
-							+ tripOriginCoordinateY + ";"
-							+ tripDestinationCoordinateX + ";"
-							+ tripDestinationCoordinateY + ";"
-							+ beelineDistance + ";"
-							+ tollPayment
-							);
-							bw.newLine();						
 						}
 					}
 				}
