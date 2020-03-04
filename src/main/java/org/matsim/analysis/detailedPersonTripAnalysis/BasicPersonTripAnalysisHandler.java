@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.analysis.detailedPersonTripAnalysis;
 
 import com.google.inject.Inject;
@@ -70,7 +67,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> ptVehicles = new HashSet<>();
-	private final Set<Id<Person>> taxiDrivers = new HashSet<Id<Person>>();
+	private final Set<Id<Person>> taxiDrivers = new HashSet<>();
 
 	// analysis information to be stored
 	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2tripModes = new HashMap<>();
@@ -370,15 +367,15 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 			if (personId2tripNumber2currentLegModeNonHelpLeg.get(event.getPersonId()) == null) {				
 				// the person's first trip
-				Map<Integer,String> tripNumber2legMode = new HashMap<Integer,String>();
+				Map<Integer,String> tripNumber2legMode = new HashMap<>();
 				tripNumber2legMode.put(1, event.getLegMode());
 				personId2tripNumber2currentLegModeNonHelpLeg.put(event.getPersonId(), tripNumber2legMode);
 				
-				Map<Integer,String> tripNumber2tripMode = new HashMap<Integer,String>();
+				Map<Integer,String> tripNumber2tripMode = new HashMap<>();
 				tripNumber2tripMode.put(1, event.getLegMode());
 				personId2tripNumber2tripModes.put(event.getPersonId(), tripNumber2tripMode);
 				
-				Map<Integer,String> tripNumber2tripMainMode = new HashMap<Integer,String>();
+				Map<Integer,String> tripNumber2tripMainMode = new HashMap<>();
 				tripNumber2tripMainMode.put(1, event.getLegMode());
 				personId2tripNumber2tripMainMode.put(event.getPersonId(), tripNumber2tripMainMode);
 			
@@ -455,9 +452,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		List<String> allSplitModes = new ArrayList<>();
 		for (String mode : modes) {
 			String[] splitModes = mode.split(",");
-			for (String mode1 : splitModes) {
-				allSplitModes.add(mode1);
-			}
+			Collections.addAll(allSplitModes, splitModes);
 		}
 		
 		for (String splitMode : allSplitModes) {
@@ -484,7 +479,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		} else {
 			int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 						
-			Map<Integer, Double> tripNr2inVehTime = null;
+			Map<Integer, Double> tripNr2inVehTime;
 			if (this.personId2tripNumber2inVehicleTime.get(event.getPersonId())  != null ) {
 				tripNr2inVehTime = this.personId2tripNumber2inVehicleTime.get(event.getPersonId());
 			} else {
@@ -504,7 +499,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 			Map<Integer,String> tripNumber2legMode = personId2tripNumber2currentLegModeNonHelpLeg.get(event.getPersonId());
 			
-			double distanceTravelled = 0.;
+			double distanceTravelled;
 			
 			if (tripNumber2legMode.get(tripNumber).equals(TransportMode.pt)) {
 				distanceTravelled = (ptVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
@@ -529,21 +524,15 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		// start vehicle kilometers tracking
 		if ( ptVehicles.contains(event.getVehicleId()) || ptDrivers.contains(event.getPersonId()) ) {
 			// either the transit driver or a passenger enters a public transit vehicle
-			if (ptVehicleId2totalDistance.get(event.getVehicleId()) == null) {
-				ptVehicleId2totalDistance.put(event.getVehicleId(), 0.);
-			}
+			ptVehicleId2totalDistance.putIfAbsent(event.getVehicleId(), 0.);
 
 		} else if ( taxiDrivers.contains(Id.createPersonId(event.getVehicleId())) || taxiDrivers.contains(event.getPersonId()) ) {
 			// either a taxi driver or a passenger enters a transit vehicle
-			if (taxiVehicleId2totalDistance.get(event.getVehicleId()) == null) {
-				taxiVehicleId2totalDistance.put(event.getVehicleId(), 0.);
-			}
+			taxiVehicleId2totalDistance.putIfAbsent(event.getVehicleId(), 0.);
 			
 		} else {
 			// normal person enters vehicle
-			if (networkModeVehicleId2totalDistance.get(event.getVehicleId()) == null) {
-				networkModeVehicleId2totalDistance.put(event.getVehicleId(), 0.);
-			}
+			networkModeVehicleId2totalDistance.putIfAbsent(event.getVehicleId(), 0.);
 		}
 		
 		// ###################################################
@@ -556,7 +545,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 			// enter time
 			
-			Map<Integer, Double> tripNr2enterTime = null;
+			Map<Integer, Double> tripNr2enterTime;
 			if (this.personId2tripNumber2previousEnterVehicleTime.get(event.getPersonId())  != null ) {
 				tripNr2enterTime = this.personId2tripNumber2previousEnterVehicleTime.get(event.getPersonId());
 			} else {
@@ -597,7 +586,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
 
 			} else {
-				tripNumber2travelTime = new HashMap<Integer, Double>();
+				tripNumber2travelTime = new HashMap<>();
 			}
 			tripNumber2travelTime.put(currentTripNumber, event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber));
 			this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
@@ -608,7 +597,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				tripNumber2arrivalTime = this.personId2tripNumber2arrivalTime.get(event.getPersonId());
 
 			} else {
-				tripNumber2arrivalTime = new HashMap<Integer, Double>();
+				tripNumber2arrivalTime = new HashMap<>();
 			}
 			tripNumber2arrivalTime.put(currentTripNumber, event.getTime());
 			personId2tripNumber2arrivalTime.put(event.getPersonId(), tripNumber2arrivalTime);
@@ -630,10 +619,10 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
 
 				} else {
-					tripNumber2travelTime = new HashMap<Integer, Double>();
+					tripNumber2travelTime = new HashMap<>();
 				}
 										
-				double traveltime = 0.;
+				double traveltime;
 				if (event.getTime() == this.scenario.getConfig().qsim().getEndTime()) {
 					traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
 					if (warnCnt3 <= 5) {
@@ -666,7 +655,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				if (this.personId2tripNumber2stuckAbort.get(event.getPersonId()) != null) {
 					tripNr2StuckAbort = this.personId2tripNumber2stuckAbort.get(event.getPersonId());
 				} else {
-					tripNr2StuckAbort = new HashMap<Integer, Boolean>();
+					tripNr2StuckAbort = new HashMap<>();
 				}
 				
 				tripNr2StuckAbort.put(currentTripNumber, true);
@@ -854,10 +843,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 				Map<Integer, Coord> tripNumber2destinationCoord = personId2tripNumber2destinationCoord.get(event.getPersonId());
 				tripNumber2destinationCoord.put(tripNumber, destinationCoord);
-				if (event.getPersonId().equals(Id.createPersonId("173729901"))) {
-					log.info("breakpoint");
-				}
-
 			}	
 		}
 	}
