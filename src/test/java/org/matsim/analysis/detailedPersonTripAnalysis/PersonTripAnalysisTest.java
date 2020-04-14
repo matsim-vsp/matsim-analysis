@@ -42,9 +42,11 @@ public class PersonTripAnalysisTest {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams activityParams = new ActivityParams();
 		activityParams.setActivityType("work");
+		activityParams.setTypicalDuration(8 * 3600.);
 		config.planCalcScore().addActivityParams(activityParams);
 		activityParams = new ActivityParams();
 		activityParams.setActivityType("home");
+		activityParams.setTypicalDuration(16 * 3600.);
 		config.planCalcScore().addActivityParams(activityParams);
 		config.plans().setInputFile(utils.getClassInputDirectory() + "PersonTripAnalysisPlans.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);

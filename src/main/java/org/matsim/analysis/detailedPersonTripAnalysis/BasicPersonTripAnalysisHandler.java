@@ -607,7 +607,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 				
-		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == this.scenario.getConfig().qsim().getEndTime()) { // scenario end time
+		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == this.scenario.getConfig().qsim().getEndTime().seconds()) { // scenario end time
 						
 			if (this.personId2currentTripNumber.get(event.getPersonId()) != null ) {
 				int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());	
@@ -623,7 +623,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				}
 										
 				double traveltime;
-				if (event.getTime() == this.scenario.getConfig().qsim().getEndTime()) {
+				if (event.getTime() == this.scenario.getConfig().qsim().getEndTime().seconds()) {
 					traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
 					if (warnCnt3 <= 5) {
 						log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");
