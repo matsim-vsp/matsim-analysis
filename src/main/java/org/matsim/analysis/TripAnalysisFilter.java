@@ -50,7 +50,7 @@ public class TripAnalysisFilter implements TripFilter {
 	private double buffer = 0.;
 	private TripConsiderType tripConsiderType = TripConsiderType.OriginAndDestination;
 	
-	private enum TripConsiderType { OriginAndDestination, OriginOrDestination }
+	public enum TripConsiderType { OriginAndDestination, OriginOrDestination }
 	
 	public TripAnalysisFilter(String filterName) {
 		this.filterName = filterName;
