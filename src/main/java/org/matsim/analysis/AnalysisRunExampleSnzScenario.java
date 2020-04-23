@@ -117,7 +117,9 @@ public class AnalysisRunExampleSnzScenario {
 			
 			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
 			shapeFileTripFilterCRS = "EPSG:25832";
-
+			
+			// Gladbeck
+			// TODO
 		}
 		
 		Scenario scenario1 = loadScenario(runDirectory, runId);
