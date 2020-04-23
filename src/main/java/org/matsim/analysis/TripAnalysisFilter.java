@@ -47,6 +47,10 @@ public class TripAnalysisFilter implements TripFilter {
 	private String zoneFile = null;
 	private String zoneCRS = null;
 	private final String filterName;
+	private double buffer = 0.;
+	private TripConsiderType tripConsiderType = TripConsiderType.OriginAndDestination;
+	
+	private enum TripConsiderType { OriginAndDestination, OriginOrDestination }
 	
 	public TripAnalysisFilter(String filterName) {
 		this.filterName = filterName;
@@ -75,40 +79,48 @@ public class TripAnalysisFilter implements TripFilter {
 		}
 		
 		// assuming the same CRS!
-		boolean originWithProvidedGeometry = false;
+		boolean originWithinProvidedGeometry = false;
 		for (Geometry geometry : zoneFeatures.values()) {
 			Point point = MGC.coord2Point(origin);
-			if (point.within(geometry)) {
-				originWithProvidedGeometry = true;
+			if (point.within(geometry.buffer(buffer))) {
+				originWithinProvidedGeometry = true;
 				break;
 			}
 		}
-		boolean destinationWithProvidedGeometry = false;
+		boolean destinationWithinProvidedGeometry = false;
 		for (Geometry geometry : zoneFeatures.values()) {
 			Point point = MGC.coord2Point(destination);
-			if (point.within(geometry)) {
-				destinationWithProvidedGeometry = true;
+			if (point.within(geometry.buffer(buffer))) {
+				destinationWithinProvidedGeometry = true;
 				break;
 			}
 		}
-		if (originWithProvidedGeometry && destinationWithProvidedGeometry) return true;
 		
+		if (this.tripConsiderType == TripConsiderType.OriginAndDestination) {
+			if (originWithinProvidedGeometry && destinationWithinProvidedGeometry) return true;
+		} else if (this.tripConsiderType == TripConsiderType.OriginOrDestination) {
+			if (originWithinProvidedGeometry || destinationWithinProvidedGeometry) return true;
+		} else {
+			throw new RuntimeException("Unknown TripConsiderType. Aborting...");
+		}
+				
 		return false;
 	}
 
 	@Override
 	public String toFileName() {
 		String fileName = "_TRIPFILTER-" + filterName;
-		
-		boolean atLeastOneFilterApplied = false;
-		
-		if (zoneFile != null) {
-			atLeastOneFilterApplied = true;
-			fileName = fileName + "_trip-within-provided-zone-file";	
-		}
-		
-		if (atLeastOneFilterApplied == false) {
-			fileName = "";
+				
+		if (zoneFile == null) {
+			fileName = fileName + "_all-trips-considered_no-shapefile-provided";	
+			
+		} else {
+			if (zoneFeatures.size() == 0) {
+				// no zoneFeatures loaded --> consider all trips
+				fileName = fileName + "_all-trips-considered_no-zone-features";	
+			} else {
+				fileName = fileName + "_" +  this.tripConsiderType.toString() + "-in-zone_buffer-" + this.buffer ;
+			}
 		}
 	
 		return fileName;
@@ -166,6 +178,14 @@ public class TripAnalysisFilter implements TripFilter {
 			log.info("Reading shape file... Done.");	
 		}
 		
+	}
+
+	public void setBuffer(double buffer) {
+		this.buffer = buffer;
+	}
+
+	public void setTripConsiderType(TripConsiderType tripConsiderType) {
+		this.tripConsiderType = tripConsiderType;
 	}
 
 }

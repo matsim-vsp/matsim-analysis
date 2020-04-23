@@ -209,7 +209,7 @@ public class AgentAnalysisFilter implements AgentFilter {
 		
 		if (zoneFile != null && this.relevantActivityTypePrefix != null) {
 			atLeastOneFilterApplied = true;
-			fileName = fileName + "_activityTypePrefix-" + this.relevantActivityTypePrefix + "-within-provided-zone-file";	
+			fileName = fileName + "_activityTypePrefix-" + this.relevantActivityTypePrefix + "-within-provided-shapefile";	
 		}
 		
 		if (this.subpopulation != null) {

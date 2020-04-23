@@ -20,6 +20,7 @@
 package org.matsim.analysis.modeSwitchAnalysis;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +49,9 @@ import org.matsim.core.utils.io.IOUtils;
 public class PersonTripScenarioComparison {
 	private final static Logger log = Logger.getLogger(PersonTripScenarioComparison.class);
 	
-	private final String analysisOutputDirectory;
+	private final String analysisOutputDirectoryModeSwitchAnalysisCoord;
+	private final String analysisOutputDirectoryModeSwitchAnalysis;
+	private final String analysisOutputDirectoryWinnerLoserAnalysis;
 	private final Scenario scenario1;
 	private final BasicPersonTripAnalysisHandler basicHandler1;
 	private final Scenario scenarioToCompareWith;
@@ -68,8 +71,19 @@ public class PersonTripScenarioComparison {
     		BasicPersonTripAnalysisHandler basicHandlerToCompareWith,
     		List<String> modes,
     		AgentFilter agentFilter) {
-    	
-		this.analysisOutputDirectory = analysisOutputDirectory;
+    			
+		this.analysisOutputDirectoryModeSwitchAnalysisCoord = analysisOutputDirectory + "modeSwitchAnalysis/coordinates/";
+		File folder1 = new File(analysisOutputDirectoryModeSwitchAnalysisCoord);			
+		folder1.mkdirs();
+		
+		this.analysisOutputDirectoryModeSwitchAnalysis = analysisOutputDirectory + "modeSwitchAnalysis/";
+		File folder2 = new File(analysisOutputDirectoryModeSwitchAnalysis);			
+		folder2.mkdirs();
+		
+		this.analysisOutputDirectoryWinnerLoserAnalysis = analysisOutputDirectory + "winnerLoserAnalysis/";
+		File folder3 = new File(analysisOutputDirectoryWinnerLoserAnalysis);			
+		folder3.mkdirs();
+		
 		this.scenario1 = scenario1;
 		this.basicHandler1 = basicHandler1;
 		this.scenarioToCompareWith = scenarioToCompareWith;
@@ -119,25 +133,25 @@ public class PersonTripScenarioComparison {
 
 		Map<String, BufferedWriter> bufferedWriter = new HashMap<>();
 		
-		bufferedWriter.put("all", IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_all" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+		bufferedWriter.put("all", IOUtils.getBufferedWriter( analysisOutputDirectoryModeSwitchAnalysis + "modeSwitchAnalysis_all" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
 		
 		for (String mode : modes) {
-			switchAndCoordType2Coord.put(mode+"-TO-"+mode+"Origin", new HashMap<>());
-			switchAndCoordType2Coord.put(mode+"-TO-"+mode+"Destination", new HashMap<>());
-			switchAndCoordType2Coord.put(mode+"-TO-"+mode+"HomeCoord", new HashMap<>());
+			switchAndCoordType2Coord.put(mode+"-TO-"+mode+"_Origin", new HashMap<>());
+			switchAndCoordType2Coord.put(mode+"-TO-"+mode+"_Destination", new HashMap<>());
+			switchAndCoordType2Coord.put(mode+"-TO-"+mode+"_HomeCoord", new HashMap<>());
 
-			switchAndCoordType2Coord.put(mode+"-TO-x"+"Origin", new HashMap<>());
-			switchAndCoordType2Coord.put(mode+"-TO-x"+"Destination", new HashMap<>());
-			switchAndCoordType2Coord.put(mode+"-TO-x"+"HomeCoord", new HashMap<>());
+			switchAndCoordType2Coord.put(mode+"-TO-x"+"_Origin", new HashMap<>());
+			switchAndCoordType2Coord.put(mode+"-TO-x"+"_Destination", new HashMap<>());
+			switchAndCoordType2Coord.put(mode+"-TO-x"+"_HomeCoord", new HashMap<>());
 
-			switchAndCoordType2Coord.put("x-TO-"+mode+"Origin", new HashMap<>());
-			switchAndCoordType2Coord.put("x-TO-"+mode+"Destination", new HashMap<>());
-			switchAndCoordType2Coord.put("x-TO-"+mode+"HomeCoord", new HashMap<>());
+			switchAndCoordType2Coord.put("x-TO-"+mode+"_Origin", new HashMap<>());
+			switchAndCoordType2Coord.put("x-TO-"+mode+"_Destination", new HashMap<>());
+			switchAndCoordType2Coord.put("x-TO-"+mode+"_HomeCoord", new HashMap<>());
 			
-			bufferedWriter.put(mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
-			bufferedWriter.put("x-TO-" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_x2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
-			bufferedWriter.put(mode + "-TO-x", IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2x" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
-			bufferedWriter.put(mode + "-TO-" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+			bufferedWriter.put(mode, IOUtils.getBufferedWriter( analysisOutputDirectoryModeSwitchAnalysis + "modeSwitchAnalysis_" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+			bufferedWriter.put("x-TO-" + mode, IOUtils.getBufferedWriter( analysisOutputDirectoryModeSwitchAnalysis + "modeSwitchAnalysis_x2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+			bufferedWriter.put(mode + "-TO-x", IOUtils.getBufferedWriter( analysisOutputDirectoryModeSwitchAnalysis + "modeSwitchAnalysis_" + mode + "2x" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+			bufferedWriter.put(mode + "-TO-" + mode, IOUtils.getBufferedWriter( analysisOutputDirectoryModeSwitchAnalysis + "modeSwitchAnalysis_" + mode + "2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
 
 			for (String mode2 : modes) {
 
@@ -147,8 +161,8 @@ public class PersonTripScenarioComparison {
 
 
 				if (!mode2.equals(mode)) {
-					bufferedWriter.put(mode2 + "-TO-" + mode, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode2 + "2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
-					bufferedWriter.put(mode + "-TO-" + mode2, IOUtils.getBufferedWriter( analysisOutputDirectory + "modeSwitchAnalysis_" + mode + "2" + mode2 + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+					bufferedWriter.put(mode2 + "-TO-" + mode, IOUtils.getBufferedWriter( analysisOutputDirectoryModeSwitchAnalysis + "modeSwitchAnalysis_" + mode2 + "2" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
+					bufferedWriter.put(mode + "-TO-" + mode2, IOUtils.getBufferedWriter( analysisOutputDirectoryModeSwitchAnalysis + "modeSwitchAnalysis_" + mode + "2" + mode2 + agentFilter.toFileName() + tripFilter.toFileName() + ".csv"));
 					
 					switchType2tripTTwithStuckingAgents.put(mode2 + "-TO-" + mode, new ArrayList<>());
 					switchType2tripTTwithStuckingAgents.put(mode + "-TO-" + mode2, new ArrayList<>());
@@ -167,7 +181,7 @@ public class PersonTripScenarioComparison {
 		}
 	    
 		for (BufferedWriter writer : bufferedWriter.values()) {
-			writer.write("personId;subpopulation;tripNr;stuck0;stuck1;main-mode0;main-mode1;beeline-distance0;beeline-distance1;main-mode-distance0;main-mode-distance1;all-legs-travelTime0;all-legs-travelTime1;payments0;payments1");
+			writer.write("personId;subpopulation;tripNr;stuck0;stuck1;main-mode0;main-mode1;trip-modes0;trip-modes1;beeline-distance0;beeline-distance1;main-mode-distance0;main-mode-distance1;all-legs-travelTime0;all-legs-travelTime1;payments0;payments1");
 			writer.newLine();
 		}
 	        
@@ -180,9 +194,9 @@ public class PersonTripScenarioComparison {
 			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
 						
 			if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
-				Map<Integer, String> tripNr2legMode = basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId);
+				Map<Integer, String> tripNr2TripMainMode = basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId);
 				
-				for (Integer tripNr : tripNr2legMode.keySet()) {
+				for (Integer tripNr : tripNr2TripMainMode.keySet()) {
 					
 					Coord originCoord = basicHandler1.getPersonId2tripNumber2originCoord().get(personId).get(tripNr);
 					Coord destinationCoord = basicHandler1.getPersonId2tripNumber2destinationCoord().get(personId).get(tripNr);
@@ -191,10 +205,10 @@ public class PersonTripScenarioComparison {
 						// skip trip
 						
 					} else {
-						String mode1 = tripNr2legMode.get(tripNr);
+						String mode1 = tripNr2TripMainMode.get(tripNr);
 						
 						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripMainMode().get(personId) == null) {
-							throw new RuntimeException("Person " + personId + " from run directory1 " + analysisOutputDirectory + "doesn't exist in run directory0 " + analysisOutputDirectory + ". Are you comparing the same scenario? Aborting...");
+							throw new RuntimeException("Person " + personId + " from run directory1 doesn't exist in run directory0. Are you comparing the same scenario? Aborting...");
 						}
 
 						String mode0 = "unknown";
@@ -217,6 +231,7 @@ public class PersonTripScenarioComparison {
 						bufferedWriter.get("all").write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
 								+ stuck0 + ";" + stuck1 + ";"
 								+ mode0 + ";" + mode1 + ";" 
+								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";"
 								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
 								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
 								+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
@@ -251,11 +266,11 @@ public class PersonTripScenarioComparison {
 									x2modeAgents.put(personId, x2modeAgents.get(personId) + 1);
 								}
 								
-								switchAndCoordType2Coord.get("x-TO-" + modeA + "Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
-								switchAndCoordType2Coord.get("x-TO-" + modeA + "Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
+								switchAndCoordType2Coord.get("x-TO-" + modeA + "_Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
+								switchAndCoordType2Coord.get("x-TO-" + modeA + "_Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
 			                	
 			                	if (personId2homeActCoord.get(personId) != null) {
-			                		switchAndCoordType2Coord.get("x-TO-" + modeA + "HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
+			                		switchAndCoordType2Coord.get("x-TO-" + modeA + "_HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
 			                	} else {
 									log.warn("No home activity coordinate for person " + personId);
 								}
@@ -283,11 +298,11 @@ public class PersonTripScenarioComparison {
 									mode2xAgents.put(personId, mode2xAgents.get(personId) + 1);
 								}
 								
-								switchAndCoordType2Coord.get(modeA + "-TO-xOrigin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
-								switchAndCoordType2Coord.get(modeA + "-TO-xDestination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
+								switchAndCoordType2Coord.get(modeA + "-TO-x_Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
+								switchAndCoordType2Coord.get(modeA + "-TO-x_Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
 			                	
 			                	if (personId2homeActCoord.get(personId) != null) {
-			                		switchAndCoordType2Coord.get(modeA + "-TO-xHomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
+			                		switchAndCoordType2Coord.get(modeA + "-TO-x_HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
 			                	} else {
 									log.warn("No home activity coordinate for person " + personId);
 								}
@@ -326,11 +341,11 @@ public class PersonTripScenarioComparison {
 									mode2modeAgents.put(personId, mode2modeAgents.get(personId) + 1);
 								}
 		                	
-								switchAndCoordType2Coord.get(modeA + "-TO-" + modeA + "Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
-								switchAndCoordType2Coord.get(modeA + "-TO-" + modeA + "Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
+								switchAndCoordType2Coord.get(modeA + "-TO-" + modeA + "_Origin").put(personId + "Trip" + tripNr, personId2actNr2coord.get(personId).get(tripNr));
+								switchAndCoordType2Coord.get(modeA + "-TO-" + modeA + "_Destination").put(personId + "Trip" + (tripNr), personId2actNr2coord.get(personId).get(tripNr + 1));
 			                	
 			                	if (personId2homeActCoord.get(personId) != null) {
-			                		switchAndCoordType2Coord.get(modeA + "-TO-" + modeA + "HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
+			                		switchAndCoordType2Coord.get(modeA + "-TO-" + modeA + "_HomeCoord").put(personId.toString(), personId2homeActCoord.get(personId));
 			                	} else {
 									log.warn("No home activity coordinate for person " + personId);
 								}
@@ -401,11 +416,11 @@ public class PersonTripScenarioComparison {
 		log.info("Comparing the two scenarios for each trip and person... Done.");
 		        	
 		for (String modeSwitchType : switchAndCoordType2Coord.keySet()) {
-			printCoordinates(switchAndCoordType2Coord.get(modeSwitchType), analysisOutputDirectory  + "/modeSwitchAnalysis_actCoord_" + modeSwitchType + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			printCoordinates(switchAndCoordType2Coord.get(modeSwitchType), analysisOutputDirectoryModeSwitchAnalysisCoord  + "/modeSwitchAnalysis_actCoord_" + modeSwitchType + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 		}
 		
 		{
-			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysis_aggregated" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectoryModeSwitchAnalysis  + "/modeSwitchAnalysis_aggregated" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 			aggregatedTripWriter.write("from;to;number of trips (with stucking agents, sample size);number of trips (without stucking agents, sample size);average change in trip travel time (with stucking agents) [sec];average change in trip travel time (without stucking agents) [sec];average change in beeline speed (without stucking agents) [m/s]");
 			aggregatedTripWriter.newLine();
 			
@@ -448,8 +463,8 @@ public class PersonTripScenarioComparison {
 		
 
 		{
-			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysisMatrix_aggregated_numberOfTrips" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
-			BufferedWriter aggregatedDiffAvgTTWriter = IOUtils.getBufferedWriter(analysisOutputDirectory  + "/modeSwitchAnalysisMatrix_aggregated_diffAvgTT" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			BufferedWriter aggregatedTripWriter = IOUtils.getBufferedWriter(analysisOutputDirectoryModeSwitchAnalysis  + "/modeSwitchAnalysisMatrix_aggregated_numberOfTrips" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			BufferedWriter aggregatedDiffAvgTTWriter = IOUtils.getBufferedWriter(analysisOutputDirectoryModeSwitchAnalysis  + "/modeSwitchAnalysisMatrix_aggregated_diffAvgTT" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 			for (String mode : modes) {
 				aggregatedTripWriter.write(";" + mode);
 				aggregatedDiffAvgTTWriter.write(";" + mode);
@@ -495,7 +510,7 @@ public class PersonTripScenarioComparison {
 		log.info("Comparing the two scenarios for each person...");
 
 		{
-			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_all" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectoryWinnerLoserAnalysis + "/winner-loser-analysis_all" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        writer.newLine();
 	       
@@ -560,7 +575,7 @@ public class PersonTripScenarioComparison {
 		}
 		
 		{
-			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_all-non-stucking-persons" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+			BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectoryWinnerLoserAnalysis + "/winner-loser-analysis_all-non-stucking-persons" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;score0 [utils];score1 [utils];monetary payments 0 [EUR]; monetary payments 1 [EUR]");
 	        writer.newLine();
 	       
@@ -657,7 +672,7 @@ public class PersonTripScenarioComparison {
 		
 		{
 	        for (String modeA : modes) {
-				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_" + modeA + "2" +  modeA + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectoryWinnerLoserAnalysis + "/winner-loser-analysis_" + modeA + "2" +  modeA + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 				writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;mode2modeTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        	writer.newLine();
 	       
@@ -721,7 +736,7 @@ public class PersonTripScenarioComparison {
 		{
 	        for (String modeA : modes) {
 
-	        	BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_x2" + modeA + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+	        	BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectoryWinnerLoserAnalysis + "/winner-loser-analysis_x2" + modeA + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        	writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;x2modeTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        	writer.newLine();
 	       
@@ -784,7 +799,7 @@ public class PersonTripScenarioComparison {
 		{
 	        for (String modeA : modes) {
 
-				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectory + "/winner-loser-analysis_" + modeA + "2x" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
+				BufferedWriter writer = IOUtils.getBufferedWriter(analysisOutputDirectoryWinnerLoserAnalysis + "/winner-loser-analysis_" + modeA + "2x" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv");
 	        	writer.write("PersonId;subpopulation;homeCoordX;homeCoordY;totalTrips;mode2xTrips;score0 [utils];score1 [utils];stuck0;stuck1");
 	        	writer.newLine();
 	       
@@ -888,9 +903,9 @@ public class PersonTripScenarioComparison {
 	
 		try {
 			
-			printCSVFile(sameScorePersons, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_same-score-persons_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
-			printCSVFile(winners, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_winners_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
-			printCSVFile(losers, person2score0score1, this.analysisOutputDirectory + "winner-loser-analysis_losers_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
+			printCSVFile(sameScorePersons, person2score0score1, this.analysisOutputDirectoryWinnerLoserAnalysis + "winner-loser-analysis_same-score-persons_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
+			printCSVFile(winners, person2score0score1, this.analysisOutputDirectoryWinnerLoserAnalysis + "winner-loser-analysis_winners_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
+			printCSVFile(losers, person2score0score1, this.analysisOutputDirectoryWinnerLoserAnalysis + "winner-loser-analysis_losers_score-tolerance-" + scoreDifferenceTolerance + agentFilter.toFileName() + ".csv");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
