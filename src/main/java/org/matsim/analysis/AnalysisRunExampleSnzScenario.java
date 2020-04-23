@@ -179,7 +179,7 @@ public class AnalysisRunExampleSnzScenario {
 		
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 		
-		String configFile = runDirectory + runId + ".output_config-for-analysis.xml";	
+		String configFile = runDirectory + runId + ".output_config.xml";	
 		String networkFile = runId + ".output_network.xml.gz";
 		String populationFile = runId + ".output_plans.xml.gz";
 
