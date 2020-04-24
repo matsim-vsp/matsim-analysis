@@ -112,7 +112,8 @@ public class TripAnalysisFilter implements TripFilter {
 		String fileName = "_TRIPFILTER-" + filterName;
 				
 		if (zoneFile == null) {
-			fileName = fileName + "_all-trips-considered_no-shapefile-provided";	
+			// all trips considered (no-shapefile-provided)
+			fileName = "";	
 			
 		} else {
 			if (zoneFeatures.size() == 0) {

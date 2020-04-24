@@ -127,11 +127,11 @@ public class AnalysisRunExampleSnzScenario {
 		
 		List<AgentFilter> agentFilters = new ArrayList<>();
 		
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("disabled");
+		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("all-persons");
 		filter1a.preProcess(scenario1);
 		agentFilters.add(filter1a);
 		
-		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("only-residents");
+		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("residents");
 		filter1b.setZoneFile(shapeFileAgentFilter);
 		filter1b.setRelevantActivityType(homeActivityPrefix);
 		filter1b.preProcess(scenario1);
@@ -139,11 +139,11 @@ public class AnalysisRunExampleSnzScenario {
 		
 		List<TripFilter> tripFilters = new ArrayList<>();
 		
-		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("disabled");
+		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("all-trips");
 		tripFilter1a.preProcess(scenario1);
 		tripFilters.add(tripFilter1a);
 		
-		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("A");
+		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("certain-trips");
 		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
 		tripFilter1b.preProcess(scenario1);
 		tripFilter1b.setBuffer(2000.);
