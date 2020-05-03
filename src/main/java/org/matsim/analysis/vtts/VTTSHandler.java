@@ -53,7 +53,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 
 
 /**
@@ -215,7 +214,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	 */
 	public void computeFinalVTTS() {
 		for (Id<Person> affectedPersonId : this.departedPersonIds) {
-			computeVTTS(affectedPersonId, Time.getUndefinedTime());
+			computeVTTS(affectedPersonId, Double.NaN);
 		}
 	}
 	
@@ -229,26 +228,38 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			
 			// First, check if the plan completed is completed, i.e. if the agent has arrived at an activity
 			if (this.personId2currentActivityType.containsKey(personId) && this.personId2currentActivityStartTime.containsKey(personId)) {
-				
+
 				String subpop = null;
 
-				if (this.scenario.getPopulation().getPersons().get(personId) != null && this.scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute(this.scenario.getConfig().plans().getSubpopulationAttributeName()) != null) {					
-					subpop = (String) this.scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute(this.scenario.getConfig().plans().getSubpopulationAttributeName());
+				if (this.scenario.getPopulation().getPersons().get(personId) != null
+						&& this.scenario.getPopulation()
+						.getPersons()
+						.get(personId)
+						.getAttributes()
+						.getAttribute(this.scenario.getConfig().plans().getSubpopulationAttributeName()) != null) {
+					subpop = (String)this.scenario.getPopulation()
+							.getPersons()
+							.get(personId)
+							.getAttributes()
+							.getAttribute(this.scenario.getConfig().plans().getSubpopulationAttributeName());
 				}
-								
-				final MarginalSumScoringFunction marginalSumScoringFunction =
-						new MarginalSumScoringFunction(
-								new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(subpop), scenario.getConfig().scenario()).build());
-				
-				if (activityEndTime == Time.getUndefinedTime()) {
+
+				final MarginalSumScoringFunction marginalSumScoringFunction = new MarginalSumScoringFunction(
+						new ScoringParameters.Builder(scenario.getConfig().planCalcScore(),
+								scenario.getConfig().planCalcScore().getScoringParameters(subpop),
+								scenario.getConfig().scenario()).build());
+
+				if (Double.isNaN(activityEndTime)) {
 					// The end time is undefined...
-												
+
 					// ... now handle the first and last OR overnight activity. This is figured out by the scoring function itself (depending on the activity types).
-						
-					Activity activityMorning = PopulationUtils.createActivityFromLinkId(this.personId2firstActivityType.get(personId), null);
+
+					Activity activityMorning = PopulationUtils.createActivityFromLinkId(
+							this.personId2firstActivityType.get(personId), null);
 					activityMorning.setEndTime(this.personId2firstActivityEndTime.get(personId));
-					
-					Activity activityEvening = PopulationUtils.createActivityFromLinkId(this.personId2currentActivityType.get(personId), null);
+
+					Activity activityEvening = PopulationUtils.createActivityFromLinkId(
+							this.personId2currentActivityType.get(personId), null);
 					activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
 						
 					activityDelayDisutilityOneSec = marginalSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, 1.0);
