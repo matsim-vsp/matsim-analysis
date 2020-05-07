@@ -283,7 +283,7 @@ public final class ODAnalysis {
 				time2odRelation.put(from + "-" + to, filteredOdRelations);
 				try {
 					if (printODSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".shp");
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -292,12 +292,17 @@ public final class ODAnalysis {
 		}
 
 		try {
-			if (printODSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins" + modesString + ".shp");
 			writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins" + modesString + "_from-to-format.csv");
-
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
+		
+		try {
+			if (printODSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins" + modesString + ".shp");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
 	}
 
 	private void writeData(Map<String, ODRelation> odRelations, Map<String, Geometry> zones,  String fileName) throws IOException {
@@ -397,7 +402,13 @@ public final class ODAnalysis {
 
 		CoordinateReferenceSystem crs;
 		if (this.shapeFileCRS != null) {
-			crs = MGC.getCRS(this.shapeFileCRS);
+			try {
+				crs = MGC.getCRS(this.shapeFileCRS);
+			} catch (IllegalArgumentException e) {
+				log.warn("Couldn't get CRS from geotools.");
+				log.error(e.getMessage());
+				crs = null;
+			}
 		} else {
 			crs = null;
 		}
