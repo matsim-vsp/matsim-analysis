@@ -44,7 +44,6 @@ import org.matsim.analysis.od.ODEventAnalysisHandler;
 import org.matsim.analysis.pngSequence2Video.MATSimVideoUtils;
 import org.matsim.analysis.shapes.Network2Shape;
 import org.matsim.analysis.visualizationScripts.VisualizationScriptAdjustment;
-import org.matsim.analysis.vtts.VTTSHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -158,7 +157,6 @@ public class MatsimAnalysis {
 		DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis1 = null;
 		MoneyExtCostHandler personMoneyHandler1 = null;
 		ActDurationHandler actHandler1 = null;
-		VTTSHandler vttsHandler1 = null;
 		ODEventAnalysisHandler odHandler1 = null;
 
 		if (scenario1 != null) {
@@ -174,9 +172,7 @@ public class MatsimAnalysis {
 			personMoneyHandler1 = new MoneyExtCostHandler();
 			
 			actHandler1 = new ActDurationHandler(this.stageActivitySubString);
-			
-			vttsHandler1 = new VTTSHandler(scenario1, helpLegModes, stageActivitySubString);
-			
+						
 			odHandler1 = new ODEventAnalysisHandler(helpLegModes, stageActivitySubString);
 			
 			events1 = EventsUtils.createEventsManager();
@@ -186,7 +182,6 @@ public class MatsimAnalysis {
 			events1.addHandler(dynamicTrafficVolumeAnalysis1);
 			events1.addHandler(personMoneyHandler1);
 			events1.addHandler(actHandler1);
-			events1.addHandler(vttsHandler1);
 			events1.addHandler(odHandler1);
 		}
 		
@@ -198,7 +193,6 @@ public class MatsimAnalysis {
 		DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis0 = null;
 		MoneyExtCostHandler personMoneyHandler0 = null;
 		ActDurationHandler actHandler0 = null;
-		VTTSHandler vttsHandler0 = null;
 		ODEventAnalysisHandler odHandler0 = null;
 		
 		if (scenario0 != null) {
@@ -214,9 +208,7 @@ public class MatsimAnalysis {
 			personMoneyHandler0 = new MoneyExtCostHandler();
 			
 			actHandler0 = new ActDurationHandler(this.stageActivitySubString);
-			
-			vttsHandler0 = new VTTSHandler(scenario0, helpLegModes, stageActivitySubString);
-			
+						
 			odHandler0 = new ODEventAnalysisHandler(helpLegModes, stageActivitySubString);
 
 			events0 = EventsUtils.createEventsManager();
@@ -226,7 +218,6 @@ public class MatsimAnalysis {
 			events0.addHandler(dynamicTrafficVolumeAnalysis0);
 			events0.addHandler(personMoneyHandler0);
 			events0.addHandler(actHandler0);
-			events0.addHandler(vttsHandler0);
 			events0.addHandler(odHandler0);
 		}
 
@@ -259,7 +250,6 @@ public class MatsimAnalysis {
 				}
 			}
 			
-			vttsHandler1.computeFinalVTTS();
 		}	
 		
 		if (scenario0 != null) {
@@ -274,7 +264,6 @@ public class MatsimAnalysis {
 				}
 			}
 			
-			vttsHandler0.computeFinalVTTS();
 		}	
 		
 		// #####################################
@@ -292,7 +281,6 @@ public class MatsimAnalysis {
 				personMoneyHandler1,
 				actHandler1,
 				modeAnalysisList1,
-				vttsHandler1,
 				modes,
 				odHandler1,
 				tripFilters1);
@@ -308,7 +296,6 @@ public class MatsimAnalysis {
 				personMoneyHandler0,
 				actHandler0,
 				modeAnalysisList0,
-				vttsHandler0,
 				modes,
 				odHandler0,
 				tripFilters1);
@@ -449,7 +436,6 @@ public class MatsimAnalysis {
 			MoneyExtCostHandler personMoneyHandler,
 			ActDurationHandler actHandler,
 			List<ModeAnalysis> modeAnalysisList,
-			VTTSHandler vttsHandler,
 			List<String> modes,
 			ODEventAnalysisHandler odHandler,
 			List<TripFilter> tripFilters
@@ -598,24 +584,6 @@ public class MatsimAnalysis {
 			distanceGroups2.add(new Tuple<>(9000., 999999999999.));
 			modeAnalysis.writeTripRouteDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".1-2-3-4-xxx.", distanceGroups2);
 			modeAnalysis.writeTripEuclideanDistances(modeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".1-2-3-4-xxx.", distanceGroups2);
-		}
-		
-		// #####################################
-		// Print results: VTTS
-		// #####################################
-		
-		String vttsOutputDirectory = analysisOutputDirectory + "vtts/";
-		createDirectory(vttsOutputDirectory);
-
-		vttsHandler.printVTTS(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_allTrips.csv");
-		vttsHandler.printAvgVTTSperPerson(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_avgPerPerson.csv"); 
-		vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_all-modes.csv", null, null);
-		
-		for (String mode : modes) {
-			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_" + mode + ".csv", mode, null);
-			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_7-9.csv", "car", new Tuple<Double, Double>(7.0 * 3600., 9. * 3600.));
-			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_11-13.csv", "car", new Tuple<Double, Double>(11.0 * 3600., 13. * 3600.));
-			vttsHandler.printVTTSstatistics(vttsOutputDirectory + scenario.getConfig().controler().getRunId() + "." + "VTTS_statistics_car_16-18.csv", "car", new Tuple<Double, Double>(16.0 * 3600., 18. * 3600.));
 		}
 		
 		// #####################################

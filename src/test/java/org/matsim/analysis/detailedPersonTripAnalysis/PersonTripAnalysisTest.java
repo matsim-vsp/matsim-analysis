@@ -14,7 +14,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.vtts.VTTSHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -66,19 +65,14 @@ public class PersonTripAnalysisTest {
 		
 		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(helpLegModes, stageActivitySubString);	
 		basicHandler.setScenario(scenario);
-
-		VTTSHandler vttsHandler = new VTTSHandler(scenario, helpLegModes, stageActivitySubString);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);
-		events.addHandler(vttsHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		log.info("Reading the events file... Done.");
-
-		vttsHandler.computeFinalVTTS();
 				
 		// plans
 		
