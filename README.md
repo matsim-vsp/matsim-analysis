@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/github/matsim-vsp/matsim-analysis.svg?branch=master)](https://travis-ci.org/github/matsim-vsp/matsim-analysis)
+[![Build Status](https://travis-ci.org/matsim-vsp/matsim-analysis.svg?branch=master)](https://travis-ci.org/matsim-vsp/matsim-analysis)
 
 # matsim-analysis
 
