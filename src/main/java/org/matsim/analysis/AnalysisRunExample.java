@@ -37,8 +37,9 @@ public class AnalysisRunExample {
 		final String runDirectory = "/path-to-run-directory/";
 		final String runId = "run-id";		
 		final String modesString = "car,pt";
+		final String scenarioCRS = "EPSG:1234";
 		
-		Scenario scenario1 = loadScenario(runDirectory, runId);
+		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
 		
 		List<AgentFilter> filters1 = new ArrayList<>();
 		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("A");
@@ -54,10 +55,11 @@ public class AnalysisRunExample {
 		analysis.setScenario1(scenario1);
 		analysis.setAgentFilters(filters1);
 		analysis.setModes(modes);
+		analysis.setScenarioCRS(scenarioCRS);
 		analysis.run();
 	}
 	
-	private static Scenario loadScenario(String runDirectory, String runId) {
+	private static Scenario loadScenario(String runDirectory, String runId, String scenarioCRS) {
 		log.info("Loading scenario...");
 		
 		if (runDirectory == null || runDirectory.equals("") || runDirectory.equals("null")) {
@@ -68,26 +70,17 @@ public class AnalysisRunExample {
 
 		String networkFile;
 		String populationFile;
-		String configFile;
 		
-		configFile = runDirectory + runId + ".output_config.xml";	
-		networkFile = runId + ".output_network.xml.gz";
-		populationFile = runId + ".output_plans.xml.gz";
+		networkFile = runDirectory + runId + ".output_network.xml.gz";
+		populationFile = runDirectory + runId + ".output_plans.xml.gz";
 
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.createConfig();
 
-		if (config.controler().getRunId() != null) {
-			if (!runId.equals(config.controler().getRunId())) throw new RuntimeException("Given run ID " + runId + " doesn't match the run ID given in the config file. Aborting...");
-		} else {
-			config.controler().setRunId(runId);
-		}
-
+		config.global().setCoordinateSystem(scenarioCRS);
+		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(runDirectory);
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
-		config.vehicles().setVehiclesFile(null);
-		config.transit().setTransitScheduleFile(null);
-		config.transit().setVehiclesFile(null);
 		
 		return ScenarioUtils.loadScenario(config);
 	}

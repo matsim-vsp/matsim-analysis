@@ -77,7 +77,7 @@ public class ModeAnalysisTest {
 		
 		filter.preProcess(scenario);
 				
-		ModeAnalysis analysis = new ModeAnalysis(scenario, filter, mainModeIdentifier);
+		ModeAnalysis analysis = new ModeAnalysis(scenario.getPopulation(), filter, mainModeIdentifier);
 		analysis.run();
 		
 		File directory = new File(outputDirectory);

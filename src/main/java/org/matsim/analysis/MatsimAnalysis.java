@@ -48,6 +48,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -64,7 +65,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * - some aggregated analysis 
  * - person-specific information
  * - trip-specific information
- * - time-specific trip travel times, distances, toll payments, externality-specific toll payments (congestion tolls, noise tolls, air pollution tolls)
+ * - time-specific trip travel times, distances, money payments
  * - delay information
  * - spatial information:
  * 		- daily traffic volume per link
@@ -100,7 +101,7 @@ public class MatsimAnalysis {
 	// base case (optional)
 	private Scenario scenario0;
 	
-	private final String outputDirectoryName = "analysis-v2.7";
+	private final String outputDirectoryName = "analysis-v2.8";
 	private final String stageActivitySubString = "interaction";
 
 	public void run() {
@@ -240,11 +241,11 @@ public class MatsimAnalysis {
 								
 		if (scenario1 != null) {
 			
-			personId2userBenefit1 = getPersonId2UserBenefit(scenario1);
+			personId2userBenefit1 = getPersonId2UserBenefit(scenario1.getPopulation());
 			
 			if (agentFilters != null) {
 				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, filter, mainModeIdentifier);
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1.getPopulation(), filter, mainModeIdentifier);
 					modeAnalysis1.run();
 					modeAnalysisList1.add(modeAnalysis1);
 				}
@@ -254,11 +255,11 @@ public class MatsimAnalysis {
 		
 		if (scenario0 != null) {
 			
-			personId2userBenefit0 = getPersonId2UserBenefit(scenario0);
+			personId2userBenefit0 = getPersonId2UserBenefit(scenario0.getPopulation());
 			
 			if (agentFilters != null) {
 				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, filter, mainModeIdentifier);
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0.getPopulation(), filter, mainModeIdentifier);
 					modeAnalysis0.run();
 					modeAnalysisList0.add(modeAnalysis0);
 				}
@@ -627,25 +628,23 @@ public class MatsimAnalysis {
 		file.mkdirs();
 	}
 	
-	private Map<Id<Person>, Double> getPersonId2UserBenefit(Scenario scenario) {
-		if (scenario != null) {
+	private Map<Id<Person>, Double> getPersonId2UserBenefit(Population population) {
+		if (population != null) {
 			int countWrn = 0;
 			Map<Id<Person>, Double> personId2userBenefit = new HashMap<>();
-			if (scenario != null) {
-				for (Person person : scenario.getPopulation().getPersons().values()) {
-					
-					if (countWrn <= 5) {
-						if (person.getSelectedPlan().getScore() == null || person.getSelectedPlan().getScore() < 0.) {
-							log.warn("The score of person " + person.getId() + " is null or negative: " + person.getSelectedPlan().toString());
-							if (countWrn == 5) {
-								log.warn("Further warnings of this type are not printed out.");
-							}
-							countWrn++;
-						}						
-					}
-					
-					personId2userBenefit.put(person.getId(), person.getSelectedPlan().getScore() / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney());
+			for (Person person : population.getPersons().values()) {
+				
+				if (countWrn <= 5) {
+					if (person.getSelectedPlan().getScore() == null || person.getSelectedPlan().getScore() < 0.) {
+						log.warn("The score of person " + person.getId() + " is null or negative: " + person.getSelectedPlan().toString());
+						if (countWrn == 5) {
+							log.warn("Further warnings of this type are not printed out.");
+						}
+						countWrn++;
+					}						
 				}
+				
+				personId2userBenefit.put(person.getId(), person.getSelectedPlan().getScore());
 			}
 			return personId2userBenefit;
 		} else {

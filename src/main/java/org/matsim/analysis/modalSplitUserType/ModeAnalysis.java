@@ -31,9 +31,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -48,7 +48,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class ModeAnalysis {
 	
 	private static final Logger log = Logger.getLogger(ModeAnalysis.class);	
-	private final Scenario scenario;
+	private final Population population;
 	private final AgentFilter filter;
 	private final AnalysisMainModeIdentifier modeIdentifier;
 	
@@ -58,8 +58,8 @@ public class ModeAnalysis {
 
 	private double totalTripsFiltered = 0.;
 
-	public ModeAnalysis(Scenario scenario, AgentFilter filter, AnalysisMainModeIdentifier modeIdentifier) {
-		this.scenario = scenario;
+	public ModeAnalysis(Population population, AgentFilter filter, AnalysisMainModeIdentifier modeIdentifier) {
+		this.population = population;
 		this.filter = filter;
 		this.modeIdentifier = modeIdentifier;
 	}
@@ -67,7 +67,7 @@ public class ModeAnalysis {
 	public void run() {
 		
 		int counter = 0;
-		for (Person person : scenario.getPopulation().getPersons().values()) {
+		for (Person person : population.getPersons().values()) {
 			
 			if (counter % 1000 == 0) {
 				log.info("Person #" + counter);

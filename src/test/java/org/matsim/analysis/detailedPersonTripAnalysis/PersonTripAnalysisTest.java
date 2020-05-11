@@ -102,7 +102,7 @@ public class PersonTripAnalysisTest {
 			String line = br.readLine();
 			while(line != null) {
 				if (line.startsWith("person")) {
-					Assert.assertTrue("Output changed!?", line.equals("person Id;number of car trips;at least one stuck and abort car trip (yes/no);number of stuck and abort events (day);car total travel time (day) [sec];car total in-vehicle time (day) [sec];car total travel distance (day) [m];travel related user benefits (based on the selected plans score) [monetary units];total money payments (day) [monetary units]"));
+					Assert.assertTrue("Output changed!?", line.equals("person Id;number of car trips;at least one stuck and abort car trip (yes/no);number of stuck and abort events (day);car total travel time (day) [sec];car total in-vehicle time (day) [sec];car total travel distance (day) [m];travel related user benefits (based on the selected plans score) [utility units];total money payments (day) [monetary units]"));
 				} else {
 					personInfos.add(line.split(";"));
 				}

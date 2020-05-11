@@ -606,8 +606,22 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-				
-		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == this.scenario.getConfig().qsim().getEndTime().seconds()) { // scenario end time
+		double endTime;
+		if (this.scenario.getConfig().qsim().getEndTime().isUndefined()) {
+			endTime = 30 * 3600.;
+			log.warn("Trying to deal with person stuck events. Assuming " + endTime + " to be the simulation end time. If you are using a different value, set the qsim end time in your run script, e.g. config.qsim().setEndTime(24 * 3600.);");
+		} else {
+			endTime = this.scenario.getConfig().qsim().getEndTime().seconds();
+		}
+		
+		boolean removeStuckVehicles = false;
+		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() == false) {
+			log.warn("Trying to deal with person stuck events. Assuming stucking vehicles not to be removed. If you are removing stucking vehicles, set the qsim parameter in your run script accordingly.");
+		} else {
+			removeStuckVehicles = true;
+		}
+		
+		if (removeStuckVehicles || event.getTime() == endTime) { // the stuck event is thrown at the end of the simulation
 						
 			if (this.personId2currentTripNumber.get(event.getPersonId()) != null ) {
 				int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());	
@@ -623,7 +637,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				}
 										
 				double traveltime;
-				if (event.getTime() == this.scenario.getConfig().qsim().getEndTime().seconds()) {
+				if (event.getTime() == endTime) {
 					traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
 					if (warnCnt3 <= 5) {
 						log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");

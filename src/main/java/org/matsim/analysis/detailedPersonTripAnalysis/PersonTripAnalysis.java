@@ -97,7 +97,7 @@ public class PersonTripAnalysis {
 					+ mode + " total travel time (day) [sec];"
 					+ mode + " total in-vehicle time (day) [sec];"
 					+ mode + " total travel distance (day) [m];"
-					+ "travel related user benefits (based on the selected plans score) [monetary units];"
+					+ "travel related user benefits (based on the selected plans score) [utility units];"
 					+ "total money payments (day) [monetary units]"
 			);
 			bw.newLine();
@@ -629,7 +629,7 @@ public class PersonTripAnalysis {
 			bw.write("-----------");
 			bw.newLine();
 
-			bw.write("travel related user benefits (sample size) (including monetary payments) [monetary units];" + userBenefitsIncludingMonetaryPayments);
+			bw.write("travel related user benefits (sample size) (including money payments) [utility units];" + userBenefitsIncludingMonetaryPayments);
 			bw.newLine();
 
 			bw.write("revenues (sample size) (tolls/fares paid by private car users or passengers) [monetary units];" + moneyPaymentsByUsers);

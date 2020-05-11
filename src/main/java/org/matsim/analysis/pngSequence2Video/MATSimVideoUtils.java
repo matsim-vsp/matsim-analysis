@@ -22,14 +22,11 @@ package org.matsim.analysis.pngSequence2Video;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.jcodec.api.awt.SequenceEncoder;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 
 /**
 * @author ikaddoura
@@ -56,6 +53,9 @@ public class MATSimVideoUtils {
 	
 	private static void createVideoX(String runDirectory, String runId, String outputDirectory, int interval, String pngFileName) throws IOException {
 
+		int firstIteration = 0;
+		int lastIteration = 1000;
+		
 		log.info("Generating a video using a png sequence... (file name: " + pngFileName + ", iteration interval: " + interval + ")");
 		
 		if (!runDirectory.endsWith("/")) {
@@ -66,36 +66,19 @@ public class MATSimVideoUtils {
 			outputDirectory = outputDirectory + "/";
 		}
 		
-		String configFile;
 		String outputDirectoryWithRunId;
 		if (runId != null) {
-			configFile = runDirectory + runId + ".output_config.xml";
 			outputDirectoryWithRunId = outputDirectory + runId + ".";
 		} else {
-			configFile = runDirectory + "output_config.xml";
 			outputDirectoryWithRunId = outputDirectory;
 		}
 		
 		String outputFile = outputDirectoryWithRunId + pngFileName + ".mp4";
 		SequenceEncoder enc = new SequenceEncoder(new File(outputFile));
-			
-		Config config = null;
-		
-		if (configFile.startsWith("http")) {
-			config = ConfigUtils.loadConfig(new URL(configFile));		
-		} else {
-			if (new File(configFile).exists()) {
-				config = ConfigUtils.loadConfig(configFile);		
-			} else if (new File(runDirectory + "output_config.xml").exists()) {
-				config = ConfigUtils.loadConfig(runDirectory + "output_config.xml");			
-			} else {
-				throw new RuntimeException("No (output) config file: " + configFile + ". Aborting...");
-			}
-		}
 
 		int counter = 0;
 		int counterNoImage = 0;
-		for (int i = config.controler().getFirstIteration(); i<= config.controler().getLastIteration(); i++) {
+		for (int i = firstIteration; i<= lastIteration; i++) {
 			
 			if (counter % interval == 0) {
 				

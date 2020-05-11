@@ -20,8 +20,6 @@
 package org.matsim.analysis;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,17 +41,18 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		final String runDirectoryToCompareWith = null;
 		final String runIdToCompareWith = null;
 		
-		Scenario scenario1 = loadScenario(runDirectory, runId);
-		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith);
+		final String scenarioCRS = TransformationFactory.GK4;	
+
+		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
+		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, scenarioCRS);
 		
 		final String modesString = "car,pt,bicycle,walk,ride";
 
-		final String scenarioCRS = TransformationFactory.DHDN_GK4;	
 		final int scalingFactor = 100;
 		final String homeActivityPrefix = "home";
 
-		final String shapeFileZones = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/berlin-sav-v5.2-10pct/input/shp-stadtteile-split-zone-3/Bezirksregionen_zone_GK4_fixed.shp";
-		final String zonesCRS = TransformationFactory.DHDN_GK4;
+		final String shapeFileZones = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-stadtteile-split-zone-3/Bezirksregionen_zone_GK4_fixed.shp";
+		final String zonesCRS = "EPSG:31468";
 		final String zoneId = "NO";
 
 		final String analysisOutputDirectory = "./test/output/analysis-" + runId;
@@ -116,7 +115,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		analysis.run();
 	}
 	
-	private static Scenario loadScenario(String runDirectory, String runId) {
+	private static Scenario loadScenario(String runDirectory, String runId, String scenarioCRS) {
 		log.info("Loading scenario...");
 		
 		if (runDirectory == null || runDirectory.equals("") || runDirectory.equals("null")) {
@@ -125,28 +124,16 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 	
-		String configFile = runDirectory + runId + ".output_config.xml";	
 		String networkFile = runDirectory + runId + ".output_network.xml.gz";
 		String populationFile = runDirectory + runId + ".output_plans.xml.gz";
 		
-		Config config = null;
-		try {
-			config = ConfigUtils.loadConfig(new URL(configFile));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		Config config = ConfigUtils.createConfig();
 
-		if (config.controler().getRunId() != null) {
-			if (!runId.equals(config.controler().getRunId())) throw new RuntimeException("Given run ID " + runId + " doesn't match the run ID given in the config file. Aborting...");
-		} else {
-			config.controler().setRunId(runId);
-		}
+		config.global().setCoordinateSystem(scenarioCRS);
+		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(runDirectory);
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
-		config.vehicles().setVehiclesFile(null);
-		config.transit().setTransitScheduleFile(null);
-		config.transit().setVehiclesFile(null);
 		
 		return ScenarioUtils.loadScenario(config);
 	}
