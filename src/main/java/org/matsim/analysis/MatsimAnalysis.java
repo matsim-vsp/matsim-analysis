@@ -728,7 +728,8 @@ public class MatsimAnalysis {
 
 	public void setZoneInformation(String shapeFileZones, String zonesCRS, String zoneId) {
 		
-		if (shapeFileZones.endsWith("null") || zoneId.endsWith("null")
+		if (shapeFileZones == null || zoneId == null
+				|| shapeFileZones.endsWith("null") || zoneId.endsWith("null")
 				|| shapeFileZones.equals("") || zoneId.equals("")) {
 			this.shapeFileZones = null;
 			this.zoneId = null;

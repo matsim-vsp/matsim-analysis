@@ -114,7 +114,7 @@ public class PersonTripAnalysisTest {
 			line = br.readLine();
 			while(line != null) {
 				if (line.startsWith("person")) {
-					Assert.assertTrue("Output changed!?", line.equals("person Id;trip no.;trip main mode;trip modes (excl. help leg modes);stuck and abort trip (yes/no);departure time (trip) [sec];arrival time (trip) [sec];travel time (trip) [sec];in-vehicle time (trip) [sec];travel distance (trip) [m];origin X coordinate (trip);origin Y coordinate (trip);destination X coordinate (trip);destination Y coordinate (trip);beeline distance (trip) [m];toll payments (trip) [monetary units]"));
+					Assert.assertTrue("Output changed!?", line.equals("person Id;trip no.;trip main mode;trip modes (excl. help leg modes);stuck and abort trip (yes/no);departure time (trip) [sec];arrival time (trip) [sec];travel time (trip) [sec];in-vehicle time (trip) [sec];travel distance (trip) [m];origin X coordinate (trip);origin Y coordinate (trip);destination X coordinate (trip);destination Y coordinate (trip);beeline distance (trip) [m];money payments (trip) [monetary units]"));
 				} else {
 					tripInfos.add(line.split(";"));
 				}

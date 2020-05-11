@@ -92,7 +92,7 @@ public class AgentAnalysisFilter implements AgentFilter {
 		return zoneFile;
 	}
 	public void setZoneFile(String zoneFile) {
-		if (zoneFile.endsWith("null") || zoneFile.equals("")) {
+		if (zoneFile == null || zoneFile.endsWith("null") || zoneFile.equals("")) {
 			this.zoneFile = null;
 		} else {
 			this.zoneFile = zoneFile;

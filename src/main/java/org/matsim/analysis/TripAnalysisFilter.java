@@ -132,7 +132,7 @@ public class TripAnalysisFilter implements TripFilter {
 	}
 
 	public void setZoneInformation(String zoneFile, String zonesCRS) {
-		if (zoneFile.endsWith("null") || zoneFile.equals("")) {
+		if (zoneFile == null || zoneFile.endsWith("null") || zoneFile.equals("")) {
 			this.zoneFile = null;
 		} else {
 			this.zoneFile = zoneFile;
