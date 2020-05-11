@@ -727,9 +727,17 @@ public class MatsimAnalysis {
 	}
 
 	public void setZoneInformation(String shapeFileZones, String zonesCRS, String zoneId) {
-		this.shapeFileZones = shapeFileZones;
+		
+		if (shapeFileZones.endsWith("null") || zoneId.endsWith("null")
+				|| shapeFileZones.equals("") || zoneId.equals("")) {
+			this.shapeFileZones = null;
+			this.zoneId = null;
+		} else {
+			this.shapeFileZones = shapeFileZones;
+			this.zoneId = zoneId;
+		}
+		
 		this.zonesCRS = zonesCRS;
-		this.zoneId = zoneId;
 	}
 
 	public void setAnalysisOutputDirectory(String analysisOutputDirectory) {

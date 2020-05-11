@@ -42,8 +42,8 @@ public class AnalysisRunExampleSnzScenario {
 		String runIdToCompareWith = null;
 		String visualizationScriptInputDirectory = null;
 		String scenarioCRS = null;	
-		String shapeFileODZones = null;
-		String shapFileODZonesCRS = null;
+		String shapeFileZones = null;
+		String shapFileZonesCRS = null;
 		String shapeFileAgentFilter = null;
 		String zoneId = null;
 		String shapeFileTripFilter = null;
@@ -66,8 +66,8 @@ public class AnalysisRunExampleSnzScenario {
 			
 			scenarioCRS = args[5];
 			
-			shapeFileODZones = args[6];
-			shapFileODZonesCRS = args[7];
+			shapeFileZones = args[6];
+			shapFileZonesCRS = args[7];
 			zoneId = args[8];
 			
 			shapeFileAgentFilter = args[9];
@@ -109,9 +109,9 @@ public class AnalysisRunExampleSnzScenario {
 			
 			scenarioCRS = "EPSG:25832";
 			
-			shapeFileODZones = null;
-			shapFileODZonesCRS = null;
-			zoneId = null;
+			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v1/shp-files/hexagon-grid-3000.shp";
+			shapFileZonesCRS = "EPSG:25832";
+			zoneId = "id";
 						
 			shapeFileAgentFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
 			
@@ -166,7 +166,7 @@ public class AnalysisRunExampleSnzScenario {
 		analysis.setScalingFactor(scalingFactor);
 		analysis.setModes(modes);
 		analysis.setHelpLegModes(helpLegModes);
-		analysis.setZoneInformation(shapeFileODZones, shapFileODZonesCRS, zoneId);
+		analysis.setZoneInformation(shapeFileZones, shapFileZonesCRS, zoneId);
 		analysis.setVisualizationScriptInputDirectory(visualizationScriptInputDirectory);
 
 		analysis.run();

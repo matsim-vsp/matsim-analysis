@@ -92,7 +92,11 @@ public class AgentAnalysisFilter implements AgentFilter {
 		return zoneFile;
 	}
 	public void setZoneFile(String zoneFile) {
-		this.zoneFile = zoneFile;
+		if (zoneFile.endsWith("null") || zoneFile.equals("")) {
+			this.zoneFile = null;
+		} else {
+			this.zoneFile = zoneFile;
+		}
 	}
 	public String getRelevantActivityType() {
 		return relevantActivityTypePrefix;

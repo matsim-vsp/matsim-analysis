@@ -225,7 +225,7 @@ public class PersonTripAnalysis {
 					+ "destination X coordinate (trip);"
 					+ "destination Y coordinate (trip);"
 					+ "beeline distance (trip) [m];"
-					+ "toll payments (trip) [monetary units]");
+					+ "money payments (trip) [monetary units]");
 
 			bw.newLine();
 
@@ -629,7 +629,7 @@ public class PersonTripAnalysis {
 			bw.write("-----------");
 			bw.newLine();
 
-			bw.write("travel related user benefits (sample size) (including toll payments) [monetary units];" + userBenefitsIncludingMonetaryPayments);
+			bw.write("travel related user benefits (sample size) (including monetary payments) [monetary units];" + userBenefitsIncludingMonetaryPayments);
 			bw.newLine();
 
 			bw.write("revenues (sample size) (tolls/fares paid by private car users or passengers) [monetary units];" + moneyPaymentsByUsers);

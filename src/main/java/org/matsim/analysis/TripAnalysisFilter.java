@@ -80,17 +80,17 @@ public class TripAnalysisFilter implements TripFilter {
 		
 		// assuming the same CRS!
 		boolean originWithinProvidedGeometry = false;
+		Point originPoint = MGC.coord2Point(origin);
 		for (Geometry geometry : zoneFeatures.values()) {
-			Point point = MGC.coord2Point(origin);
-			if (point.within(geometry.buffer(buffer))) {
+			if (originPoint.within(geometry)) {
 				originWithinProvidedGeometry = true;
 				break;
 			}
 		}
 		boolean destinationWithinProvidedGeometry = false;
+		Point destinationPoint = MGC.coord2Point(destination);
 		for (Geometry geometry : zoneFeatures.values()) {
-			Point point = MGC.coord2Point(destination);
-			if (point.within(geometry.buffer(buffer))) {
+			if (destinationPoint.within(geometry)) {
 				destinationWithinProvidedGeometry = true;
 				break;
 			}
@@ -132,7 +132,11 @@ public class TripAnalysisFilter implements TripFilter {
 	}
 
 	public void setZoneInformation(String zoneFile, String zonesCRS) {
-		this.zoneFile = zoneFile;
+		if (zoneFile.endsWith("null") || zoneFile.equals("")) {
+			this.zoneFile = null;
+		} else {
+			this.zoneFile = zoneFile;
+		}		
 		this.zoneCRS  = zonesCRS;
 	}
 	
@@ -173,7 +177,8 @@ public class TripAnalysisFilter implements TripFilter {
 			int counter = 0;
 			for (SimpleFeature feature : features) {
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
-                zoneFeatures.put(String.valueOf(counter), geometry);
+                Geometry geometryWithBuffer = geometry.buffer(buffer);
+                zoneFeatures.put(String.valueOf(counter), geometryWithBuffer);
                 counter++;
             }
 			log.info("Reading shape file... Done.");	
