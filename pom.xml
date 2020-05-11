@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.matsim-vsp</groupId>
     <artifactId>matsim-analysis</artifactId>
-    <version>v2.7</version>
+    <version>v2.8</version>
 
     <name>MATSim analysis project</name>
     <description>MATSim analysis project</description>
 
     <properties>
         <!-- release> -->
-        <matsim.version>12.0-SNAPSHOT</matsim.version>
+        <!-- <matsim.version>12.0-SNAPSHOT</matsim.version>  -->
         <!--weekly "release":-->
-        <!-- <matsim.version>12.0-2020w09-SNAPSHOT</matsim.version>  -->
+        <matsim.version>12.0-2020w15-SNAPSHOT</matsim.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,11 +22,6 @@
     <repositories>
         <!--Note that in general repositories are not transitive, so they need to be repeated at every level where needed.-->
         <repository>
-            <!-- Geotools is not on Maven central -->
-<!--             <id>osgeo</id> -->
-<!--             <name>Geotools repository</name> -->
-<!--             <url>http://download.osgeo.org/webdav/geotools</url> -->
-
 			<id>osgeo</id>
  			<name>OSGeo Release Repository</name>
  			<url>https://repo.osgeo.org/repository/release/</url>
@@ -35,8 +30,7 @@
  			</snapshots>
  			<releases>
  				<enabled>true</enabled>
- 			</releases>
- 			
+ 			</releases>		
         </repository>
         <repository>
             <!-- Repository for MATSim releases (MATSim is not on Maven central) -->
