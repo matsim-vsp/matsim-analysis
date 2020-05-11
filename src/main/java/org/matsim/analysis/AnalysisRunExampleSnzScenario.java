@@ -89,8 +89,8 @@ public class AnalysisRunExampleSnzScenario {
 //			
 //			scenarioCRS = "EPSG:25832";
 //			
-//			shapeFileODZones = "../../shared-svn/projects/avoev/data/berlkoenig-od-trips/Bezirksregionen_zone_UTM32N/Bezirksregionen_zone_UTM32N_fixed.SHP";
-//			shapFileODZonesCRS = "EPSG:25832";
+//			shapeFileZones = "../../shared-svn/projects/avoev/data/berlkoenig-od-trips/Bezirksregionen_zone_UTM32N/Bezirksregionen_zone_UTM32N_fixed.SHP";
+//			shapFileZonesCRS = "EPSG:25832";
 //			zoneId = "NO";
 //						
 //			shapeFileAgentFilter = "../../shared-svn/projects/avoev/data/berlin-area/berlin-area_EPSG25832.shp";
@@ -99,6 +99,7 @@ public class AnalysisRunExampleSnzScenario {
 //			shapeFileTripFilterCRS = "EPSG:25832";
 			
 			// Vulkaneifel
+			
 			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrt342/";
 			runId = "snzDrt342";		
 			
@@ -118,8 +119,6 @@ public class AnalysisRunExampleSnzScenario {
 			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
 			shapeFileTripFilterCRS = "EPSG:25832";
 			
-			// Gladbeck
-			// TODO
 		}
 		
 		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
