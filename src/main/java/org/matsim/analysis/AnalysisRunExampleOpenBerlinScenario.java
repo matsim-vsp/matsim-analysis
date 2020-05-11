@@ -41,7 +41,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		final String runDirectoryToCompareWith = null;
 		final String runIdToCompareWith = null;
 		
-		final String scenarioCRS = TransformationFactory.GK4;	
+		final String scenarioCRS = TransformationFactory.DHDN_GK4;	
 
 		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
 		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, scenarioCRS);
@@ -52,7 +52,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		final String homeActivityPrefix = "home";
 
 		final String shapeFileZones = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-stadtteile-split-zone-3/Bezirksregionen_zone_GK4_fixed.shp";
-		final String zonesCRS = "EPSG:31468";
+		final String zonesCRS = TransformationFactory.DHDN_GK4;
 		final String zoneId = "NO";
 
 		final String analysisOutputDirectory = "./test/output/analysis-" + runId;
@@ -129,7 +129,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		
 		Config config = ConfigUtils.createConfig();
 
-		config.global().setCoordinateSystem(scenarioCRS);
+		config.global().setCoordinateSystem(TransformationFactory.GK4);
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(runDirectory);
 		config.plans().setInputFile(populationFile);
