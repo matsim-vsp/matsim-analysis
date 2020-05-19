@@ -59,15 +59,13 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	// temporary information
 	private final Map<Id<Person>,Integer> personId2currentTripNumber = new HashMap<>();
 	private final Map<Id<Person>,Double> personId2distanceEnterValue = new HashMap<>();
-	private final Map<Id<Vehicle>,Double> ptVehicleId2totalDistance = new HashMap<>();
-	private final Map<Id<Vehicle>,Double> taxiVehicleId2totalDistance = new HashMap<>();
 	private final Map<Id<Vehicle>,Double> networkModeVehicleId2totalDistance = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2currentLegModeNonHelpLeg = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2previousEnterVehicleTime = new HashMap<>();
 
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> ptVehicles = new HashSet<>();
-	private final Set<Id<Person>> taxiDrivers = new HashSet<>();
+	private final Set<Id<Person>> taxiOrDrtDrivers = new HashSet<>();
 
 	// analysis information to be stored
 	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2tripModes = new HashMap<>();
@@ -124,7 +122,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		personId2tripNumber2tripMainMode.clear();
 		personId2tripNumber2previousEnterVehicleTime.clear();
 		personId2tripNumber2inVehicleTime.clear();
-		ptVehicleId2totalDistance.clear();
 		personId2totalpayments.clear();
 		personId2totalrewards.clear();
 		personId2totalamounts.clear();
@@ -134,8 +131,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		personId2distanceEnterValue.clear();
 		ptDrivers.clear();
 		ptVehicles.clear();
-		taxiDrivers.clear();
-		taxiVehicleId2totalDistance.clear();
+		taxiOrDrtDrivers.clear();
 		networkModeVehicleId2totalDistance.clear();
 		personId2stuckAndAbortEvents.clear();
 		personId2tripNumber2originCoord.clear();
@@ -164,7 +160,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 		// trip
 		
-		if (this.taxiDrivers.contains(event.getPersonId()) || this.ptDrivers.contains(event.getPersonId())) {
+		if (this.taxiOrDrtDrivers.contains(event.getPersonId()) || this.ptDrivers.contains(event.getPersonId())) {
 			if (warnCnt0 <= 5) {
 				log.warn("A person money event is thrown for a public tranist driver or taxi driver: " + event.toString());
 				if (warnCnt0 == 5) {
@@ -239,13 +235,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				
 		double linkLength = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 		
-		if (ptVehicleId2totalDistance.get(event.getVehicleId()) != null) {
-			ptVehicleId2totalDistance.put(event.getVehicleId(), ptVehicleId2totalDistance.get(event.getVehicleId()) + linkLength);
-		 
-		} else if (taxiVehicleId2totalDistance.get(event.getVehicleId()) != null) {
-			taxiVehicleId2totalDistance.put(event.getVehicleId(), taxiVehicleId2totalDistance.get(event.getVehicleId()) + linkLength);
-		
-		} else if (networkModeVehicleId2totalDistance.get(event.getVehicleId()) != null) {
+		if (networkModeVehicleId2totalDistance.get(event.getVehicleId()) != null) {
 			networkModeVehicleId2totalDistance.put(event.getVehicleId(), networkModeVehicleId2totalDistance.get(event.getVehicleId()) + linkLength);
 
 		} else {
@@ -269,10 +259,10 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	public void handleEvent(ActivityEndEvent event) {
 		
 		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
-			this.taxiDrivers.add(event.getPersonId());
+			this.taxiOrDrtDrivers.add(event.getPersonId());
 		}
 		
-		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())){
+		if (ptDrivers.contains(event.getPersonId()) || taxiOrDrtDrivers.contains(event.getPersonId())){
 			// activities by pt or taxi drivers are not considered
 			
 		} else {
@@ -360,7 +350,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())){
+		if (ptDrivers.contains(event.getPersonId()) || taxiOrDrtDrivers.contains(event.getPersonId())){
 			// no normal person
 			
 		} else {
@@ -473,7 +463,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 	
-		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())) {
+		if (ptDrivers.contains(event.getPersonId()) || taxiOrDrtDrivers.contains(event.getPersonId())) {
 			// no normal person
 			
 		} else {
@@ -495,21 +485,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			}
 			this.personId2tripNumber2inVehicleTime.put(event.getPersonId(), tripNr2inVehTime);
 			
-			// distance
-			
-			Map<Integer,String> tripNumber2legMode = personId2tripNumber2currentLegModeNonHelpLeg.get(event.getPersonId());
-			
-			double distanceTravelled;
-			
-			if (tripNumber2legMode.get(tripNumber).equals(TransportMode.pt)) {
-				distanceTravelled = (ptVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
-			
-			} else if (tripNumber2legMode.get(tripNumber).equals(TransportMode.taxi) || tripNumber2legMode.get(tripNumber).equals(TransportMode.drt)) {
-				distanceTravelled = (taxiVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
-
-			} else {
-				distanceTravelled = (networkModeVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId()));			
-			}
+			// distance	
+			double distanceTravelled = (networkModeVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId()));			
 			
 			Map<Integer,Double> tripNumber2distance = personId2tripNumber2tripDistance.get(event.getPersonId());
 			tripNumber2distance.put(tripNumber, tripNumber2distance.get(tripNumber) + distanceTravelled);
@@ -522,22 +499,11 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	public void handleEvent(PersonEntersVehicleEvent event) {
 				
 		// start vehicle kilometers tracking
-		if ( ptVehicles.contains(event.getVehicleId()) || ptDrivers.contains(event.getPersonId()) ) {
-			// either the transit driver or a passenger enters a public transit vehicle
-			ptVehicleId2totalDistance.putIfAbsent(event.getVehicleId(), 0.);
-
-		} else if ( taxiDrivers.contains(Id.createPersonId(event.getVehicleId())) || taxiDrivers.contains(event.getPersonId()) ) {
-			// either a taxi driver or a passenger enters a transit vehicle
-			taxiVehicleId2totalDistance.putIfAbsent(event.getVehicleId(), 0.);
-			
-		} else {
-			// normal person enters vehicle
-			networkModeVehicleId2totalDistance.putIfAbsent(event.getVehicleId(), 0.);
-		}
+		networkModeVehicleId2totalDistance.putIfAbsent(event.getVehicleId(), 0.);
 		
 		// ###################################################
 		
-		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())) {
+		if (ptDrivers.contains(event.getPersonId()) || taxiOrDrtDrivers.contains(event.getPersonId())) {
 			// no normal person
 		} else {
 			
@@ -555,18 +521,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			this.personId2tripNumber2previousEnterVehicleTime.put(event.getPersonId(), tripNr2enterTime);
 			
 			// distance
+			personId2distanceEnterValue.put(event.getPersonId(), networkModeVehicleId2totalDistance.get(event.getVehicleId()));
 			
-			Map<Integer,String> tripNumber2legMode = personId2tripNumber2currentLegModeNonHelpLeg.get(event.getPersonId());
-			
-			if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.pt)){
-				personId2distanceEnterValue.put(event.getPersonId(), ptVehicleId2totalDistance.get(event.getVehicleId()));
-			
-			} else if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.taxi) || tripNumber2legMode.get(tripNumber).equals(TransportMode.drt)){
-				personId2distanceEnterValue.put(event.getPersonId(), taxiVehicleId2totalDistance.get(event.getVehicleId()));
-
-			} else {
-				personId2distanceEnterValue.put(event.getPersonId(), networkModeVehicleId2totalDistance.get(event.getVehicleId()));
-			}
 			
 		}		
 	}
@@ -574,7 +530,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 			
-		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())) {
+		if (ptDrivers.contains(event.getPersonId()) || taxiOrDrtDrivers.contains(event.getPersonId())) {
 			// no normal person
 			
 		} else {
@@ -784,7 +740,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	}
 	
 	public Set<Id<Person>> getTaxiDrivers() {
-		return taxiDrivers;
+		return taxiOrDrtDrivers;
 	}
 
 	public Scenario getScenario() {
@@ -809,14 +765,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		return totalTravelTimeByPersons;
 	}
 
-	public Map<Id<Vehicle>, Double> getTaxiVehicleId2totalDistance() {
-		return taxiVehicleId2totalDistance;
-	}
-
-	public Map<Id<Vehicle>, Double> getPtVehicleId2totalDistance() {
-		return ptVehicleId2totalDistance;
-	}
-
 	public Map<Id<Vehicle>, Double> getCarVehicleId2totalDistance() {
 		return networkModeVehicleId2totalDistance;
 	}
@@ -835,7 +783,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())){
+		if (ptDrivers.contains(event.getPersonId()) || taxiOrDrtDrivers.contains(event.getPersonId())){
 			// activities by pt or taxi drivers are not considered
 			
 		} else {
