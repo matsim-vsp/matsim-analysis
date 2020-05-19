@@ -9,7 +9,6 @@ env:
     - TEST=MatsimAnalysisRunTest
     - TEST=MatsimAnalysisRunDrtTest
     - TEST=MatsimAnalysisRunIntermodalTest
-    - TEST=VTTSHandlerTest
     - TEST=ModeAnalysisTest
     - TEST=BasicPersonTripAnalysisTest
     - TEST=PersonTripAnalysisTest
