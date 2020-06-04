@@ -14,6 +14,7 @@
 	</module>
 	<module name="multiModeDrt">
 		<parameterset type="drt">
+			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 			<param name="estimatedBeelineDistanceFactor" value="1.3"/>
 			<param name="estimatedDrtSpeed" value="8.333333333333334"/>
