@@ -129,7 +129,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		
 		Config config = ConfigUtils.createConfig();
 
-		config.global().setCoordinateSystem(TransformationFactory.GK4);
+		config.global().setCoordinateSystem(scenarioCRS);
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(runDirectory);
 		config.plans().setInputFile(populationFile);
@@ -137,7 +137,4 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		
 		return ScenarioUtils.loadScenario(config);
 	}
-
 }
-		
-
