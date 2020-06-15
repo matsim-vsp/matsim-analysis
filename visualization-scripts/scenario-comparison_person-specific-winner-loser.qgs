@@ -5,13 +5,13 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Unchecked" id="winner_loser_analysis_losers_score_tolerance_0_020180209164449138" source="winner-loser-analysis_losers_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="losers: change in score">
+    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Unchecked" id="winner_loser_analysis_losers_score_tolerance_0_020180209164449138" source="./winnerLoserAnalysis/winner-loser-analysis_losers_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="losers: change in score">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Unchecked" id="winner_loser_analysis_winners_score_tolerance_0_020180209164426324" source="winner-loser-analysis_winners_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="winners: change in score">
+    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Unchecked" id="winner_loser_analysis_winners_score_tolerance_0_020180209164426324" source="./winnerLoserAnalysis/winner-loser-analysis_losers_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="winners: change in score">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="winner_loser_analysis_all20180209163823326" source="winner-loser-analysis_all.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="all agents: change in score">
+    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="winner_loser_analysis_all20180209163823326" source="./winnerLoserAnalysis/winner-loser-analysis_all.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="all agents: change in score">
       <customproperties/>
     </layer-tree-layer>
     <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="policyCase_network20180209164251275" source="policyCaseRunId.network.shp" name="policyCase.network">
@@ -507,7 +507,7 @@ def my_form_open(dialog, layer, feature):
         <ymax>5933298.16604509297758341</ymax>
       </extent>
       <id>winner_loser_analysis_all20180209163823326</id>
-      <datasource>winner-loser-analysis_all.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
+      <datasource>./winnerLoserAnalysis/winner-loser-analysis_all.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1006,7 +1006,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
       <id>winner_loser_analysis_losers_score_tolerance_0_020180209164449138</id>
-      <datasource>winner-loser-analysis_losers_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
+      <datasource>./winnerLoserAnalysis/winner-loser-analysis_losers_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1482,7 +1482,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
       <id>winner_loser_analysis_winners_score_tolerance_0_020180209164426324</id>
-      <datasource>winner-loser-analysis_winners_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
+      <datasource>./winnerLoserAnalysis/winner-loser-analysis_losers_score-tolerance-0.0.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=homeCoordX&amp;yField=homeCoordY&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
       <keywordList>
         <value></value>
       </keywordList>

@@ -5,16 +5,13 @@
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="modeSwitchAnalysis_x2x_homeCoord20180209110138825" source="modeSwitchAnalysis_x2x_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="modeSwitchAnalysis_x2x_homeCoord">
+    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="modeSwitchAnalysis_x2car_homeCoord20180209110125241" source="./modeSwitchAnalysis/coordinates/modeSwitchAnalysis_actCoord_x-TO-car_HomeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="modeSwitchAnalysis_x2car_homeCoord">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="modeSwitchAnalysis_x2car_homeCoord20180209110125241" source="modeSwitchAnalysis_x2car_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="modeSwitchAnalysis_x2car_homeCoord">
+    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="modeSwitchAnalysis_car2x_homeCoord20180209110111786" source="./modeSwitchAnalysis/coordinates/modeSwitchAnalysis_actCoord_car-TO-x_HomeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="modeSwitchAnalysis_car2x_homeCoord">
       <customproperties/>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="modeSwitchAnalysis_car2x_homeCoord20180209110111786" source="modeSwitchAnalysis_car2x_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="modeSwitchAnalysis_car2x_homeCoord">
-      <customproperties/>
-    </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="modeSwitchAnalysis_car2car_homeCoord20180209110039363" source="modeSwitchAnalysis_car2car_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="modeSwitchAnalysis_car2car_homeCoord">
+    <layer-tree-layer expanded="1" providerKey="delimitedtext" checked="Qt::Checked" id="modeSwitchAnalysis_car2car_homeCoord20180209110039363" source="./modeSwitchAnalysis/coordinates/modeSwitchAnalysis_actCoord_car-TO-car_HomeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no" name="modeSwitchAnalysis_car2car_homeCoord">
       <customproperties/>
     </layer-tree-layer>
   </layer-tree-group>
@@ -38,15 +35,9 @@
       <item>modeSwitchAnalysis_car2car_homeCoord20180209110039363</item>
       <item>modeSwitchAnalysis_car2x_homeCoord20180209110111786</item>
       <item>modeSwitchAnalysis_x2car_homeCoord20180209110125241</item>
-      <item>modeSwitchAnalysis_x2x_homeCoord20180209110138825</item>
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="modeSwitchAnalysis_x2x_homeCoord" showFeatureCount="0">
-      <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="modeSwitchAnalysis_x2x_homeCoord20180209110138825" visible="1"/>
-      </filegroup>
-    </legendlayer>
     <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="modeSwitchAnalysis_x2car_homeCoord" showFeatureCount="0">
       <filegroup open="true" hidden="false">
         <legendlayerfile isInOverview="0" layerid="modeSwitchAnalysis_x2car_homeCoord20180209110125241" visible="1"/>
@@ -68,7 +59,7 @@
       <extent>
       </extent>
       <id>modeSwitchAnalysis_car2car_homeCoord20180209110039363</id>
-      <datasource>file:./modeSwitchAnalysis_car2car_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
+      <datasource>file:./modeSwitchAnalysis/coordinates/modeSwitchAnalysis_actCoord_car-TO-car_HomeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -184,7 +175,7 @@
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
       <id>modeSwitchAnalysis_car2x_homeCoord20180209110111786</id>
-      <datasource>file:./modeSwitchAnalysis_car2x_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
+      <datasource>file:./modeSwitchAnalysis/coordinates/modeSwitchAnalysis_actCoord_car-TO-x_HomeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -300,7 +291,7 @@
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
       <id>modeSwitchAnalysis_x2car_homeCoord20180209110125241</id>
-      <datasource>file:./modeSwitchAnalysis_x2car_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
+      <datasource>file:./modeSwitchAnalysis/coordinates/modeSwitchAnalysis_actCoord_x-TO-car_HomeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -393,122 +384,6 @@
       <excludeAttributesWFS/>
       <attributeactions default="-1"/>
       <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
-        <columns/>
-      </attributetableconfig>
-      <editform></editform>
-      <editforminit/>
-      <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
-      <editforminitcode><![CDATA[]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
-      <editorlayout>generatedlayout</editorlayout>
-      <widgets/>
-      <conditionalstyles>
-        <rowstyles/>
-        <fieldstyles/>
-      </conditionalstyles>
-      <defaults>
-        <default field="Id" expression=""/>
-        <default field="xCoord" expression=""/>
-        <default field="yCoord" expression=""/>
-      </defaults>
-      <previewExpression></previewExpression>
-    </maplayer>
-    <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
-      <id>modeSwitchAnalysis_x2x_homeCoord20180209110138825</id>
-      <datasource>file:./modeSwitchAnalysis_x2x_homeCoord.csv?type=csv&amp;delimiter=,%5Ct;&amp;decimalPoint=,&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>
-      <keywordList>
-        <value></value>
-      </keywordList>
-      <layername>modeSwitchAnalysis_x2x_homeCoord</layername>
-      <srs>
-        <spatialrefsys>
-          	crs-specification
-        </spatialrefsys>
-      </srs>
-      <provider encoding="UTF-8">delimitedtext</provider>
-      <vectorjoins/>
-      <layerDependencies/>
-      <expressionfields/>
-      <map-layer-style-manager current="">
-        <map-layer-style name=""/>
-      </map-layer-style-manager>
-      <edittypes>
-        <edittype widgetv2type="TextEdit" name="Id">
-          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-        </edittype>
-        <edittype widgetv2type="TextEdit" name="xCoord">
-          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-        </edittype>
-        <edittype widgetv2type="TextEdit" name="yCoord">
-          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-        </edittype>
-      </edittypes>
-      <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
-        <symbols>
-          <symbol alpha="1" clip_to_extent="1" type="marker" name="0">
-            <layer pass="0" class="SimpleMarker" locked="0">
-              <prop k="angle" v="0"/>
-              <prop k="color" v="198,43,38,255"/>
-              <prop k="horizontal_anchor_point" v="1"/>
-              <prop k="joinstyle" v="bevel"/>
-              <prop k="name" v="circle"/>
-              <prop k="offset" v="0,0"/>
-              <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
-              <prop k="offset_unit" v="MM"/>
-              <prop k="outline_color" v="0,0,0,255"/>
-              <prop k="outline_style" v="solid"/>
-              <prop k="outline_width" v="0"/>
-              <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
-              <prop k="outline_width_unit" v="MM"/>
-              <prop k="scale_method" v="diameter"/>
-              <prop k="size" v="2"/>
-              <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
-              <prop k="size_unit" v="MM"/>
-              <prop k="vertical_anchor_point" v="1"/>
-            </layer>
-          </symbol>
-        </symbols>
-        <rotation/>
-        <sizescale scalemethod="diameter"/>
-      </renderer-v2>
-      <labeling type="simple"/>
-      <customproperties/>
-      <blendMode>0</blendMode>
-      <featureBlendMode>0</featureBlendMode>
-      <layerTransparency>0</layerTransparency>
-      <displayfield>Id</displayfield>
-      <label>0</label>
-      <labelattributes>
-        <label fieldname="" text="Beschriftung"/>
-        <family fieldname="" name=".SF NS Text"/>
-        <size fieldname="" units="pt" value="12"/>
-        <bold fieldname="" on="0"/>
-        <italic fieldname="" on="0"/>
-        <underline fieldname="" on="0"/>
-        <strikeout fieldname="" on="0"/>
-        <color fieldname="" red="0" blue="0" green="0"/>
-        <x fieldname=""/>
-        <y fieldname=""/>
-        <offset x="0" y="0" units="pt" yfieldname="" xfieldname=""/>
-        <angle fieldname="" value="0" auto="0"/>
-        <alignment fieldname="" value="center"/>
-        <buffercolor fieldname="" red="255" blue="255" green="255"/>
-        <buffersize fieldname="" units="pt" value="1"/>
-        <bufferenabled fieldname="" on=""/>
-        <multilineenabled fieldname="" on=""/>
-        <selectedonly on=""/>
-      </labelattributes>
-      <annotationform></annotationform>
-      <aliases>
-        <alias field="Id" index="0" name=""/>
-        <alias field="xCoord" index="1" name=""/>
-        <alias field="yCoord" index="2" name=""/>
-      </aliases>
-      <excludeAttributesWMS/>
-      <excludeAttributesWFS/>
-      <attributeactions default="-1"/>
-      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="-805">
         <columns/>
       </attributetableconfig>
       <editform></editform>
