@@ -83,7 +83,7 @@ public class ActDurationHandler implements ActivityStartEventHandler, ActivityEn
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
-		if(event.getActType().contains(stageActivitySubString)) {
+		if(!event.getActType().contains(stageActivitySubString)) {
 		
 			personId2startTime.put(event.getPersonId(), event.getTime());
 			personId2currentActivity.put(event.getPersonId(), event.getActType());
@@ -106,7 +106,7 @@ public class ActDurationHandler implements ActivityStartEventHandler, ActivityEn
 	}
 
 	public void handleEvent(ActivityEndEvent event) {
-		if(event.getActType().contains(stageActivitySubString)) {
+		if(!event.getActType().contains(stageActivitySubString)) {
 			
 			if (personId2startTime.get(event.getPersonId()) != null ) {
 				
