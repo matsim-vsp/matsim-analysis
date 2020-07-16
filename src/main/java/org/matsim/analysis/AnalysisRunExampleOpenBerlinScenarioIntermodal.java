@@ -89,6 +89,7 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 			zoneId = "NO";
 			shapeFileAgentFilter = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-spandau/spandau_b.shp";
 			shapeFileTripFilter = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-spandau/spandau_b.shp";
+			shapeFileTripFilterCRS = TransformationFactory.DHDN_GK4;
 			bufferMAroundTripFilterShp = "2000";
 		}
 
