@@ -21,6 +21,7 @@ package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -34,101 +35,121 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 	private static final Logger log = Logger.getLogger(AnalysisRunExampleOpenBerlinScenarioIntermodal.class);
 			
 	public static void main(String[] args) throws IOException {
-		
-		final String runDirectory;
-		final String runId;
-		
-		final String runDirectoryToCompareWith;
-		final String runIdToCompareWith;
+
+		String runDirectory = null;
+		String runId = null;
+		String runDirectoryToCompareWith = null;
+		String runIdToCompareWith = null;
+		String visualizationScriptInputDirectory = null;
+		String scenarioCRS = null;
+		String shapeFileZones = null;
+		String shapFileZonesCRS = null;
+		String shapeFileAgentFilter = null;
+		String zoneId = null;
+		String shapeFileTripFilter = null;
+		String shapeFileTripFilterCRS = null;
+		String bufferMAroundTripFilterShp = null;
+
+		final String[] helpLegModes = {TransportMode.walk, TransportMode.non_network_walk};
+		final int scalingFactor = 10;
+		final String homeActivityPrefix = "home";
+		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + "bicycle" + "," + TransportMode.walk + "," + TransportMode.ride + "," + TransportMode.drt + IntermodalPtDrtRouterAnalysisModeIdentifier.ANALYSIS_MAIN_MODE_PT_WITH_DRT_USED_FOR_ACCESS_OR_EGRESS;
 
 		if (args.length > 0) {
 			runDirectory = args[0];
 			runId = args[1];
+
 			runDirectoryToCompareWith = args[2];
 			runIdToCompareWith = args[3];
+
+			if(!args[4].equals("null")) visualizationScriptInputDirectory = args[4];
+
+			scenarioCRS = args[5];
+
+			shapeFileZones = args[6];
+			shapFileZonesCRS = args[7];
+			zoneId = args[8];
+
+			shapeFileAgentFilter = args[9];
+
+			shapeFileTripFilter = args[10];
+			shapeFileTripFilterCRS = args[11];
+
+			bufferMAroundTripFilterShp = args[12];
 		} else {
 			//TODO
-			runDirectory = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-1pct/output-berlin-v5.4-1pct/";
-			runId = "berlin-v5.4-1pct";
+			runDirectory = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/";
+			runId = "berlin-v5.5-1pct";
 			runDirectoryToCompareWith = null;
 			runIdToCompareWith = null;
+			visualizationScriptInputDirectory = "./visualization-scripts/";
+			scenarioCRS = TransformationFactory.DHDN_GK4;
+			shapeFileZones = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-stadtteile-split-zone-3/Bezirksregionen_zone_GK4_fixed.shp";
+			shapFileZonesCRS = TransformationFactory.DHDN_GK4;
+			zoneId = "NO";
+			shapeFileAgentFilter = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-spandau/spandau_b.shp";
+			shapeFileTripFilter = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-spandau/spandau_b.shp";
+			bufferMAroundTripFilterShp = "2000";
 		}
-		
-		final String scenarioCRS = TransformationFactory.DHDN_GK4;	
 
 		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
 		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith, scenarioCRS);
-		
-		final String modesString = "car,pt,bicycle,walk,ride," + IntermodalPtDrtRouterAnalysisModeIdentifier.ANALYSIS_MAIN_MODE_PT_WITH_DRT_USED_FOR_ACCESS_OR_EGRESS;
-
-		final int scalingFactor = 10;
-		final String homeActivityPrefix = "home";
-
-		final String shapeFileDrtOperationArea = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-berlkoenig-area/berlkoenig-area.shp";
-
-		final String shapeFileZones = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-stadtteile-split-zone-3/Bezirksregionen_zone_GK4_fixed.shp";
-		final String zonesCRS = TransformationFactory.DHDN_GK4;
-		final String zoneId = "NO";
-
-		final String analysisOutputDirectory = "./test/output/analysis-" + runId;
-
-		final String visualizationScriptInputDirectory = "./visualization-scripts/";
 
 		final List<AgentFilter> agentFilters = new ArrayList<>();
 
 		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("A");
 		filter1a.setSubpopulation("person");
 		filter1a.preProcess(scenario1);
-		filter1a.setZoneFile(shapeFileDrtOperationArea);
+		filter1a.setZoneFile(shapeFileAgentFilter);
 		filter1a.setRelevantActivityType(homeActivityPrefix);
 		agentFilters.add(filter1a);
-		
+
 		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("B");
 		filter1b.preProcess(scenario1);
 		agentFilters.add(filter1b);
-		
+
 		AgentAnalysisFilter filter1c = new AgentAnalysisFilter("C");
 		filter1c.setSubpopulation("person");
 		filter1c.setPersonAttribute("brandenburg");
 		filter1c.setPersonAttributeName("home-activity-zone");
 		filter1c.preProcess(scenario1);
 		agentFilters.add(filter1c);
-				
+
 		final List<TripFilter> tripFilters = new ArrayList<>();
-		
+
 		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("A");
 		tripFilter1a.preProcess(scenario1);
 		tripFilters.add(tripFilter1a);
-		
+
 		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("B");
-		tripFilter1b.setZoneInformation(shapeFileDrtOperationArea, zonesCRS);
+		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
 		tripFilter1b.preProcess(scenario1);
+		tripFilter1b.setBuffer(Double.valueOf(bufferMAroundTripFilterShp));
 		tripFilters.add(tripFilter1b);
-				
+
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
 			modes.add(mode);
 		}
-		
+
 		MatsimAnalysis analysis = new MatsimAnalysis();
-		
-		analysis.setScenario1(scenario1);	
+
+		analysis.setScenario1(scenario1);
 		analysis.setScenario0(scenario0);
-		
+
 		analysis.setAgentFilters(agentFilters);
 		analysis.setTripFilters(tripFilters);
-		
+
 		analysis.setScenarioCRS(scenarioCRS);
-		analysis.setZoneInformation(shapeFileZones, zonesCRS, zoneId);
-		
+		analysis.setZoneInformation(shapeFileZones, shapFileZonesCRS, zoneId);
+
 		analysis.setModes(modes);
 		analysis.setVisualizationScriptInputDirectory(visualizationScriptInputDirectory);
 		analysis.setHomeActivityPrefix(homeActivityPrefix);
 		analysis.setScalingFactor(scalingFactor);
-
+		analysis.setHelpLegModes(helpLegModes);
 		analysis.setMainModeIdentifier(new IntermodalPtDrtRouterAnalysisModeIdentifier());
-		
-		analysis.setAnalysisOutputDirectory(analysisOutputDirectory);		
+
 		analysis.run();
 	}
 	
