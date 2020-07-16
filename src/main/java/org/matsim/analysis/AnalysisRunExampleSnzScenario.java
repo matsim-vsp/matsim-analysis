@@ -48,6 +48,7 @@ public class AnalysisRunExampleSnzScenario {
 		String zoneId = null;
 		String shapeFileTripFilter = null;
 		String shapeFileTripFilterCRS = null;
+		String bufferMAroundTripFilterShp = null;
 
 		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.walk, TransportMode.non_network_walk, "access_walk", "egress_walk"}; // to be able to analyze old runs
 		final int scalingFactor = 4;
@@ -74,6 +75,8 @@ public class AnalysisRunExampleSnzScenario {
 			
 			shapeFileTripFilter = args[10];
 			shapeFileTripFilterCRS = args[11];
+
+			bufferMAroundTripFilterShp = args[12];
 									
 		} else {
 			
@@ -118,6 +121,7 @@ public class AnalysisRunExampleSnzScenario {
 			
 			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
 			shapeFileTripFilterCRS = "EPSG:25832";
+			bufferMAroundTripFilterShp = "2000";
 			
 		}
 		
@@ -145,7 +149,7 @@ public class AnalysisRunExampleSnzScenario {
 		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("certain-trips");
 		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
 		tripFilter1b.preProcess(scenario1);
-		tripFilter1b.setBuffer(2000.);
+		tripFilter1b.setBuffer(Double.valueOf(bufferMAroundTripFilterShp));
 		tripFilter1b.setTripConsiderType(TripConsiderType.OriginOrDestination);
 		tripFilters.add(tripFilter1b);
 		
