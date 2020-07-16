@@ -59,12 +59,13 @@ public class ODAnalysisTest {
             final String runDirectory = testUtils.getPackageInputDirectory() + "test_runDirectory/";
             final String runId = "berlin-drtA-v5.2-1pct";
             final String shapeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-bezirke/bezirke_berlin.shp";
-            final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
+            final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk, "access_walk", "egress_walk"};
             final String stageActivitySubString = "interaction";
 
             final String zoneId = "SCHLUESSEL";
             final List<String> modes = new ArrayList<>();
             modes.add(TransportMode.drt);
+            modes.add("access_walk");
 
             double scaleFactor = 10.;
 			final String networkFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.2-10pct/output-berlin-v5.2-10pct/berlin-v5.2-10pct.output_network.xml.gz";
@@ -85,9 +86,10 @@ public class ODAnalysisTest {
 			Network network = ScenarioUtils.loadScenario(config).getNetwork();
 			
 			ODAnalysis odAnalysis = new ODAnalysis(outputDirectory, network, runId, shapeFile, "EPSG:31468" , zoneId, modes, scaleFactor);
+			odAnalysis.setPrintTripSHPfiles(true);
 			odAnalysis.process(handler1);
 
-            String csvFilename = outputDirectory+ "/od-analysis/" + runId + ".od-analysis_0.0-36.0_drt.csv";
+            String csvFilename = outputDirectory+ "/od-analysis/" + runId + ".od-analysis_0.0-36.0_drt_trips.csv";
             List<ODRelation> odRelationsList = ODAnalysisCSVReader(csvFilename);
 
             for (ODRelation odRelation : odRelationsList) {
@@ -129,8 +131,10 @@ public class ODAnalysisTest {
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw new RuntimeException();
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException();
         }
         return ODRelationsList;
     }

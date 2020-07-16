@@ -130,7 +130,7 @@ public final class ODAnalysis {
 		}
 		
 		if (printTripSHPfiles) {
-			File file = new File(outputDirectory + "shapefiles_trip-od-analysis/");
+			File file = new File(outputDirectory + "shapefiles_disaggegated-od-analysis/");
 			file.mkdirs();
 		}
 
@@ -166,47 +166,86 @@ public final class ODAnalysis {
         }
 
 		List<ODTrip> odTrips = new ArrayList<>();
+		{
+			int counter = 0;
+			log.info("persons (sample size): " + handler1.getPersonId2tripNumber2departureTime().size());
+			for (Id<Person> personId : handler1.getPersonId2tripNumber2departureTime().keySet()) {
+				counter++;
+				if (counter%1000 == 0.) log.info("person # " + counter);
+				for (Integer tripNr : handler1.getPersonId2tripNumber2departureTime().get(personId).keySet()) {
+					ODTrip odTrip = new ODTrip();
+					odTrip.setPersonId(personId);
+					Id<Link> departureLink = handler1.getPersonId2tripNumber2departureLink().get(personId).get(tripNr);
+					if (network.getLinks().get(departureLink) == null) {
+						throw new RuntimeException("departure link is null. Aborting...");
+					}
+					Coord departureLinkCoord = network.getLinks().get(departureLink).getCoord();
+					odTrip.setOriginCoord(departureLinkCoord);
+					odTrip.setOrigin(getDistrictId(zones, departureLinkCoord ));
 
-		int counter = 0;
-		log.info("persons (sample size): " + handler1.getPersonId2tripNumber2departureTime().size());
-		for (Id<Person> personId : handler1.getPersonId2tripNumber2departureTime().keySet()) {
-			counter++;
-			if (counter%1000 == 0.) log.info("person # " + counter);
-			for (Integer tripNr : handler1.getPersonId2tripNumber2departureTime().get(personId).keySet()) {
-				ODTrip odTrip = new ODTrip();
-				odTrip.setPersonId(personId);
-				Id<Link> departureLink = handler1.getPersonId2tripNumber2departureLink().get(personId).get(tripNr);
-				if (network.getLinks().get(departureLink) == null) {
-					throw new RuntimeException("departure link is null. Aborting...");
+					Coord arrivalLinkCoord;
+					if (handler1.getPersonId2tripNumber2arrivalLink().get(personId) == null || handler1.getPersonId2tripNumber2arrivalLink().get(personId).get(tripNr) == null) {
+						log.warn("no arrival link for person " + personId + " / trip # " + tripNr + ". Probably a stucking agent.");
+						arrivalLinkCoord = dummyCoord;
+					} else {
+						Id<Link> arrivalLink = handler1.getPersonId2tripNumber2arrivalLink().get(personId).get(tripNr);
+						arrivalLinkCoord = network.getLinks().get(arrivalLink).getCoord();
+					}
+					odTrip.setDestinationCoord(arrivalLinkCoord);
+					odTrip.setDestination(getDistrictId(zones, arrivalLinkCoord));
+					odTrip.setMode(handler1.getPersonId2tripNumber2legMode().get(personId).get(tripNr));
+					odTrip.setDepartureTime(handler1.getPersonId2tripNumber2departureTime().get(personId).get(tripNr));
+					odTrips.add(odTrip);
 				}
-				Coord departureLinkCoord = network.getLinks().get(departureLink).getCoord();
-				odTrip.setOriginCoord(departureLinkCoord);
-				odTrip.setOrigin(getDistrictId(zones, departureLinkCoord ));
+			}
+		}
+		
+		List<ODTrip> odLegs = new ArrayList<>();
+		{
+			int counter = 0;
+			log.info("persons (sample size): " + handler1.getPersonId2legNumber2departureTime().size());
+			for (Id<Person> personId : handler1.getPersonId2legNumber2departureTime().keySet()) {
+				counter++;
+				if (counter%1000 == 0.) log.info("person # " + counter);
+				for (Integer tripNr : handler1.getPersonId2legNumber2departureTime().get(personId).keySet()) {
+					ODTrip odLeg = new ODTrip();
+					odLeg.setPersonId(personId);
+					Id<Link> departureLink = handler1.getPersonId2legNumber2departureLink().get(personId).get(tripNr);
+					if (network.getLinks().get(departureLink) == null) {
+						throw new RuntimeException("departure link is null. Aborting...");
+					}
+					Coord departureLinkCoord = network.getLinks().get(departureLink).getCoord();
+					odLeg.setOriginCoord(departureLinkCoord);
+					odLeg.setOrigin(getDistrictId(zones, departureLinkCoord ));
 
-				Coord arrivalLinkCoord;
-				if (handler1.getPersonId2tripNumber2arrivalLink().get(personId) == null || handler1.getPersonId2tripNumber2arrivalLink().get(personId).get(tripNr) == null) {
-					log.warn("no arrival link for person " + personId + " / trip # " + tripNr + ". Probably a stucking agent.");
-					arrivalLinkCoord = dummyCoord;
-				} else {
-					Id<Link> arrivalLink = handler1.getPersonId2tripNumber2arrivalLink().get(personId).get(tripNr);
-					arrivalLinkCoord = network.getLinks().get(arrivalLink).getCoord();
+					Coord arrivalLinkCoord;
+					if (handler1.getPersonId2legNumber2arrivalLink().get(personId) == null || handler1.getPersonId2legNumber2arrivalLink().get(personId).get(tripNr) == null) {
+						log.warn("no arrival link for person " + personId + " / trip # " + tripNr + ". Probably a stucking agent.");
+						arrivalLinkCoord = dummyCoord;
+					} else {
+						Id<Link> arrivalLink = handler1.getPersonId2legNumber2arrivalLink().get(personId).get(tripNr);
+						arrivalLinkCoord = network.getLinks().get(arrivalLink).getCoord();
+					}
+					odLeg.setDestinationCoord(arrivalLinkCoord);
+					odLeg.setDestination(getDistrictId(zones, arrivalLinkCoord));
+					odLeg.setMode(handler1.getPersonId2legNumber2legMode().get(personId).get(tripNr));
+					odLeg.setDepartureTime(handler1.getPersonId2legNumber2departureTime().get(personId).get(tripNr));
+					odLegs.add(odLeg);
 				}
-				odTrip.setDestinationCoord(arrivalLinkCoord);
-				odTrip.setDestination(getDistrictId(zones, arrivalLinkCoord));
-				odTrip.setMode(handler1.getPersonId2tripNumber2legMode().get(personId).get(tripNr));
-				odTrip.setDepartureTime(handler1.getPersonId2tripNumber2departureTime().get(personId).get(tripNr));
-				odTrips.add(odTrip);
 			}
 		}
 		
 		List<Tuple<Double, Double>> timeBinsDay = new ArrayList<>();
 		timeBinsDay.add(new Tuple<Double, Double>(0., 36.));
-		filterTripsAndPrintInformation(odTrips, zones, modes, timeBinsDay);
+		filterAndPrintInformation("trips", odTrips, zones, modes, timeBinsDay);
+		filterAndPrintInformation("legs", odLegs, zones, modes, timeBinsDay);
+
 		if (modes.size() > 1) {
 			for (String mode : modes) {
 				List<String> eachModeSeparately = new ArrayList<>();
 				eachModeSeparately.add(mode);
-				filterTripsAndPrintInformation(odTrips, zones, eachModeSeparately, timeBinsDay);
+				filterAndPrintInformation("trips", odTrips, zones, eachModeSeparately, timeBinsDay);
+				filterAndPrintInformation("legs", odLegs, zones, eachModeSeparately, timeBinsDay);
 			}
 		}
 		
@@ -218,17 +257,19 @@ public final class ODAnalysis {
 		timeBinsPeriods.add(new Tuple<Double, Double>(15., 18.));
 		timeBinsPeriods.add(new Tuple<Double, Double>(18., 21.));
 		timeBinsPeriods.add(new Tuple<Double, Double>(21., 24.));
-		filterTripsAndPrintInformation(odTrips, zones, modes, timeBinsPeriods);		
+		filterAndPrintInformation("trips", odTrips, zones, modes, timeBinsPeriods);
+		filterAndPrintInformation("legs", odLegs, zones, modes, timeBinsPeriods);		
 		if (modes.size() > 1) {
 			for (String mode : modes) {
 				List<String> eachModeSeparately = new ArrayList<>();
 				eachModeSeparately.add(mode);
-				filterTripsAndPrintInformation(odTrips, zones, eachModeSeparately, timeBinsPeriods);
+				filterAndPrintInformation("trips", odTrips, zones, eachModeSeparately, timeBinsPeriods);
+				filterAndPrintInformation("legs", odLegs, zones, eachModeSeparately, timeBinsPeriods);
 			}
 		}
 	}
 
-	private void filterTripsAndPrintInformation(List<ODTrip> odTrips, Map<String, Geometry> zones, List<String> modes, List<Tuple<Double, Double>> timeBins) {
+	private void filterAndPrintInformation(String filePrefix, List<ODTrip> odTrips, Map<String, Geometry> zones, List<String> modes, List<Tuple<Double, Double>> timeBins) {
 
 		LinkedHashMap<String, Map<String, ODRelation>> time2odRelations = new LinkedHashMap<>();
 		
@@ -248,7 +289,7 @@ public final class ODAnalysis {
 
 			ODTripFilter hourFilter = new ODTripFilter(from, to, "", modes);
 			log.info("###### " + from + " to " + to);
-			log.info("total number of trips (sample size) " + odTrips.size());
+			log.info("total number of trips or legs (sample size) " + odTrips.size());
 
 			for (ODTrip trip : odTrips) {
 				if (hourFilter.considerTrip(trip)) {
@@ -266,11 +307,11 @@ public final class ODAnalysis {
 					// skip trip
 				}
 			}
-			log.info("filtered (considered mode, time bin, ...) trips (sample size): " + filteredTripCounter);
+			log.info("filtered (considered mode, time bin, ...) trips/legs (sample size): " + filteredTripCounter);
 			try {
-				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".csv");
-				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + "_from-to-format.csv");
-				if (printTripSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_trip-od-analysis/" + runId + ".trip-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".shp");
+				writeData(filteredOdRelations, zones, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + "_" + filePrefix +".csv");
+				writeDataTable(filteredOdRelations, outputDirectory + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + "_from-to-format_" + filePrefix + ".csv");
+				if (printTripSHPfiles) printODLinesForEachAgent(filteredTrips, outputDirectory + "shapefiles_disaggegated-od-analysis/" + runId + ".disaggregated-od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + "_" + filePrefix + ".shp");
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -282,7 +323,7 @@ public final class ODAnalysis {
 				Map<String, Map<String, ODRelation>> time2odRelation = new HashMap<>();
 				time2odRelation.put(from + "-" + to, filteredOdRelations);
 				try {
-					if (printODSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + ".shp");
+					if (printODSHPfiles) printODLines(time2odRelation, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_" + timeBin.getFirst() + "-" + timeBin.getSecond() + modesString + "_" + filePrefix + ".shp");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -292,13 +333,13 @@ public final class ODAnalysis {
 		}
 
 		try {
-			writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins" + modesString + "_from-to-format.csv");
+			writeDataTableTimeBins(time2odRelations, zones, outputDirectory + runId + ".od-analysis_AllTimeBins" + modesString + "_from-to-format_" + filePrefix + ".csv");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			if (printODSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins" + modesString + ".shp");
+			if (printODSHPfiles) printODLines(time2odRelations, zones, outputDirectory + "shapefiles_aggregated-od-analysis/" + runId + ".od-analysis_AllTimeBins" + modesString + "_" + filePrefix + ".shp");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
@@ -341,7 +382,7 @@ public final class ODAnalysis {
 	
 	private void writeDataTable(Map<String, ODRelation> odRelations, String fileName) throws IOException {
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
-		writer.write("origin;destination;trips");
+		writer.write("origin;destination;number");
 		writer.newLine();
 
 		for (ODRelation odRelation : odRelations.values()) {
@@ -419,7 +460,7 @@ public final class ODAnalysis {
         		.addAttribute("OD_ID", String.class)
         		.addAttribute("O", String.class)
         		.addAttribute("D", String.class)
-        		.addAttribute("trips", Integer.class)
+        		.addAttribute("number", Integer.class)
         		.addAttribute("startTime", String.class)
         		.addAttribute("endTime", String.class)
         		.create();
