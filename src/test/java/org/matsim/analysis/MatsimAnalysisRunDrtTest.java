@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
@@ -107,6 +108,14 @@ public class MatsimAnalysisRunDrtTest {
 		tripAnalysisFilter0.preProcess(scenario1);
 		tripFilters.add(tripAnalysisFilter0);
 		
+		final List<VehicleFilter> vehicleFilters = new ArrayList<>();
+		
+		VehicleAnalysisFilter vehicleAnalysisFilter0 = null;
+		vehicleFilters.add(vehicleAnalysisFilter0);
+		
+		VehicleAnalysisFilter vehicleAnalysisFilter1 = new VehicleAnalysisFilter("drt-vehicles", "rt", StringComparison.Contains);
+		vehicleFilters.add(vehicleAnalysisFilter1);
+		
 		final List<String> modes = new ArrayList<>();
 		modes.add(TransportMode.car);
 		modes.add(TransportMode.pt);
@@ -124,6 +133,7 @@ public class MatsimAnalysisRunDrtTest {
 		analysis.setScalingFactor(scalingFactor);
 		analysis.setAgentFilters(agentFilters);
 		analysis.setTripFilters(tripFilters);
+		analysis.setVehicleFilters(vehicleFilters);
 		analysis.setModes(modes);
 		analysis.setVisualizationScriptInputDirectory("./visualization-scripts/");
 		analysis.run();

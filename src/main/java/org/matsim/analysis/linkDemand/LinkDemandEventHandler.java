@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.VehicleFilter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -47,9 +48,16 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler {
 	private Network network;
 	
 	private Map<Id<Link>,Integer> linkId2demand = new HashMap<Id<Link>, Integer>();
+	private VehicleFilter vehicleFilter;
 
+	public LinkDemandEventHandler(Network network, VehicleFilter vehicleFilter) {
+		this.network = network;
+		this.vehicleFilter = vehicleFilter;
+	}
+	
 	public LinkDemandEventHandler(Network network) {
 		this.network = network;
+		this.vehicleFilter = null;
 	}
 
 	@Override
@@ -60,16 +68,24 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler {
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
-		if (this.linkId2demand.containsKey(event.getLinkId())) {
-			int agents = this.linkId2demand.get(event.getLinkId());
-			this.linkId2demand.put(event.getLinkId(), agents + 1);
-			
-		} else {
-			this.linkId2demand.put(event.getLinkId(), 1);
+		if (vehicleFilter == null || vehicleFilter.considerVehicle(event.getVehicleId())) {
+			if (this.linkId2demand.containsKey(event.getLinkId())) {
+				int agents = this.linkId2demand.get(event.getLinkId());
+				this.linkId2demand.put(event.getLinkId(), agents + 1);
+				
+			} else {
+				this.linkId2demand.put(event.getLinkId(), 1);
+			}
 		}
 	}
 
-	public void printResults(String fileName) {
+	public void printResults(String fileNameWithoutEnding) {
+		String fileName;
+		if (this.vehicleFilter == null) {
+			fileName = fileNameWithoutEnding + "link_dailyTrafficVolume.csv";
+		} else {
+			fileName = fileNameWithoutEnding + "link_dailyTrafficVolume" + this.vehicleFilter.toFileName() +".csv";
+		}
 		File file = new File(fileName);
 		
 		try {

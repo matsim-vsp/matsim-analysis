@@ -34,6 +34,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.VehicleFilter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -50,11 +51,18 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 	
 	private double timeBinSize = 3600.;
 	private Network network;
+	private VehicleFilter vehicleFilter;
 	
 	private SortedMap<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2demand = new TreeMap<Double, Map<Id<Link>, Integer>>();
 
 	public DynamicLinkDemandEventHandler(Network network) {
 		this.network = network;
+		this.vehicleFilter = null;
+	}
+	
+	public DynamicLinkDemandEventHandler(Network network, VehicleFilter vehicleFilter) {
+		this.network = network;
+		this.vehicleFilter = vehicleFilter;
 	}
 
 	@Override
@@ -65,26 +73,33 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
-		double currentTimeBin = (Math.floor(event.getTime() / this.timeBinSize) + 1) * this.timeBinSize;
-		
-		if (this.timeBinEndTime2linkId2demand.containsKey(currentTimeBin)) {
-			if (this.timeBinEndTime2linkId2demand.get(currentTimeBin).containsKey(event.getLinkId())) {
-				int agents = this.timeBinEndTime2linkId2demand.get(currentTimeBin).get(event.getLinkId());
-				this.timeBinEndTime2linkId2demand.get(currentTimeBin).put(event.getLinkId(), agents + 1);
-			} else {
-				this.timeBinEndTime2linkId2demand.get(currentTimeBin).put(event.getLinkId(), 1);
-			}
+		if (vehicleFilter == null || vehicleFilter.considerVehicle(event.getVehicleId())) {
+			double currentTimeBin = (Math.floor(event.getTime() / this.timeBinSize) + 1) * this.timeBinSize;
 			
-		} else {
-			Map<Id<Link>, Integer> linkId2demand = new HashMap<Id<Link>, Integer>();
-			linkId2demand.put(event.getLinkId(), 1);
-			this.timeBinEndTime2linkId2demand.put(currentTimeBin, linkId2demand);
+			if (this.timeBinEndTime2linkId2demand.containsKey(currentTimeBin)) {
+				if (this.timeBinEndTime2linkId2demand.get(currentTimeBin).containsKey(event.getLinkId())) {
+					int agents = this.timeBinEndTime2linkId2demand.get(currentTimeBin).get(event.getLinkId());
+					this.timeBinEndTime2linkId2demand.get(currentTimeBin).put(event.getLinkId(), agents + 1);
+				} else {
+					this.timeBinEndTime2linkId2demand.get(currentTimeBin).put(event.getLinkId(), 1);
+				}
+				
+			} else {
+				Map<Id<Link>, Integer> linkId2demand = new HashMap<Id<Link>, Integer>();
+				linkId2demand.put(event.getLinkId(), 1);
+				this.timeBinEndTime2linkId2demand.put(currentTimeBin, linkId2demand);
+			}
 		}
 	}
 
 	public void printResults(String path) {
+		String fileName;
+		if (this.vehicleFilter == null) {
+			fileName = path + "link_hourlyTrafficVolume_numberOfLinkLeaveEvents.csv";
+		} else {
+			fileName = path + this.vehicleFilter.toFileName() + "_link_hourlyTrafficVolume_numberOfLinkLeaveEvents.csv";
+		}
 		
-		String fileName = path + "link_hourlyTrafficVolume_numberOfLinkLeaveEvents.csv";
 		File file1 = new File(fileName);
 		File file2 = new File(fileName + "t");
 		
