@@ -46,13 +46,23 @@ public class VehicleAnalysisFilter implements VehicleFilter {
 	public boolean considerVehicle(Id<Vehicle> vehicleId) {
 		if (substring.equals("")) return true;
 		else {
-			switch(stringComparison) {
-			case StartsWith: if (vehicleId.toString().startsWith(substring)) return true;
-			case Contains: if (vehicleId.toString().contains(substring)) return true;
-			case EndsWith: if (vehicleId.toString().endsWith(substring)) return true;
-			default: log.warn("Unknown string comparison approach.");
-		}
-		return false;
+			if (stringComparison == StringComparison.StartsWith) {
+				if (vehicleId.toString().startsWith(substring)) {
+					return true;
+				}
+			} else if (stringComparison == StringComparison.Contains) {
+				if (vehicleId.toString().contains(substring)) {
+					return true;
+				}
+			} else if (stringComparison == StringComparison.EndsWith) {
+				if (vehicleId.toString().endsWith(substring)) {
+					return true;
+				}
+			} else {
+				log.warn("Unknown string comparison approach.");
+			}
+			
+			return false;
 		}
 	}
 
