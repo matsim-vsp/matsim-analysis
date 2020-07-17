@@ -97,7 +97,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 		if (this.vehicleFilter == null) {
 			fileName = path + "link_hourlyTrafficVolume_numberOfLinkLeaveEvents.csv";
 		} else {
-			fileName = path + "link_hourlyTrafficVolume_numberOfLinkLeaveEvents_" + this.vehicleFilter.toFileName() + ".csv";
+			fileName = path + "link_hourlyTrafficVolume_numberOfLinkLeaveEvents" + this.vehicleFilter.toFileName() + ".csv";
 		}
 		
 		File file1 = new File(fileName);
