@@ -240,6 +240,8 @@ public class GISAnalyzer {
 			featuresToWriteOut.add(feature);
 		}
 		
+		log.info("Writing shape file to" +  outputPath + fileName + "...");
+
 		ShapeFileWriter.writeGeometries(featuresToWriteOut, outputPath + fileName);
 
 		log.info("Writing shape file... Done.");
