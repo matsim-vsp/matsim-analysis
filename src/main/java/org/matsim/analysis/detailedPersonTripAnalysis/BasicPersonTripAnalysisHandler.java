@@ -563,11 +563,11 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		double endTime;
-		if (this.scenario.getConfig().qsim().getEndTime().isUndefined()) {
+		if (this.scenario.getConfig().qsim().getEndTime() == Double.NaN) {
 			endTime = 30 * 3600.;
 			log.warn("Trying to deal with person stuck events. Assuming " + endTime + " to be the simulation end time. If you are using a different value, set the qsim end time in your run script, e.g. config.qsim().setEndTime(24 * 3600.);");
 		} else {
-			endTime = this.scenario.getConfig().qsim().getEndTime().seconds();
+			endTime = this.scenario.getConfig().qsim().getEndTime();
 		}
 		
 		boolean removeStuckVehicles = false;

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.matsim-vsp</groupId>
     <artifactId>matsim-analysis</artifactId>
-    <version>v2.9</version>
+    <version>v2.9-avoev-backport</version>
 
     <name>MATSim analysis project</name>
     <description>MATSim analysis project</description>
@@ -13,9 +13,9 @@
         <!-- release> -->
         <!-- <matsim.version>12.0-SNAPSHOT</matsim.version>  -->
         <!--weekly "release":-->
-        <matsim.version>13.0-2020w24-SNAPSHOT</matsim.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <matsim.version>12.0-2020w04-SNAPSHOT</matsim.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
