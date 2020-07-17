@@ -55,7 +55,7 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 		final String[] helpLegModes = {TransportMode.walk, TransportMode.non_network_walk};
 		final int scalingFactor = 10;
 		final String homeActivityPrefix = "home";
-		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + "bicycle" + "," + TransportMode.walk + "," + TransportMode.ride + "," + TransportMode.drt + IntermodalPtDrtRouterAnalysisModeIdentifier.ANALYSIS_MAIN_MODE_PT_WITH_DRT_USED_FOR_ACCESS_OR_EGRESS;
+		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + "bicycle" + "," + TransportMode.walk + "," + TransportMode.ride + "," + TransportMode.drt + "," + IntermodalPtDrtRouterAnalysisModeIdentifier.ANALYSIS_MAIN_MODE_PT_WITH_DRT_USED_FOR_ACCESS_OR_EGRESS;
 
 		if (args.length > 0) {
 			runDirectory = args[0];
@@ -100,12 +100,12 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 
 		final List<AgentFilter> agentFilters = new ArrayList<>();
 
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("A");
-		filter1a.setSubpopulation("person");
-		filter1a.preProcess(scenario1);
-		filter1a.setZoneFile(shapeFileAgentFilter);
-		filter1a.setRelevantActivityType(homeActivityPrefix);
-		agentFilters.add(filter1a);
+		AgentAnalysisFilter agentFilterShape = new AgentAnalysisFilter("A");
+		agentFilterShape.setSubpopulation("person");
+		agentFilterShape.setZoneFile(shapeFileAgentFilter);
+		agentFilterShape.setRelevantActivityType(homeActivityPrefix);
+		agentFilterShape.preProcess(scenario1); // has to be done after setting shape file
+		agentFilters.add(agentFilterShape);
 
 		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("B");
 		filter1b.preProcess(scenario1);
@@ -118,6 +118,13 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 		filter1c.preProcess(scenario1);
 		agentFilters.add(filter1c);
 
+		AgentAnalysisFilter agentFilter1d = new AgentAnalysisFilter("Berlin");
+		agentFilter1d.setSubpopulation("person");
+		agentFilter1d.setPersonAttribute("berlin");
+		agentFilter1d.setPersonAttributeName("home-activity-zone");
+		agentFilter1d.preProcess(scenario1);
+		agentFilters.add(agentFilter1d);
+
 		final List<TripFilter> tripFilters = new ArrayList<>();
 
 		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("A");
@@ -126,9 +133,9 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 
 		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("B");
 		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
-		tripFilter1b.preProcess(scenario1);
 		tripFilter1b.setBuffer(Double.valueOf(bufferMAroundTripFilterShp));
 		tripFilter1b.setTripConsiderType(OriginOrDestination);
+		tripFilter1b.preProcess(scenario1);
 		tripFilters.add(tripFilter1b);
 
 		List<String> modes = new ArrayList<>();
