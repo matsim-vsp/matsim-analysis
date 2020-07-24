@@ -37,23 +37,30 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.VehicleFilter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Ihab
  *
  */
-public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
+public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 	private static final Logger log = Logger.getLogger(DynamicLinkDemandEventHandler.class);
 	
 	private double timeBinSize = 3600.;
 	private Network network;
 	private VehicleFilter vehicleFilter;
+	private Map<Id<Vehicle>, Integer> vehicleId2passengers = new HashMap<>();
 	
-	private SortedMap<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2demand = new TreeMap<Double, Map<Id<Link>, Integer>>();
+	private SortedMap<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2vehicles = new TreeMap<Double, Map<Id<Link>, Integer>>();
+	private SortedMap<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2vehiclePassengers = new TreeMap<Double, Map<Id<Link>, Integer>>();
 
 	public DynamicLinkDemandEventHandler(Network network) {
 		this.network = network;
@@ -67,7 +74,8 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		this.timeBinEndTime2linkId2demand.clear();
+		this.timeBinEndTime2linkId2vehicles.clear();
+		this.timeBinEndTime2linkId2vehiclePassengers.clear();
 	}
 	
 	@Override
@@ -76,68 +84,145 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 		if (vehicleFilter == null || vehicleFilter.considerVehicle(event.getVehicleId())) {
 			double currentTimeBin = (Math.floor(event.getTime() / this.timeBinSize) + 1) * this.timeBinSize;
 			
-			if (this.timeBinEndTime2linkId2demand.containsKey(currentTimeBin)) {
-				if (this.timeBinEndTime2linkId2demand.get(currentTimeBin).containsKey(event.getLinkId())) {
-					int agents = this.timeBinEndTime2linkId2demand.get(currentTimeBin).get(event.getLinkId());
-					this.timeBinEndTime2linkId2demand.get(currentTimeBin).put(event.getLinkId(), agents + 1);
+			if (this.timeBinEndTime2linkId2vehicles.containsKey(currentTimeBin)) {
+				if (this.timeBinEndTime2linkId2vehicles.get(currentTimeBin).containsKey(event.getLinkId())) {
+					
+					int vehicles = this.timeBinEndTime2linkId2vehicles.get(currentTimeBin).get(event.getLinkId());
+					this.timeBinEndTime2linkId2vehicles.get(currentTimeBin).put(event.getLinkId(), vehicles + 1);
+					
+					int passengers = this.timeBinEndTime2linkId2vehiclePassengers.get(currentTimeBin).get(event.getLinkId());
+					this.timeBinEndTime2linkId2vehiclePassengers.get(currentTimeBin).put(event.getLinkId(), passengers + this.vehicleId2passengers.get(event.getVehicleId()));
+					
 				} else {
-					this.timeBinEndTime2linkId2demand.get(currentTimeBin).put(event.getLinkId(), 1);
+					this.timeBinEndTime2linkId2vehicles.get(currentTimeBin).put(event.getLinkId(), 1);
+					this.timeBinEndTime2linkId2vehiclePassengers.get(currentTimeBin).put(event.getLinkId(), this.vehicleId2passengers.get(event.getVehicleId()));
 				}
 				
 			} else {
-				Map<Id<Link>, Integer> linkId2demand = new HashMap<Id<Link>, Integer>();
-				linkId2demand.put(event.getLinkId(), 1);
-				this.timeBinEndTime2linkId2demand.put(currentTimeBin, linkId2demand);
+				Map<Id<Link>, Integer> linkId2vehicles = new HashMap<Id<Link>, Integer>();
+				linkId2vehicles.put(event.getLinkId(), 1);
+				this.timeBinEndTime2linkId2vehicles.put(currentTimeBin, linkId2vehicles);
+				
+				Map<Id<Link>, Integer> linkId2passengers = new HashMap<Id<Link>, Integer>();
+				linkId2passengers.put(event.getLinkId(), this.vehicleId2passengers.get(event.getVehicleId()));
+				this.timeBinEndTime2linkId2vehiclePassengers.put(currentTimeBin, linkId2passengers);
+
 			}
 		}
 	}
 
 	public void printResults(String path) {
-		String fileName;
-		if (this.vehicleFilter == null) {
-			fileName = path + "link_hourlyTrafficVolume_numberOfLinkLeaveEvents.csv";
-		} else {
-			fileName = path + "link_hourlyTrafficVolume_numberOfLinkLeaveEvents" + this.vehicleFilter.toFileName() + ".csv";
-		}
-		
-		File file1 = new File(fileName);
-		File file2 = new File(fileName + "t");
-		
-		try {
-			BufferedWriter bw1 = new BufferedWriter(new FileWriter(file1));
-			BufferedWriter bw2 = new BufferedWriter(new FileWriter(file2));
-
-			bw1.write("link");
-			bw2.write("\"String\"");
-			
-			for (Double timeBinEndTime : this.timeBinEndTime2linkId2demand.keySet()) {
-				bw1.write(";" + Time.writeTime(timeBinEndTime, Time.TIMEFORMAT_HHMMSS));
-				bw2.write(",\"Real\"");
+		// print results for vehicles
+		{
+			String fileName;
+			if (this.vehicleFilter == null) {
+				fileName = path + "link_hourlyTrafficVolume_vehicles.csv";
+			} else {
+				fileName = path + "link_hourlyTrafficVolume_vehicles" + this.vehicleFilter.toFileName() + ".csv";
 			}
-			bw1.newLine();
 			
-			for (Id<Link> linkId : this.network.getLinks().keySet()){
+			File file1 = new File(fileName);
+			
+			try {
+				BufferedWriter bw1 = new BufferedWriter(new FileWriter(file1));
+
+				bw1.write("link");
 				
-				bw1.write(linkId.toString());
-				
-				for (Double timeBinEndTime : this.timeBinEndTime2linkId2demand.keySet()) {
-					int agents = 0;
-					if (this.timeBinEndTime2linkId2demand.get(timeBinEndTime).containsKey(linkId)) {
-						agents = this.timeBinEndTime2linkId2demand.get(timeBinEndTime).get(linkId);
-					}
-					bw1.write(";" + agents);
+				for (Double timeBinEndTime : this.timeBinEndTime2linkId2vehicles.keySet()) {
+					bw1.write(";" + Time.writeTime(timeBinEndTime, Time.TIMEFORMAT_HHMMSS));
 				}
 				bw1.newLine();
+				
+				for (Id<Link> linkId : this.network.getLinks().keySet()){
+					
+					bw1.write(linkId.toString());
+					
+					for (Double timeBinEndTime : this.timeBinEndTime2linkId2vehicles.keySet()) {
+						int agents = 0;
+						if (this.timeBinEndTime2linkId2vehicles.get(timeBinEndTime).containsKey(linkId)) {
+							agents = this.timeBinEndTime2linkId2vehicles.get(timeBinEndTime).get(linkId);
+						}
+						bw1.write(";" + agents);
+					}
+					bw1.newLine();
+				}
+				
+				bw1.close();
+				log.info("Output written to " + fileName);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			
-			bw1.close();
-			bw2.close();
-			log.info("Output written to " + fileName);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		
+		// print results for passengers
+		{
+			String fileName;
+			if (this.vehicleFilter == null) {
+				fileName = path + "link_hourlyTrafficVolume_passengers.csv";
+			} else {
+				fileName = path + "link_hourlyTrafficVolume_passengers" + this.vehicleFilter.toFileName() + ".csv";
+			}
+			
+			File file1 = new File(fileName);
+			
+			try {
+				BufferedWriter bw1 = new BufferedWriter(new FileWriter(file1));
+
+				bw1.write("link");
+				
+				for (Double timeBinEndTime : this.timeBinEndTime2linkId2vehiclePassengers.keySet()) {
+					bw1.write(";" + Time.writeTime(timeBinEndTime, Time.TIMEFORMAT_HHMMSS));
+				}
+				bw1.newLine();
+				
+				for (Id<Link> linkId : this.network.getLinks().keySet()){
+					
+					bw1.write(linkId.toString());
+					
+					for (Double timeBinEndTime : this.timeBinEndTime2linkId2vehiclePassengers.keySet()) {
+						int agents = 0;
+						if (this.timeBinEndTime2linkId2vehiclePassengers.get(timeBinEndTime).containsKey(linkId)) {
+							agents = this.timeBinEndTime2linkId2vehiclePassengers.get(timeBinEndTime).get(linkId);
+						}
+						bw1.write(";" + agents);
+					}
+					bw1.newLine();
+				}
+				
+				bw1.close();
+				log.info("Output written to " + fileName);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (vehicleFilter == null || vehicleFilter.considerVehicle(event.getVehicleId())) {
+			if (this.vehicleId2passengers.get(event.getVehicleId()) == null) {
+				this.vehicleId2passengers.put(event.getVehicleId(), 1);
+			} else {
+				int currentPassengers = this.vehicleId2passengers.get(event.getVehicleId());
+				this.vehicleId2passengers.put(event.getVehicleId(), currentPassengers + 1);
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		int currentPassengers = this.vehicleId2passengers.get(event.getVehicleId());
+		int updatedPassengerNumber = currentPassengers - 1;
+		
+		if (updatedPassengerNumber < 0) {
+			throw new RuntimeException("Negative number of passengers: " + event.toString() + " Aborting...");
+		}
+		
+		this.vehicleId2passengers.put(event.getVehicleId(), currentPassengers - 1);
 	}
 
 }
