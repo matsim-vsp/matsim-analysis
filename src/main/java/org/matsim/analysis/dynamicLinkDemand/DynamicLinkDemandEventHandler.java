@@ -215,14 +215,16 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, Pe
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		int currentPassengers = this.vehicleId2passengers.get(event.getVehicleId());
-		int updatedPassengerNumber = currentPassengers - 1;
-		
-		if (updatedPassengerNumber < 0) {
-			throw new RuntimeException("Negative number of passengers: " + event.toString() + " Aborting...");
+		if (vehicleFilter == null || vehicleFilter.considerVehicle(event.getVehicleId())) {
+			int currentPassengers = this.vehicleId2passengers.get(event.getVehicleId());
+			int updatedPassengerNumber = currentPassengers - 1;
+			
+			if (updatedPassengerNumber < 0) {
+				throw new RuntimeException("Negative number of passengers: " + event.toString() + " Aborting...");
+			}
+			
+			this.vehicleId2passengers.put(event.getVehicleId(), currentPassengers - 1);
 		}
-		
-		this.vehicleId2passengers.put(event.getVehicleId(), currentPassengers - 1);
 	}
 
 }
