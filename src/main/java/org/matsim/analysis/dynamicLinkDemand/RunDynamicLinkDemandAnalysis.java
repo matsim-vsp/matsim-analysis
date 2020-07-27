@@ -33,7 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 * @author ikaddoura
 */
 
-public class RunVehicleOperatingTimesAnalysis {
+public class RunDynamicLinkDemandAnalysis {
 
 	public static void main(String[] args) {
 		

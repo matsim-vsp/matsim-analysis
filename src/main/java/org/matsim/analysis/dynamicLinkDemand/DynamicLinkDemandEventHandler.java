@@ -76,6 +76,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, Pe
 	public void reset(int iteration) {
 		this.timeBinEndTime2linkId2vehicles.clear();
 		this.timeBinEndTime2linkId2vehiclePassengers.clear();
+		this.vehicleId2passengers.clear();
 	}
 	
 	@Override
