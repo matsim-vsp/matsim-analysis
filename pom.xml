@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.matsim-vsp</groupId>
     <artifactId>matsim-analysis</artifactId>
-    <version>v2.9</version>
+    <version>v3.0</version>
 
     <name>MATSim analysis project</name>
     <description>MATSim analysis project</description>
