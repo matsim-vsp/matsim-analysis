@@ -100,6 +100,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private int warnCnt3 = 0;
 	private int warnCnt4 = 0;
 	private int stuckPersonWarnCounter;
+	private int stuckPersonWarnCounter2;
 
 	
 	public void setScenario(Scenario scenario) {
@@ -580,7 +581,13 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		
 		boolean removeStuckVehicles = false;
 		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() == false) {
-			log.warn("Trying to deal with person stuck events. Assuming stucking vehicles not to be removed. If you are removing stucking vehicles, set the qsim parameter in your run script accordingly.");
+			if (this.stuckPersonWarnCounter2 <= 5) {
+				log.warn("Trying to deal with person stuck events. Assuming stucking vehicles not to be removed. If you are removing stucking vehicles, set the qsim parameter in your run script accordingly.");
+				if (this.stuckPersonWarnCounter2 == 5) {
+					log.warn("Further warnings of this type will not be printed out.");
+				}
+				this.stuckPersonWarnCounter2++;
+			}
 		} else {
 			removeStuckVehicles = true;
 		}

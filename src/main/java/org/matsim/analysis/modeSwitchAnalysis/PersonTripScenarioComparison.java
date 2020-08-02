@@ -433,15 +433,19 @@ public class PersonTripScenarioComparison {
 												);
 										bufferedWriter.get(modeSwitchType).newLine();
 										
-										double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-										switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
-										
-										if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
-											double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-											switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
+										if (basicHandler1.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null
+												&& basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
 											
-											double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
-											switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
+											double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+											switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
+											
+											if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
+												double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+												switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
+												
+												double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
+												switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
+											}
 										}
 									}										
 								}
