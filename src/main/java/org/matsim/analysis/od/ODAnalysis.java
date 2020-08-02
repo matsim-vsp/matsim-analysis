@@ -74,6 +74,7 @@ public final class ODAnalysis {
 	
 	private boolean printODSHPfiles = true;
 	private boolean printTripSHPfiles = false;
+	private int noArrivalLinkWarnCounter;
 
     /**
      * @param outputDirectory
@@ -220,7 +221,13 @@ public final class ODAnalysis {
 
 					Coord arrivalLinkCoord;
 					if (handler1.getPersonId2legNumber2arrivalLink().get(personId) == null || handler1.getPersonId2legNumber2arrivalLink().get(personId).get(tripNr) == null) {
-						log.warn("no arrival link for person " + personId + " / trip # " + tripNr + ". Probably a stucking agent.");
+						if (this.noArrivalLinkWarnCounter <= 5) {
+							log.warn("no arrival link for person " + personId + " / trip # " + tripNr + ". Probably a stucking agent.");
+							if (this.noArrivalLinkWarnCounter == 5) {
+								log.warn("Further warnings of this type will not be printed out.");
+							}
+							this.noArrivalLinkWarnCounter++;
+						}
 						arrivalLinkCoord = dummyCoord;
 					} else {
 						Id<Link> arrivalLink = handler1.getPersonId2legNumber2arrivalLink().get(personId).get(tripNr);

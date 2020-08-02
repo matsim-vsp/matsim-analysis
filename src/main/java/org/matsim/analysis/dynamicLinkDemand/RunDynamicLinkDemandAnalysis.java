@@ -37,8 +37,8 @@ public class RunDynamicLinkDemandAnalysis {
 
 	public static void main(String[] args) {
 		
-		String outputDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-drt0/";
-		String runId = "drt0";
+		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
+		String runId = "snzDrtO443g";
 		
 		Config config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem("epsg:25832");
@@ -48,14 +48,20 @@ public class RunDynamicLinkDemandAnalysis {
 		VehicleAnalysisFilter vehicleFilter = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
 		DynamicLinkDemandEventHandler handler = new DynamicLinkDemandEventHandler(scenario.getNetwork(), vehicleFilter);
 		
+		VehicleAnalysisFilter vehicleFilter2 = new VehicleAnalysisFilter("drt-vehicles", "rt", StringComparison.Contains);
+		DynamicLinkDemandEventHandler handler2 = new DynamicLinkDemandEventHandler(scenario.getNetwork(), vehicleFilter2);
+		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler);
+		events.addHandler(handler2);
 		
+//		String eventsFile = outputDirectory + "filtered-events-tr.xml";
 		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
 		handler.printResults(outputDirectory + runId + ".");
+		handler2.printResults(outputDirectory + runId + ".");
 	}
 
 }

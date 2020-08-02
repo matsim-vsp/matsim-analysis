@@ -17,23 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.analysis.linkDemand;
+package org.matsim.analysis.shapes;
 
-import org.matsim.analysis.VehicleAnalysisFilter;
-import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
 * @author ikaddoura
 */
 
-public class RunLinkDemandAnalysis {
+public class RunExportNetwork {
 
 	public static void main(String[] args) {
 		
@@ -45,17 +41,7 @@ public class RunLinkDemandAnalysis {
 		config.network().setInputFile(outputDirectory + runId + ".output_network.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		VehicleAnalysisFilter vehicleFilter = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
-		LinkDemandEventHandler handler = new LinkDemandEventHandler(scenario.getNetwork(), vehicleFilter);
-		
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(handler);
-		
-		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventsFile);
-		
-		handler.printResults(outputDirectory + runId + ".");
+		Network2Shape.exportNetwork2Shp(scenario, outputDirectory, "epsg:25832", TransformationFactory.getCoordinateTransformation("epsg:25832", "epsg:25832"));
 	}
 
 }

@@ -99,6 +99,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private int warnCnt2 = 0;
 	private int warnCnt3 = 0;
 	private int warnCnt4 = 0;
+	private int stuckPersonWarnCounter;
 
 	
 	public void setScenario(Scenario scenario) {
@@ -565,7 +566,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		double endTime;
 		if (this.scenario.getConfig().qsim().getEndTime().isUndefined()) {
 			endTime = 30 * 3600.;
-			log.warn("Trying to deal with person stuck events. Assuming " + endTime + " to be the simulation end time. If you are using a different value, set the qsim end time in your run script, e.g. config.qsim().setEndTime(24 * 3600.);");
+			if (this.stuckPersonWarnCounter <= 5) {
+				log.warn("Trying to deal with person stuck events. Assuming " + endTime + " to be the simulation end time. If you are using a different value, set the qsim end time in your run script, e.g. config.qsim().setEndTime(24 * 3600.);");
+				if (this.stuckPersonWarnCounter == 5) {
+					log.warn("Further warnings of this type will not be printed.");
+				}
+				this.stuckPersonWarnCounter++;
+			}
+			
 		} else {
 			endTime = this.scenario.getConfig().qsim().getEndTime().seconds();
 		}
