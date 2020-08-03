@@ -234,43 +234,43 @@ public class PersonTripScenarioComparison {
 						}
 						
 						String tripModes0 = "unknown";
-						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) != null) {
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) != null) {
 							tripModes0 = basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr);
 						}
 						String tripModes1 = "unknown";
-						if (basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) != null) {
+						if (basicHandler1.getPersonId2tripNumber2tripModes().get(personId) != null &&  basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) != null) {
 							tripModes1 = basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr);
 						}
 						String beelineDistance0 = "unknown";
-						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) != null) {
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) != null) {
 							beelineDistance0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr));
 						}
 						String beelineDistance1 = "unknown";
-						if (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) != null) {
+						if (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId) != null && basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) != null) {
 							beelineDistance1 = String.valueOf(basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr));
 						}
 						String mainModeDistance0 = "unknown";
-						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) != null) {
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) != null) {
 							mainModeDistance0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr));
 						}
 						String mainModeDistance1 = "unknown";
-						if (basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) != null) {
+						if (basicHandler1.getPersonId2tripNumber2tripDistance().get(personId) != null && basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) != null) {
 							mainModeDistance1 = String.valueOf(basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr));
 						}
 						String allLegsTravelTime0 = "unknown";
-						if (basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
 							allLegsTravelTime0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
 						}
 						String allLegsTravelTime1 = "unknown";
-						if (basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
+						if (basicHandler1.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
 							allLegsTravelTime1 = String.valueOf(basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
 						}
 						String payments0 = "unknown";
-						if (basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) != null) {
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) != null) {
 							payments0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr));
 						}
 						String payments1 = "unknown";
-						if (basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) != null) {
+						if (basicHandler1.getPersonId2tripNumber2payment().get(personId) != null && basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) != null) {
 							payments1 = String.valueOf(basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr));
 						}
 						
