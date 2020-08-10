@@ -345,22 +345,33 @@ public class MatsimAnalysis {
 				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, agentFilter);
 				
 				try {
-					if (this.tripFilters1 == null) {					
-						TripAnalysisFilter tripFilter1 = new TripAnalysisFilter("");
-						tripFilter1.preProcess(this.scenario1);
-						scenarioComparisonFiltered.analyzeByMode(tripFilter1);
 
-					} else {
-						for (TripFilter tripFilter : this.tripFilters1) {
-							scenarioComparisonFiltered.analyzeByMode(tripFilter);
-						}
-					}
+					// do not apply trip filter in addition to person filter
+					TripAnalysisFilter tripFilter1 = new TripAnalysisFilter("");
+					tripFilter1.preProcess(this.scenario1);
+					scenarioComparisonFiltered.analyzeByMode(tripFilter1);
 					
 					scenarioComparisonFiltered.analyzeByScore(0.0);
 					scenarioComparisonFiltered.analyzeByScore(1.0);
 					scenarioComparisonFiltered.analyzeByScore(10.0);
 					scenarioComparisonFiltered.analyzeByScore(100.0);			
 				
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			for (TripFilter tripFilter : this.tripFilters1) {
+				
+				// do not apply person filter in addition to trip filter
+				AgentAnalysisFilter filter1 = new AgentAnalysisFilter("");
+				filter1.preProcess(scenario1);
+				agentFilters.add(filter1);
+				
+				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, filter1);
+				
+				try {
+					scenarioComparisonFiltered.analyzeByMode(tripFilter);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

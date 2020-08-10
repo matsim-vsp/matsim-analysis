@@ -110,12 +110,11 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler, PersonEnt
 				
 				for (Id<Link> linkId : this.network.getLinks().keySet()){
 					
-					double volume = 0.;
 					if (this.linkId2vehicles.get(linkId) != null) {
-						volume = this.linkId2vehicles.get(linkId);
+						double volume = this.linkId2vehicles.get(linkId);
+						bw.write(linkId + ";" + volume);
+						bw.newLine();
 					}
-					bw.write(linkId + ";" + volume);
-					bw.newLine();
 				}
 				
 				bw.close();
