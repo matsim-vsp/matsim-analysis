@@ -33,8 +33,23 @@ public class RunDynamicLinkDemandAnalysis {
 
 	public static void main(String[] args) {
 		
-		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
-		String runId = "snzDrtO443g";
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
+//		String runId = "snzDrtO443g";
+		
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
+//		String runId = "snzDrtO443l";
+		
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO442g/";
+//		String runId = "snzDrtO442g";
+		
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO442l/";
+//		String runId = "snzDrtO442l";
+		
+//		String outputDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO320g/";
+//		String runId = "snzDrtO320g";
+		
+		String outputDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO321g/";
+		String runId = "snzDrtO321g";
 		
 		VehicleAnalysisFilter vehicleFilter = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
 		DynamicLinkDemandEventHandler handler = new DynamicLinkDemandEventHandler(vehicleFilter);

@@ -33,20 +33,40 @@ public class RunLinkDemandAnalysis {
 
 	public static void main(String[] args) {
 		
-		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
-		String runId = "snzDrtO443g";
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
+//		String runId = "snzDrtO443g";
 		
-		VehicleAnalysisFilter vehicleFilter = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
-		LinkDemandEventHandler handler = new LinkDemandEventHandler(vehicleFilter);
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
+//		String runId = "snzDrtO443l";
+		
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO442g/";
+//		String runId = "snzDrtO442g";
+		
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO442l/";
+//		String runId = "snzDrtO442l";
+		
+//		String outputDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO320g/";
+//		String runId = "snzDrtO320g";
+		
+		String outputDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO321g/";
+		String runId = "snzDrtO321g";
+		
+		VehicleAnalysisFilter vehicleFilter1 = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
+		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(vehicleFilter1);
+		
+		VehicleAnalysisFilter vehicleFilter2 = new VehicleAnalysisFilter("drt-vehicles", "rt", StringComparison.Contains);
+		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(vehicleFilter2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(handler);
+		events.addHandler(handler1);
+		events.addHandler(handler2);
 		
 		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		handler.printResults(outputDirectory + runId + ".");
+		handler1.printResults(outputDirectory + runId + ".");
+		handler2.printResults(outputDirectory + runId + ".");
 	}
 
 }
