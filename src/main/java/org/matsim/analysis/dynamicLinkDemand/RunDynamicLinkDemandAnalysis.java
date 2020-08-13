@@ -21,13 +21,9 @@ package org.matsim.analysis.dynamicLinkDemand;
 
 import org.matsim.analysis.VehicleAnalysisFilter;
 import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
 * @author ikaddoura
@@ -40,22 +36,16 @@ public class RunDynamicLinkDemandAnalysis {
 		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
 		String runId = "snzDrtO443g";
 		
-		Config config = ConfigUtils.createConfig();
-		config.global().setCoordinateSystem("epsg:25832");
-		config.network().setInputFile(outputDirectory + runId + ".output_network.xml.gz");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
 		VehicleAnalysisFilter vehicleFilter = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
-		DynamicLinkDemandEventHandler handler = new DynamicLinkDemandEventHandler(scenario.getNetwork(), vehicleFilter);
+		DynamicLinkDemandEventHandler handler = new DynamicLinkDemandEventHandler(vehicleFilter);
 		
 		VehicleAnalysisFilter vehicleFilter2 = new VehicleAnalysisFilter("drt-vehicles", "rt", StringComparison.Contains);
-		DynamicLinkDemandEventHandler handler2 = new DynamicLinkDemandEventHandler(scenario.getNetwork(), vehicleFilter2);
+		DynamicLinkDemandEventHandler handler2 = new DynamicLinkDemandEventHandler(vehicleFilter2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler);
 		events.addHandler(handler2);
 		
-//		String eventsFile = outputDirectory + "filtered-events-tr.xml";
 		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);

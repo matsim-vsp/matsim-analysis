@@ -28,8 +28,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -55,20 +59,17 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, Pe
 	private static final Logger log = Logger.getLogger(DynamicLinkDemandEventHandler.class);
 	
 	private double timeBinSize = 3600.;
-	private Network network;
 	private VehicleFilter vehicleFilter;
 	private Map<Id<Vehicle>, Integer> vehicleId2passengers = new HashMap<>();
 	
 	private SortedMap<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2vehicles = new TreeMap<Double, Map<Id<Link>, Integer>>();
 	private SortedMap<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2vehiclePassengers = new TreeMap<Double, Map<Id<Link>, Integer>>();
 
-	public DynamicLinkDemandEventHandler(Network network) {
-		this.network = network;
+	public DynamicLinkDemandEventHandler() {
 		this.vehicleFilter = null;
 	}
 	
-	public DynamicLinkDemandEventHandler(Network network, VehicleFilter vehicleFilter) {
-		this.network = network;
+	public DynamicLinkDemandEventHandler(VehicleFilter vehicleFilter) {
 		this.vehicleFilter = vehicleFilter;
 	}
 
@@ -115,6 +116,17 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, Pe
 	public void printResults(String path) {
 		// print results for vehicles
 		{
+			
+			Set<Id<Link>> linkIDs = new HashSet<>();
+			for (Double timeBinEndTime : this.timeBinEndTime2linkId2vehicles.keySet()) {
+				for (Id<Link> linkID : this.timeBinEndTime2linkId2vehicles.get(timeBinEndTime).keySet()) {
+					if (!linkIDs.contains(linkID)) {
+						linkIDs.add(linkID);
+					}
+				}
+			}
+
+			
 			String fileName;
 			if (this.vehicleFilter == null) {
 				fileName = path + "link_hourlyTrafficVolume_vehicles.csv";
@@ -134,7 +146,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, Pe
 				}
 				bw1.newLine();
 				
-				for (Id<Link> linkId : this.network.getLinks().keySet()){
+				for (Id<Link> linkId : linkIDs){
 					
 					bw1.write(linkId.toString());
 					
@@ -158,6 +170,16 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, Pe
 		
 		// print results for passengers
 		{
+			
+			Set<Id<Link>> linkIDs = new HashSet<>();
+			for (Double timeBinEndTime : this.timeBinEndTime2linkId2vehicles.keySet()) {
+				for (Id<Link> linkID : this.timeBinEndTime2linkId2vehicles.get(timeBinEndTime).keySet()) {
+					if (!linkIDs.contains(linkID)) {
+						linkIDs.add(linkID);
+					}
+				}
+			}
+			
 			String fileName;
 			if (this.vehicleFilter == null) {
 				fileName = path + "link_hourlyTrafficVolume_passengers.csv";
@@ -177,7 +199,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, Pe
 				}
 				bw1.newLine();
 				
-				for (Id<Link> linkId : this.network.getLinks().keySet()){
+				for (Id<Link> linkId : linkIDs){
 					
 					bw1.write(linkId.toString());
 					

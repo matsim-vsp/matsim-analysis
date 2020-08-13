@@ -179,7 +179,7 @@ public class MatsimAnalysis {
 				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
 				trafficVolumeAnalysis1.add(trafficVolumeAnalysis);
 				
-				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(scenario1.getNetwork(), vehicleFilter);
+				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(vehicleFilter);
 				dynamicTrafficVolumeAnalysis1.add(dynamicTrafficVolumeAnalysis);
 			}
 			
@@ -224,7 +224,7 @@ public class MatsimAnalysis {
 				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
 				trafficVolumeAnalysis0.add(trafficVolumeAnalysis);
 				
-				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(scenario0.getNetwork(), vehicleFilter);
+				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(vehicleFilter);
 				dynamicTrafficVolumeAnalysis0.add(dynamicTrafficVolumeAnalysis);
 			}
 			
