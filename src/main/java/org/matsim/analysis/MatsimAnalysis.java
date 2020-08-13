@@ -176,7 +176,7 @@ public class MatsimAnalysis {
 			delayAnalysis1.setScenario(scenario1);
 			
 			for (VehicleFilter vehicleFilter : this.vehicleFilters) {
-				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(scenario1.getNetwork(), vehicleFilter);
+				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
 				trafficVolumeAnalysis1.add(trafficVolumeAnalysis);
 				
 				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(scenario1.getNetwork(), vehicleFilter);
@@ -221,7 +221,7 @@ public class MatsimAnalysis {
 			delayAnalysis0.setScenario(scenario0);
 
 			for (VehicleFilter vehicleFilter : this.vehicleFilters) {
-				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(scenario0.getNetwork(), vehicleFilter);
+				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
 				trafficVolumeAnalysis0.add(trafficVolumeAnalysis);
 				
 				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(scenario0.getNetwork(), vehicleFilter);

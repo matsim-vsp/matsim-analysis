@@ -50,7 +50,6 @@ import org.matsim.vehicles.Vehicle;
  */
 public class LinkDemandEventHandler implements  LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 	private static final Logger log = Logger.getLogger(LinkDemandEventHandler.class);
-	private Network network;
 	
 	private Map<Id<Link>,Integer> linkId2vehicles = new HashMap<Id<Link>, Integer>();
 	private Map<Id<Link>,Integer> linkId2passengers = new HashMap<Id<Link>, Integer>();
@@ -58,13 +57,11 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler, PersonEnt
 	private VehicleFilter vehicleFilter;
 	private Map<Id<Vehicle>, Integer> vehicleId2passengers = new HashMap<>();
 
-	public LinkDemandEventHandler(Network network, VehicleFilter vehicleFilter) {
-		this.network = network;
+	public LinkDemandEventHandler(VehicleFilter vehicleFilter) {
 		this.vehicleFilter = vehicleFilter;
 	}
 	
-	public LinkDemandEventHandler(Network network) {
-		this.network = network;
+	public LinkDemandEventHandler() {
 		this.vehicleFilter = null;
 	}
 
@@ -108,13 +105,10 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler, PersonEnt
 				bw.write("link;agents");
 				bw.newLine();
 				
-				for (Id<Link> linkId : this.network.getLinks().keySet()){
-					
-					if (this.linkId2vehicles.get(linkId) != null) {
-						double volume = this.linkId2vehicles.get(linkId);
-						bw.write(linkId + ";" + volume);
-						bw.newLine();
-					}
+				for (Id<Link> linkId : this.linkId2vehicles.keySet()){
+					double volume = this.linkId2vehicles.get(linkId);
+					bw.write(linkId + ";" + volume);
+					bw.newLine();
 				}
 				
 				bw.close();
@@ -139,12 +133,10 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler, PersonEnt
 				bw.write("link;agents");
 				bw.newLine();
 				
-				for (Id<Link> linkId : this.network.getLinks().keySet()){
+				for (Id<Link> linkId : this.linkId2passengers.keySet()){
 					
-					double volume = 0.;
-					if (this.linkId2passengers.get(linkId) != null) {
-						volume = this.linkId2passengers.get(linkId);
-					}
+					double volume = this.linkId2passengers.get(linkId);
+					
 					bw.write(linkId + ";" + volume);
 					bw.newLine();
 				}

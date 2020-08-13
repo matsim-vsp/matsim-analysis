@@ -21,13 +21,9 @@ package org.matsim.analysis.linkDemand;
 
 import org.matsim.analysis.VehicleAnalysisFilter;
 import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
 * @author ikaddoura
@@ -40,13 +36,8 @@ public class RunLinkDemandAnalysis {
 		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
 		String runId = "snzDrtO443g";
 		
-		Config config = ConfigUtils.createConfig();
-		config.global().setCoordinateSystem("epsg:25832");
-		config.network().setInputFile(outputDirectory + runId + ".output_network.xml.gz");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
 		VehicleAnalysisFilter vehicleFilter = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
-		LinkDemandEventHandler handler = new LinkDemandEventHandler(scenario.getNetwork(), vehicleFilter);
+		LinkDemandEventHandler handler = new LinkDemandEventHandler(vehicleFilter);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler);
