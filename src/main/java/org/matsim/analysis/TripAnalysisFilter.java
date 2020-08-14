@@ -53,6 +53,7 @@ public class TripAnalysisFilter implements TripFilter {
 	private final String filterName;
 	private double buffer = 0.;
 	private TripConsiderType tripConsiderType = TripConsiderType.OriginAndDestination;
+	private int originDestinationNullCounter;
 	
 	public enum TripConsiderType { OriginAndDestination, OriginOrDestination }
 	
@@ -80,7 +81,13 @@ public class TripAnalysisFilter implements TripFilter {
 		}
 		
 		if (origin == null || destination == null) {
-			log.warn("Origin or destination null. Can't interpret this trip. Origin: " + origin + "--> Destination: " +  destination);
+			if (this.originDestinationNullCounter <= 5) {
+				log.warn("Origin or destination null. Can't interpret this trip. Origin: " + origin + "--> Destination: " +  destination);
+				if (this.originDestinationNullCounter == 5) {
+					log.warn("Further warnings of this type will not be printed out.");
+				}
+				this.originDestinationNullCounter++;
+			}
 			return false;
 		}
 		

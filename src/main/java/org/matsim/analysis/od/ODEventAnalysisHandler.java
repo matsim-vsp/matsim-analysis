@@ -51,6 +51,7 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 	
 	// temporary information
 	private final Map<Id<Person>,Integer> personId2currentTripNumber = new HashMap<>();
+	private final Map<Id<Person>,Integer> personId2currentLegNumber = new HashMap<>();
 
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Person>> taxiDrivers = new HashSet<Id<Person>>();
@@ -62,6 +63,14 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 	private final Map<Id<Person>,Map<Integer,Id<Link>>> personId2tripNumber2departureLink = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Id<Link>>> personId2tripNumber2arrivalLink = new HashMap<>();
 
+	// analysis information to be stored
+	private final Map<Id<Person>,Map<Integer,String>> personId2legNumber2legMode = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Double>> personId2legNumber2departureTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Double>> personId2legNumber2arrivalTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Id<Link>>> personId2legNumber2departureLink = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Id<Link>>> personId2legNumber2arrivalLink = new HashMap<>();
+
+	
 	public ODEventAnalysisHandler(String[] helpLegModes, String helpActivitySubString) {
 		this.helpLegModes = helpLegModes;
 		this.helpActivitySubString = helpActivitySubString;
@@ -76,6 +85,10 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 		personId2tripNumber2departureTime.clear();
 		personId2tripNumber2arrivalTime.clear();
 		personId2tripNumber2legMode.clear();
+		personId2currentLegNumber.clear();
+		personId2legNumber2departureTime.clear();
+		personId2legNumber2arrivalTime.clear();
+		personId2legNumber2legMode.clear();
 		ptDrivers.clear();
 		taxiDrivers.clear();
 	}
@@ -96,11 +109,38 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 			// activities by pt or taxi drivers are not considered
 			
 		} else {
+			
+			if (personId2currentLegNumber.containsKey(event.getPersonId())) {
+				// the following leg is at least the person's second trip
+				personId2currentLegNumber.put(event.getPersonId(), personId2currentLegNumber.get(event.getPersonId()) + 1);
+				
+				Map<Integer,Double> legNumber2departureTime = personId2legNumber2departureTime.get(event.getPersonId());
+				legNumber2departureTime.put(personId2currentLegNumber.get(event.getPersonId()), event.getTime());
+				personId2legNumber2departureTime.put(event.getPersonId(), legNumber2departureTime);
+				
+				Map<Integer,Id<Link>> legNumber2departureLink = personId2legNumber2departureLink.get(event.getPersonId());
+				legNumber2departureLink.put(personId2currentLegNumber.get(event.getPersonId()), event.getLinkId());
+				personId2legNumber2departureLink.put(event.getPersonId(), legNumber2departureLink);
+		
+			} else {
+				// the following leg is the person's first trip
+				personId2currentLegNumber.put(event.getPersonId(), 1);
+				
+				Map<Integer,Double> legNumber2departureTime = new HashMap<Integer, Double>();
+				legNumber2departureTime.put(1, event.getTime());
+				personId2legNumber2departureTime.put(event.getPersonId(), legNumber2departureTime);
+				
+				Map<Integer,Id<Link>> legNumber2departureLink = new HashMap<>();
+				legNumber2departureLink.put(1, event.getLinkId());
+				personId2legNumber2departureLink.put(event.getPersonId(), legNumber2departureLink);
+
+			}
+			
 			if (event.getActType().toString().contains(helpActivitySubString)){
-				// pseudo activities are excluded
+				// pseudo activities are excluded in the trip analysis
 				
 			} else {
-				// a "real" activity
+				// a "real" activity, used for the trip analysis
 				
 				if (personId2currentTripNumber.containsKey(event.getPersonId())) {
 					// the following trip is at least the person's second trip
@@ -137,8 +177,27 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 			// no normal person
 			
 		} else {
+			// leg analysis
+			
+			if (personId2legNumber2legMode.containsKey(event.getPersonId())) {
+				// at least the person's second leg				
+				
+				int legNumber = personId2currentLegNumber.get(event.getPersonId());
+				Map<Integer,String> legNumber2legMode = personId2legNumber2legMode.get(event.getPersonId());
+				legNumber2legMode.put(legNumber, event.getLegMode());
+				personId2legNumber2legMode.put(event.getPersonId(), legNumber2legMode);
+				
+			} else {
+				// the person's first trip
+				Map<Integer,String> legNumber2legMode = new HashMap<Integer,String>();
+				legNumber2legMode.put(1, event.getLegMode());
+				personId2legNumber2legMode.put(event.getPersonId(), legNumber2legMode);
+			}
+			
+			// trip analysis
 			if (personId2tripNumber2legMode.containsKey(event.getPersonId())) {
-				// at least the person's second trip
+				// at least the person's second trip				
+				
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 				Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
 				
@@ -177,6 +236,27 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 			// no normal person
 			
 		} else {
+			
+			// leg analysis
+			int currentLegNumber = this.personId2currentLegNumber.get(event.getPersonId());
+			
+			 // arrival time + arrival link
+			Map<Integer, Double> legNumber2arrivalTime;
+			Map<Integer,Id<Link>> legNumber2arrivalLink;
+			if (this.personId2legNumber2arrivalTime.containsKey(event.getPersonId())) {
+				legNumber2arrivalTime = this.personId2legNumber2arrivalTime.get(event.getPersonId());
+				legNumber2arrivalLink = this.personId2legNumber2arrivalLink.get(event.getPersonId());
+			} else {
+				legNumber2arrivalTime = new HashMap<>();
+				legNumber2arrivalLink = new HashMap<>();
+			}
+			legNumber2arrivalTime.put(currentLegNumber, event.getTime());
+			personId2legNumber2arrivalTime.put(event.getPersonId(), legNumber2arrivalTime);
+			
+			legNumber2arrivalLink.put(currentLegNumber, event.getLinkId());
+			personId2legNumber2arrivalLink.put(event.getPersonId(), legNumber2arrivalLink);
+			
+			// trip analysis
 			int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());
 			
 			 // arrival time + arrival link
@@ -197,6 +277,8 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 		}
 	}
 	
+	// trip information
+	
 	public Map<Id<Person>, Map<Integer, String>> getPersonId2tripNumber2legMode() {
 		return personId2tripNumber2legMode;
 	}
@@ -215,6 +297,28 @@ public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, 
 
 	public Map<Id<Person>, Map<Integer, Id<Link>>> getPersonId2tripNumber2arrivalLink() {
 		return personId2tripNumber2arrivalLink;
+	}
+	
+	// leg information
+	
+	public Map<Id<Person>, Map<Integer, String>> getPersonId2legNumber2legMode() {
+		return personId2legNumber2legMode;
+	}
+
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2legNumber2departureTime() {
+		return personId2legNumber2departureTime;
+	}
+	
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2legNumber2arrivalTime() {
+		return personId2legNumber2arrivalTime;
+	}
+
+	public Map<Id<Person>, Map<Integer, Id<Link>>> getPersonId2legNumber2departureLink() {
+		return personId2legNumber2departureLink;
+	}
+
+	public Map<Id<Person>, Map<Integer, Id<Link>>> getPersonId2legNumber2arrivalLink() {
+		return personId2legNumber2arrivalLink;
 	}
 	
 }
