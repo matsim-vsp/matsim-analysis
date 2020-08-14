@@ -48,10 +48,6 @@ public class CollectiveAnalysis {
 				directories = list.toArray(new File[0]);
 			}
 		}
-//		try {
-//			FileWriter fwriter = new FileWriter(new File(rootPath + "/runOverview.csv"), false);
-//			BufferedWriter bww = new BufferedWriter(fwriter);
-//			PrintWriter writer = new PrintWriter(bww);
 		ArrayList<String> paths = new ArrayList<String>();
 		for (int i = 0; i < directories.length; i++) {
 			paths = new ArrayList<String>();
@@ -93,7 +89,7 @@ public class CollectiveAnalysis {
 			}
 			runIdWithPath.put(runId, paths);
 		}
-		//sorting runids
+		// sorting runids
 		LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted = new LinkedHashMap<>();
 		runIdWithPath.entrySet().stream().sorted(Map.Entry.comparingByKey())
 				.forEachOrdered(x -> runIdWithPathSorted.put(x.getKey(), x.getValue()));
@@ -114,29 +110,25 @@ public class CollectiveAnalysis {
 				fileNames.add(filename);
 			}
 			fileList.removeAll(fileNames);
-			
+
 			Iterator<String> fileListItr = fileList.iterator();
-			while(fileListItr.hasNext()) {
+			while (fileListItr.hasNext()) {
 				String eachvalue = fileListItr.next();
-				eachvalue = filePath.getParent()+"\\"+eachvalue+".txt";
+				eachvalue = filePath.getParent() + "\\" + eachvalue + ".txt";
 				value.add(eachvalue);
 			}
-			
-			//value.addAll(fileList);
-			
+
+			// value.addAll(fileList);
+
 			runIdWithPathSorted.put(key, value);
 		}
 		LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite = readDataFile(runIdWithPathSorted);
 		writeData(dataToWrite, rootPath);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 	}
 
 	private static LinkedHashMap<String, Map<String, Map<String, String>>> readDataFile(
 			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
-			//		  runID		  filename	  column	value
+		//            runID       filename    column   value
 		LinkedHashMap<String, Map<String, Map<String, String>>> toPrint = new LinkedHashMap<>();
 		BufferedReader br;
 		String line = null;
@@ -150,7 +142,7 @@ public class CollectiveAnalysis {
 			ListIterator<String> pathListItr = pathList.listIterator();
 			while (pathListItr.hasNext()) {
 				String filePath = pathListItr.next();
-				//TreeMap sort key by default
+				// TreeMap sort key by default
 				Map<String, String> lastLineValues = new TreeMap<String, String>();
 				try {
 					br = new BufferedReader(new FileReader(filePath));
@@ -186,23 +178,24 @@ public class CollectiveAnalysis {
 				}
 
 			}
-			//toPrint ---> (runid --- (filename --> (lastline)))
+			// toPrint ---> (runid --- (filename --> (lastline)))
 			toPrint.put(runId, lastLineValuesWithFileName);
 		}
 		LinkedHashMap<String, Map<String, Map<String, String>>> organisedData = organiseDataTable(toPrint);
 		return organisedData;
 	}
-	//Taking a particular file and its last line values from each runID
-	//							  runId		fileName	 column   value
+
+	// Taking a particular file and its last line values from each runID
+							//   runId      fileName     column   value
 	private static LinkedHashMap<String, Map<String, Map<String, String>>> organiseDataTable(
 			LinkedHashMap<String, Map<String, Map<String, String>>> toPrint) {
 		initiateFileList();
-		//TreeMap sort key by default
+		// TreeMap sort key by default
 		Map<String, Map<String, String>> lastLine = new TreeMap<String, Map<String, String>>();
 		Iterator<String> fileListItr = fileList.iterator();
 		Set<String> runIds = toPrint.keySet();
 		String fileName = null;
-		//getting a particular file from all runIDs
+		// getting a particular file from all runIDs
 		while (fileListItr.hasNext()) {
 			Iterator<String> runIdsItr = runIds.iterator();
 			fileName = fileListItr.next();
@@ -210,29 +203,29 @@ public class CollectiveAnalysis {
 			while (runIdsItr.hasNext()) {
 				runId = runIdsItr.next();
 				Map<String, String> lastline = toPrint.get(runId).get(fileName);
-				//last line of only one file for all runIDs 
+				// last line of only one file for all runIDs
 				lastLine.put(runId, lastline);
 			}
-			//organized data for last line of only one file for all runIDs
+			// organized data for last line of only one file for all runIDs
 			Map<String, Map<String, String>> orgaisedData = organiseData(lastLine);
-			//Now, replace the old values with the new organized data in toPrint
-			//overriding the existing (file, last-line) pair with the organized one
+			// Now, replace the old values with the new organized data in toPrint
+			// overriding the existing (file, last-line) pair with the organized one
 			Iterator<String> runIdItr1 = runIds.iterator();
-			while(runIdItr1.hasNext()) {
+			while (runIdItr1.hasNext()) {
 				String runId1 = runIdItr1.next();
-				    //file      column   value
-				//Map<String, Map<String, String>> files = toPrint.get(runId1);//contains all the files in the directory
-				//replace the old values with the new organized data in toPrint
+				// the files in the directory
+				// replace the old values with the new organized data in toPrint
 				toPrint.get(runId1).get(fileName).putAll(orgaisedData.get(runId1));
 			}
-			//toPrint.put(runId, orgaisedData); //wrong
+			// toPrint.put(runId, orgaisedData); //wrong
 		}
 
 		return toPrint;
 	}
 
-	//working with only one file for each runID
-	//Here we only check if all the files are having the same columns, if any column is missing add that column with NA as value
+	// working with only one file for each runID
+	// Here we only check if all the files are having the same columns, if any
+	// column is missing add that column with NA as value
 	private static Map<String, Map<String, String>> organiseData(Map<String, Map<String, String>> lastLine) {
 		LinkedHashSet<String> columnName = new LinkedHashSet<String>();
 
@@ -253,9 +246,9 @@ public class CollectiveAnalysis {
 				String runId1 = runIdKeyItr1.next();
 				Map<String, String> lastline1 = lastLine.get(runId1);
 				Iterator<String> columnNameItr = columnName.iterator();
-				while(columnNameItr.hasNext()) {
+				while (columnNameItr.hasNext()) {
 					String column = columnNameItr.next();
-					if(!lastline1.containsKey(column)) {
+					if (!lastline1.containsKey(column)) {
 						lastline1.put(column, "NA");
 					}
 				}
@@ -264,24 +257,24 @@ public class CollectiveAnalysis {
 		}
 		return lastLine;
 	}
-	
-	//writing data to csv file
+
+	// writing data to csv file
 	public static void writeData(LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite, File rootPath) {
-		
+
 		FileWriter fwriter;
 		try {
 			fwriter = new FileWriter(new File(rootPath + "/runOverview.csv"), false);
 			BufferedWriter bww = new BufferedWriter(fwriter);
 			PrintWriter writer = new PrintWriter(bww);
-			
+
 			Iterator<String> columnRuIds = dataToWrite.keySet().iterator();
 			int i = 1;
-			while(columnRuIds.hasNext()) {
+			while (columnRuIds.hasNext()) {
 				String columnRunId1 = columnRuIds.next();
 				Map<String, Map<String, String>> dataForRunId1 = dataToWrite.get(columnRunId1);
 				Iterator<String> fileKeyItr1 = dataForRunId1.keySet().iterator();
-				while(fileKeyItr1.hasNext()) {
-					if(i == 1) {
+				while (fileKeyItr1.hasNext()) {
+					if (i == 1) {
 						writer.print("RunID");
 						writer.print(" ");
 						writer.print(",");
@@ -295,28 +288,28 @@ public class CollectiveAnalysis {
 					String fileKey1 = fileKeyItr1.next();
 					Map<String, String> columnData1 = dataForRunId1.get(fileKey1);
 					Iterator<String> columnNnameKeyset = columnData1.keySet().iterator();
-					while(columnNnameKeyset.hasNext()) {
+					while (columnNnameKeyset.hasNext()) {
 						String columnName = columnNnameKeyset.next();
 						writer.print(columnName);
 						writer.print(",");
 					}
-						i++;		
+					i++;
 				}
 				break;
 			}
-			
+
 			Iterator<String> ruIds = dataToWrite.keySet().iterator();
-			while(ruIds.hasNext()) {
+			while (ruIds.hasNext()) {
 				String runId = ruIds.next();
-					writer.println();
-					writer.print(runId);
-					writer.print(",");
-					writer.print(" ");
-					writer.print(",");
-				
+				writer.println();
+				writer.print(runId);
+				writer.print(",");
+				writer.print(" ");
+				writer.print(",");
+
 				Map<String, Map<String, String>> dataForRunId = dataToWrite.get(runId);
 				Iterator<String> fileKeyItr = dataForRunId.keySet().iterator();
-				while(fileKeyItr.hasNext()) {
+				while (fileKeyItr.hasNext()) {
 					String fileKey = fileKeyItr.next();
 					writer.print(" ");
 					writer.print(",");
@@ -324,10 +317,10 @@ public class CollectiveAnalysis {
 					writer.print(",");
 					Map<String, String> columnData = dataForRunId.get(fileKey);
 					Iterator<String> columnKeyItr = columnData.keySet().iterator();
-					while(columnKeyItr.hasNext()) {
+					while (columnKeyItr.hasNext()) {
 						String columnkey = columnKeyItr.next();
 						String eachValue = columnData.get(columnkey);
-						
+
 						if (eachValue.contains(",")) {
 							eachValue = String.format("\"%s\"", eachValue);
 						}
@@ -346,9 +339,9 @@ public class CollectiveAnalysis {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private static void initiateFileList() {
 		fileList = new LinkedHashSet<String>();
 		fileList.add("drt_customer_stats_drt");
