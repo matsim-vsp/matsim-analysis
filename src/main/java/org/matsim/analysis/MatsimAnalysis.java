@@ -96,9 +96,9 @@ public class MatsimAnalysis {
 	// policy case
 	private Scenario scenario1;
 	private List<AgentFilter> agentFilters;
-	private List<TripFilter> tripFilters1;
+	private List<TripFilter> tripFilters;
 	private List<VehicleFilter> vehicleFilters;
-	
+
 	// base case (optional)
 	private Scenario scenario0;
 	
@@ -146,13 +146,13 @@ public class MatsimAnalysis {
 		log.info("Run directory to compare with: " + runDirectoryToCompareWith);
 		log.info("Run ID to compare with: " + runIdToCompareWith);
 	
-		
+
 		if (this.vehicleFilters == null) {
 			this.vehicleFilters = new ArrayList<>();
 			VehicleFilter vehicleFilter = null;
 			this.vehicleFilters.add(vehicleFilter);
 		}
-		
+
 		// #####################################
 		// Create and add the event handlers
 		// #####################################
@@ -178,7 +178,7 @@ public class MatsimAnalysis {
 			for (VehicleFilter vehicleFilter : this.vehicleFilters) {
 				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
 				trafficVolumeAnalysis1.add(trafficVolumeAnalysis);
-				
+
 				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(vehicleFilter);
 				dynamicTrafficVolumeAnalysis1.add(dynamicTrafficVolumeAnalysis);
 			}
@@ -223,7 +223,7 @@ public class MatsimAnalysis {
 			for (VehicleFilter vehicleFilter : this.vehicleFilters) {
 				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
 				trafficVolumeAnalysis0.add(trafficVolumeAnalysis);
-				
+
 				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(vehicleFilter);
 				dynamicTrafficVolumeAnalysis0.add(dynamicTrafficVolumeAnalysis);
 			}
@@ -270,8 +270,16 @@ public class MatsimAnalysis {
 			personId2userBenefit1 = getPersonId2UserBenefit(scenario1.getPopulation());
 			
 			if (agentFilters != null) {
-				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1.getPopulation(), filter, mainModeIdentifier);
+				for (AgentFilter agentFilter : agentFilters) {
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, agentFilter, null, mainModeIdentifier);
+					modeAnalysis1.run();
+					modeAnalysisList1.add(modeAnalysis1);
+				}
+			}
+
+			if (tripFilters != null) {
+				for (TripFilter tripFilter : tripFilters) {
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, null, tripFilter, mainModeIdentifier);
 					modeAnalysis1.run();
 					modeAnalysisList1.add(modeAnalysis1);
 				}
@@ -284,8 +292,16 @@ public class MatsimAnalysis {
 			personId2userBenefit0 = getPersonId2UserBenefit(scenario0.getPopulation());
 			
 			if (agentFilters != null) {
-				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0.getPopulation(), filter, mainModeIdentifier);
+				for (AgentFilter agentFilter : agentFilters) {
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, agentFilter, null, mainModeIdentifier);
+					modeAnalysis0.run();
+					modeAnalysisList0.add(modeAnalysis0);
+				}
+			}
+
+			if (tripFilters != null) {
+				for (TripFilter tripFilter : tripFilters) {
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, null, tripFilter, mainModeIdentifier);
 					modeAnalysis0.run();
 					modeAnalysisList0.add(modeAnalysis0);
 				}
@@ -310,7 +326,7 @@ public class MatsimAnalysis {
 				modeAnalysisList1,
 				modes,
 				odHandler1,
-				tripFilters1);
+				tripFilters);
 		
 		log.info("Printing results...");
 		if (scenario0 != null) printResults(scenario0,
@@ -325,7 +341,7 @@ public class MatsimAnalysis {
 				modeAnalysisList0,
 				modes,
 				odHandler0,
-				tripFilters1);
+				tripFilters);
 
 		// #####################################
 		// Scenario comparison
@@ -345,12 +361,11 @@ public class MatsimAnalysis {
 				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, agentFilter);
 				
 				try {
-
 					// do not apply trip filter in addition to person filter
 					TripAnalysisFilter tripFilter1 = new TripAnalysisFilter("");
 					tripFilter1.preProcess(this.scenario1);
 					scenarioComparisonFiltered.analyzeByMode(tripFilter1);
-					
+
 					scenarioComparisonFiltered.analyzeByScore(0.0);
 					scenarioComparisonFiltered.analyzeByScore(1.0);
 					scenarioComparisonFiltered.analyzeByScore(10.0);
@@ -360,23 +375,23 @@ public class MatsimAnalysis {
 					e.printStackTrace();
 				}
 			}
-			
-			for (TripFilter tripFilter : this.tripFilters1) {
-				
+
+			for (TripFilter tripFilter : this.tripFilters) {
+
 				// do not apply person filter in addition to trip filter
 				AgentAnalysisFilter filter1 = new AgentAnalysisFilter("");
 				filter1.preProcess(scenario1);
 				agentFilters.add(filter1);
-				
+
 				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, filter1);
-				
+
 				try {
 					scenarioComparisonFiltered.analyzeByMode(tripFilter);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-		
+
 		}
 
 		// #####################################
@@ -762,8 +777,8 @@ public class MatsimAnalysis {
 		this.agentFilters = filters;
 	}
 
-	public void setTripFilters(List<TripFilter> tripFilters1) {
-		this.tripFilters1 = tripFilters1;
+	public void setTripFilters(List<TripFilter> tripFilters) {
+		this.tripFilters = tripFilters;
 	}
 
 	public void setScenario0(Scenario scenario0) {

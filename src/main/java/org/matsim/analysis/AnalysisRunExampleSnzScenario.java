@@ -49,6 +49,7 @@ public class AnalysisRunExampleSnzScenario {
 		String zoneId = null;
 		String shapeFileTripFilter = null;
 		String shapeFileTripFilterCRS = null;
+		String bufferMAroundTripFilterShp = null;
 
 		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.walk, TransportMode.non_network_walk, "access_walk", "egress_walk"}; // to be able to analyze old runs
 		final int scalingFactor = 4;
@@ -75,7 +76,9 @@ public class AnalysisRunExampleSnzScenario {
 			
 			shapeFileTripFilter = args[10];
 			shapeFileTripFilterCRS = args[11];
-									
+
+			bufferMAroundTripFilterShp = args[12];
+
 		} else {
 			
 			// Berlin
@@ -119,28 +122,29 @@ public class AnalysisRunExampleSnzScenario {
 			
 			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
 			shapeFileTripFilterCRS = "EPSG:25832";
-			
+			bufferMAroundTripFilterShp = "2000";
+
 			// Gladbeck
-			
+
 //			runDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
-//			runId = "snzDrtO443g";		
-//			
+//			runId = "snzDrtO443g";
+//
 //			runDirectoryToCompareWith = null;
 //			runIdToCompareWith = null;
-//			
+//
 //			visualizationScriptInputDirectory = null;
-//			
+//
 //			scenarioCRS = "EPSG:25832";
-//			
+//
 //			shapeFileODZones = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/shp-files/hexagon-grid-1000.shp";
 //			shapFileODZonesCRS = "EPSG:25832";
 //			zoneId = "id";
-//						
+//
 //			shapeFileFilterBerlinZone = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
-//			
+//
 //			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
 //			shapeFileTripFilterCRS = "EPSG:25832";
-			
+
 		}
 		
 		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
@@ -167,21 +171,21 @@ public class AnalysisRunExampleSnzScenario {
 		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("trips-in-area");
 		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
 		tripFilter1b.preProcess(scenario1);
-		tripFilter1b.setBuffer(2000.);
+		tripFilter1b.setBuffer(Double.valueOf(bufferMAroundTripFilterShp));
 		tripFilter1b.setTripConsiderType(TripConsiderType.OriginOrDestination);
 		tripFilters.add(tripFilter1b);
 		
 		final List<VehicleFilter> vehicleFilters = new ArrayList<>();
-		
+
 		VehicleAnalysisFilter vehicleAnalysisFilter0 = null;
 		vehicleFilters.add(vehicleAnalysisFilter0);
-		
+
 		VehicleAnalysisFilter vehicleAnalysisFilter1 = new VehicleAnalysisFilter("drt-vehicles", "drt", StringComparison.Contains);
 		vehicleFilters.add(vehicleAnalysisFilter1);
-		
+
 		VehicleAnalysisFilter vehicleAnalysisFilter2 = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
 		vehicleFilters.add(vehicleAnalysisFilter2);
-		
+
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
 			modes.add(mode);
@@ -194,7 +198,7 @@ public class AnalysisRunExampleSnzScenario {
 		analysis.setAgentFilters(agentFilters);		
 		analysis.setTripFilters(tripFilters);
 		analysis.setVehicleFilters(vehicleFilters);
-		
+
 		analysis.setScenarioCRS(scenarioCRS);
 		analysis.setScalingFactor(scalingFactor);
 		analysis.setModes(modes);

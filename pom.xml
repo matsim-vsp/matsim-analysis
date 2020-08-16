@@ -98,6 +98,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.matsim</groupId>
+            <artifactId>matsim-examples</artifactId>
+            <version>${matsim.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.jcodec</groupId>
             <artifactId>jcodec-javase</artifactId>
             <version>0.1.9</version>

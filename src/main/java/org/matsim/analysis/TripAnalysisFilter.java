@@ -29,7 +29,11 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -60,6 +64,13 @@ public class TripAnalysisFilter implements TripFilter {
 	@Deprecated
 	public TripAnalysisFilter() {
 		this.filterName = "";
+	}
+
+	@Override
+	public boolean considerTrip(TripStructureUtils.Trip trip, Scenario scenario) {
+		Coord origin = getCoordFromActivity(trip.getOriginActivity(), scenario);
+		Coord destination = getCoordFromActivity(trip.getDestinationActivity(), scenario);
+		return considerTrip(origin, destination);
 	}
 
 	@Override
@@ -201,5 +212,24 @@ public class TripAnalysisFilter implements TripFilter {
 		this.tripConsiderType = tripConsiderType;
 	}
 
+	// there is PopulationUtils.decideOnCoordForActivity, but it throws exceptions when the coord of a activityFacility is null
+	// not sure whether this is a problem, keeping the existing Joschka methods from TripsAndLegsCSVWriter
+
+	// copy from TripsAndLegsCSVWriter
+	private Coord getCoordFromActivity(Activity activity, Scenario scenario) {
+		if (activity.getCoord() != null) {
+			return activity.getCoord();
+		} else if (activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId())) {
+			Coord coord = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
+			return coord != null ? coord : this.getCoordFromLink(activity.getLinkId(), scenario);
+		} else {
+			return this.getCoordFromLink(activity.getLinkId(), scenario);
+		}
+	}
+
+	// copy from TripsAndLegsCSVWriter
+	private Coord getCoordFromLink(Id<Link> linkId, Scenario scenario) {
+		return scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord();
+	}
 }
 

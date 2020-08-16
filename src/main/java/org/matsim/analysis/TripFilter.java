@@ -20,6 +20,8 @@
 package org.matsim.analysis;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
 * @author ikaddoura
@@ -27,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 
 public interface TripFilter {
 	public boolean considerTrip(Coord origin, Coord destination);
+	public boolean considerTrip(TripStructureUtils.Trip trip, Scenario scenario);
 	public String toFileName();
 }
 

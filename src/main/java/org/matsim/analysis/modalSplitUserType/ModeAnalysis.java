@@ -31,6 +31,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
+import org.matsim.analysis.TripFilter;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -49,7 +51,9 @@ public class ModeAnalysis {
 	
 	private static final Logger log = Logger.getLogger(ModeAnalysis.class);	
 	private final Population population;
-	private final AgentFilter filter;
+	private final Scenario scenario;
+	private final AgentFilter agentFilter;
+	private final TripFilter tripFilter;
 	private final AnalysisMainModeIdentifier modeIdentifier;
 	
 	private Map<String, Integer> mode2TripCounterFiltered = new HashMap<>();		
@@ -58,9 +62,11 @@ public class ModeAnalysis {
 
 	private double totalTripsFiltered = 0.;
 
-	public ModeAnalysis(Population population, AgentFilter filter, AnalysisMainModeIdentifier modeIdentifier) {
-		this.population = population;
-		this.filter = filter;
+	public ModeAnalysis(Scenario scenario, AgentFilter agentFilter, TripFilter tripFilter, AnalysisMainModeIdentifier modeIdentifier) {
+		this.population = scenario.getPopulation();
+		this.scenario = scenario;
+		this.agentFilter = agentFilter;
+		this.tripFilter = tripFilter;
 		this.modeIdentifier = modeIdentifier;
 	}
 
@@ -73,38 +79,42 @@ public class ModeAnalysis {
 				log.info("Person #" + counter);
 			}
 			
-			if (filter == null || filter.considerAgent(person)) {
+			if (agentFilter == null || agentFilter.considerAgent(person)) {
 												
 				for (Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan().getPlanElements())) {
-					totalTripsFiltered++;
+					if (tripFilter == null || tripFilter.considerTrip(trip, scenario)) {
+						totalTripsFiltered++;
 
-					double routeDistance = 0.;
-					for (Leg leg : trip.getLegsOnly()) {
-						routeDistance += leg.getRoute().getDistance();
-					}
-					
-					String currentLegMode = modeIdentifier.identifyMainMode(trip.getTripElements());
-					
-					if (mode2TripCounterFiltered.containsKey(currentLegMode)) {
-						
-						mode2TripCounterFiltered.put(currentLegMode, mode2TripCounterFiltered.get(currentLegMode) + 1);
-						mode2TripRouteDistancesFiltered.get(currentLegMode).add(routeDistance);
-						
-						double euclideanDistance = CoordUtils.calcEuclideanDistance(trip.getOriginActivity().getCoord(), trip.getDestinationActivity().getCoord());
-						mode2TripEuclideanDistancesFiltered.get(currentLegMode).add(euclideanDistance);
-						
+						double routeDistance = 0.;
+						for (Leg leg : trip.getLegsOnly()) {
+							routeDistance += leg.getRoute().getDistance();
+						}
+
+						String currentLegMode = modeIdentifier.identifyMainMode(trip.getTripElements());
+
+						if (mode2TripCounterFiltered.containsKey(currentLegMode)) {
+
+							mode2TripCounterFiltered.put(currentLegMode, mode2TripCounterFiltered.get(currentLegMode) + 1);
+							mode2TripRouteDistancesFiltered.get(currentLegMode).add(routeDistance);
+
+							double euclideanDistance = CoordUtils.calcEuclideanDistance(trip.getOriginActivity().getCoord(), trip.getDestinationActivity().getCoord());
+							mode2TripEuclideanDistancesFiltered.get(currentLegMode).add(euclideanDistance);
+
+						} else {
+
+							mode2TripCounterFiltered.put(currentLegMode, 1);
+
+							List<Double> routeDistances = new ArrayList<>();
+							routeDistances.add(routeDistance);
+							mode2TripRouteDistancesFiltered.put(currentLegMode, routeDistances);
+
+							List<Double> euclideanDistances = new ArrayList<>();
+							double euclideanDistance = CoordUtils.calcEuclideanDistance(trip.getOriginActivity().getCoord(), trip.getDestinationActivity().getCoord());
+							euclideanDistances.add(euclideanDistance);
+							mode2TripEuclideanDistancesFiltered.put(currentLegMode, euclideanDistances);
+						}
 					} else {
-						
-						mode2TripCounterFiltered.put(currentLegMode, 1);
-						
-						List<Double> routeDistances = new ArrayList<>();
-						routeDistances.add(routeDistance);
-						mode2TripRouteDistancesFiltered.put(currentLegMode, routeDistances);
-						
-						List<Double> euclideanDistances = new ArrayList<>();
-						double euclideanDistance = CoordUtils.calcEuclideanDistance(trip.getOriginActivity().getCoord(), trip.getDestinationActivity().getCoord());
-						euclideanDistances.add(euclideanDistance);
-						mode2TripEuclideanDistancesFiltered.put(currentLegMode, euclideanDistances);
+						// skip trip
 					}
 				}
 			} else {
@@ -119,14 +129,10 @@ public class ModeAnalysis {
 		return mode2TripCounterFiltered;
 	}
 
-	public void writeModeShares(String outputDirectory) {		
-		String outputFileName;
-		if (filter == null) {
-			outputFileName = "tripModeAnalysis.csv";
-		} else {
-			outputFileName = "tripModeAnalysis" + filter.toFileName() + ".csv";
-		}
-		
+	public void writeModeShares(String outputDirectory) {
+		String agentFilterFileName = agentFilter == null ? "_noAgentFilter" : agentFilter.toFileName();
+		String tripFilterFileName = tripFilter == null ? "_noTripFilter" : tripFilter.toFileName();
+		String outputFileName = "tripModeAnalysis" + agentFilterFileName + tripFilterFileName + ".csv";
 		File file = new File(outputDirectory + outputFileName);
 		
 		try {
@@ -152,12 +158,9 @@ public class ModeAnalysis {
 	public void writeTripRouteDistances(String outputDirectory) {
 		
 		for (String mode : this.mode2TripRouteDistancesFiltered.keySet()) {
-			String outputFileName;
-			if (filter == null) {
-				outputFileName = mode + "_tripRouteDistances.csv";
-			} else {
-				outputFileName = mode + "_tripRouteDistances" + filter.toFileName() + ".csv";
-			}
+			String agentFilterFileName = agentFilter == null ? "_noAgentFilter" : agentFilter.toFileName();
+			String tripFilterFileName = tripFilter == null ? "_noTripFilter" : tripFilter.toFileName(); // automatically adds an _
+			String outputFileName = mode + "_tripRouteDistances" + agentFilterFileName + tripFilterFileName + ".csv";
 			File file = new File(outputDirectory + outputFileName);
 
 			try {
@@ -182,12 +185,9 @@ public class ModeAnalysis {
 	public void writeTripEuclideanDistances(String outputDirectory) {
 		
 		for (String mode : this.mode2TripEuclideanDistancesFiltered.keySet()) {
-			String outputFileName;
-			if (filter == null) {
-				outputFileName = mode + "_tripEuclideanDistances.csv";
-			} else {
-				outputFileName = mode + "_tripEuclideanDistances" + filter.toFileName() + ".csv";
-			}
+			String agentFilterFileName = agentFilter == null ? "_noAgentFilter" : agentFilter.toFileName();
+			String tripFilterFileName = tripFilter == null ? "_noTripFilter" : tripFilter.toFileName(); // automatically adds an _
+			String outputFileName = mode + "_tripEuclideanDistances" + agentFilterFileName + tripFilterFileName + ".csv";
 			File file = new File(outputDirectory + outputFileName);
 
 			try {
@@ -277,26 +277,17 @@ public class ModeAnalysis {
 	}
 	
 	public void writeTripEuclideanDistances(String outputDirectory, List<Tuple<Double, Double>> distanceGroups) {
-		
-		String outputFileName;
-		if (filter == null) {
-			outputFileName = "tripsPerModeAndEuclideanDistanceGroup.csv";
-		} else {
-			outputFileName = "tripsPerModeAndEuclideanDistanceGroup" + filter.toFileName() + ".csv";
-		}
+		String agentFilterFileName = agentFilter == null ? "_noAgentFilter" : agentFilter.toFileName();
+		String tripFilterFileName = tripFilter == null ? "_noTripFilter" : tripFilter.toFileName();
+		String outputFileName = "tripsPerModeAndEuclideanDistanceGroup" + agentFilterFileName + tripFilterFileName + ".csv";
 		writeDistances(outputDirectory, outputFileName, distanceGroups, this.mode2TripEuclideanDistancesFiltered);
 	}
 	
 	public void writeTripRouteDistances(String outputDirectory, List<Tuple<Double, Double>> distanceGroups) {
-		
-		String outputFileName;
-		if (filter == null) {
-			outputFileName = "tripsPerModeAndRouteDistanceGroup.csv";
-		} else {
-			outputFileName = "tripsPerModeAndRouteDistanceGroup" + filter.toFileName() + ".csv";
-		}
+		String agentFilterFileName = agentFilter == null ? "_noAgentFilter" : agentFilter.toFileName();
+		String tripFilterFileName = tripFilter == null ? "_noTripFilter" : tripFilter.toFileName();
+		String outputFileName = "tripsPerModeAndRouteDistanceGroup" + agentFilterFileName + tripFilterFileName + ".csv";
 		writeDistances(outputDirectory, outputFileName, distanceGroups, this.mode2TripRouteDistancesFiltered);
-
 	}
 		
 }
