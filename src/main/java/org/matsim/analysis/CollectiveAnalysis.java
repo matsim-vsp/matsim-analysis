@@ -114,7 +114,7 @@ public class CollectiveAnalysis {
 			Iterator<String> fileListItr = fileList.iterator();
 			while (fileListItr.hasNext()) {
 				String eachvalue = fileListItr.next();
-				eachvalue = filePath.getParent() + "\\" + eachvalue + ".txt";
+				eachvalue = filePath.getParent() + "/" + eachvalue + ".txt";
 				value.add(eachvalue);
 			}
 
