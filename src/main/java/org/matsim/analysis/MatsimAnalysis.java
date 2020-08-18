@@ -520,15 +520,25 @@ public class MatsimAnalysis {
 			}
 		}
 		
-		// TODO: Add combined agent and trip filters...
-
 		// aggregated analysis
-		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, personId2userBenefit, basicHandler);
-		for (String mode : modes) {
-			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, personId2userBenefit, basicHandler);
+		for (AgentFilter agentFilter : agentFilters) {
+			TripFilter tripFilter = null;
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			for (String mode : modes) {
+				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			}
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, agentFilter, tripFilter, personId2userBenefit, basicHandler, delayAnalysis);
 		}
-		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, personId2userBenefit, basicHandler, delayAnalysis);
 		
+		for (TripFilter tripFilter : tripFilters) {
+			AgentFilter agentFilter = null;
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			for (String mode : modes) {
+				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			}
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, agentFilter, tripFilter, personId2userBenefit, basicHandler, delayAnalysis);
+		}
+				
 		// time-specific trip distance analysis
 		for (String mode : modes) {
 			SortedMap<Double, List<Double>> departureTime2traveldistance = analysis.getParameter2Values(mode, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);

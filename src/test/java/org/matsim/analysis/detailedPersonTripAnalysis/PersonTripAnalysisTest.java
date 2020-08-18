@@ -86,7 +86,7 @@ public class PersonTripAnalysisTest {
 		
 		PersonTripAnalysis analysis = new PersonTripAnalysis();
 		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, null);
-		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler);
+		analysis.printAggregatedResults(outputPath, TransportMode.car, null, null, personId2userBenefit, basicHandler);
 		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, null);
 		
 	}

@@ -351,6 +351,8 @@ public class PersonTripAnalysis {
 
 	public void printAggregatedResults(String outputPath,
 									   String mode,
+									   AgentFilter agentFilter,
+									   TripFilter tripFilter,
 									   Map<Id<Person>, Double> personId2userBenefit,
 									   BasicPersonTripAnalysisHandler basicHandler) {
 
@@ -360,7 +362,16 @@ public class PersonTripAnalysis {
 			ignoreModes = true;
 		}
 
-		String fileName = outputPath + "aggregated_info_" + mode + ".csv";
+		String fileName = null;
+		if (agentFilter == null && tripFilter == null) {
+			fileName = outputPath + "aggregated_info_" + mode + ".csv";
+		} else if (agentFilter != null && tripFilter == null) {
+			fileName = outputPath + "aggregated_info_" + mode + agentFilter.toFileName() + ".csv";
+		} else if (agentFilter == null && tripFilter != null) {
+			fileName = outputPath + "aggregated_info_" + mode + tripFilter.toFileName() + ".csv";
+		} else {
+			fileName = outputPath + "aggregated_info_" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv";
+		}
 		File file = new File(fileName);
 
 		try {
@@ -378,38 +389,43 @@ public class PersonTripAnalysis {
 			double mode_inVehTime = 0.;
 			double mode_TravelDistance = 0.;
 
-			for (Id<Person> id : basicHandler.getScenario().getPopulation().getPersons().keySet()) {
+			for (Person person : basicHandler.getScenario().getPopulation().getPersons().values()) {
+				Id<Person> id = person.getId();
+				if (agentFilter == null || agentFilter.considerAgent(person)) {
+					
+					if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
 
-				if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
+						for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
 
-					for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
+							if (tripFilter == null || tripFilter.considerTrip(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip), basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip))) {
+								
+								// now, filter by mode
+								if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
 
-						// only for the predefined mode
+									mode_trips++;
 
-						if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
+									if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
+										if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
+											mode_StuckAndAbortTrips++;
+										}
+									}
 
-							mode_trips++;
+									if (basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id)) {
+										stuckAndAbortEvents = basicHandler.getPersonId2stuckAndAbortEvents().get(id);
+									}
 
-							if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
-								if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
-									mode_StuckAndAbortTrips++;
+									if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
+										mode_TravelTime = mode_TravelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
+									}
+
+									if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+										mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
+									}
+
+									if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
+										mode_TravelDistance = mode_TravelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
+									}
 								}
-							}
-
-							if (basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id)) {
-								stuckAndAbortEvents = basicHandler.getPersonId2stuckAndAbortEvents().get(id);
-							}
-
-							if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
-								mode_TravelTime = mode_TravelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
-							}
-
-							if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
-								mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
-							}
-
-							if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
-								mode_TravelDistance = mode_TravelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
 							}
 						}
 					}
@@ -451,12 +467,23 @@ public class PersonTripAnalysis {
 	}
 
 	public void printAggregatedResults(String outputPath,
-									   Map<Id<Person>, Double> personId2userBenefit,
-									   BasicPersonTripAnalysisHandler basicHandler,
-									   DelayAnalysis delayAnalysis
+			AgentFilter agentFilter,
+			TripFilter tripFilter,
+			Map<Id<Person>, Double> personId2userBenefit,
+			BasicPersonTripAnalysisHandler basicHandler,
+			DelayAnalysis delayAnalysis
 	) {
 
-		String fileName = outputPath + "aggregated_info.csv";
+		String fileName = null;
+		if (agentFilter == null && tripFilter == null) {
+			fileName = outputPath + "aggregated_info_for-each-mode.csv";
+		} else if (agentFilter != null && tripFilter == null) {
+			fileName = outputPath + "aggregated_info_for-each-mode" + agentFilter.toFileName() + ".csv";
+		} else if (agentFilter == null && tripFilter != null) {
+			fileName = outputPath + "aggregated_info_for-each-mode" + tripFilter.toFileName() + ".csv";
+		} else {
+			fileName = outputPath + "aggregated_info_for-each-mode" + agentFilter.toFileName() + tripFilter.toFileName() + ".csv";
+		}
 		File file = new File(fileName);
 
 		try {
@@ -480,34 +507,38 @@ public class PersonTripAnalysis {
 				double mode_inVehTime = 0.;
 				double mode_TravelDistance = 0.;
 
-				for (Id<Person> id : basicHandler.getScenario().getPopulation().getPersons().keySet()) {
+				for (Person person : basicHandler.getScenario().getPopulation().getPersons().values()) {
+					Id<Person> id = person.getId();
+					
+					if (agentFilter == null || agentFilter.considerAgent(person)) {
+						if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
+							
+							for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
+								
+								if (tripFilter == null || tripFilter.considerTrip(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip), basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip))) {
+									// filter by mode
+									if (basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
 
-					if (basicHandler.getPersonId2tripNumber2tripMainMode().containsKey(id)) {
+										mode_trips++;
 
-						for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
+										if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
+											if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
+												mode_StuckAndAbortTrips++;
+											}
+										}
 
-							// only for the predefined mode
+										if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
+											mode_TravelTime = mode_TravelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
+										}
 
-							if (basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
+										if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+											mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
+										}
 
-								mode_trips++;
-
-								if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
-									if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
-										mode_StuckAndAbortTrips++;
+										if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
+											mode_TravelDistance = mode_TravelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
+										}
 									}
-								}
-
-								if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
-									mode_TravelTime = mode_TravelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
-								}
-
-								if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
-									mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
-								}
-
-								if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
-									mode_TravelDistance = mode_TravelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
 								}
 							}
 						}
