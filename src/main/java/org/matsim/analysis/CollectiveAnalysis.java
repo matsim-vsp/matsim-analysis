@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,11 +21,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.JFileChooser;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class CollectiveAnalysis {
 
@@ -42,7 +47,7 @@ public class CollectiveAnalysis {
 		File[] directories1 = directories;
 		for (int i = 0; i < directories1.length; i++) {
 			File dir = directories1[i];
-			if (dir.isHidden() || !dir.getName().contains("output")) {
+			if (dir.isHidden() || !dir.getName().contains("output-")) {
 				List<File> list = new ArrayList<File>(Arrays.asList(directories));
 				list.remove(dir);
 				directories = list.toArray(new File[0]);
@@ -152,11 +157,13 @@ public class CollectiveAnalysis {
 							values = line.split("\\s");
 							if (itr == 0) {
 								keys = line.split("\\s");
+								keys = removeDuplicateKeys(keys);
 							}
 						} else if (filePath.endsWith(".csv")) {
 							values = line.split(";");
 							if (itr == 0) {
 								keys = line.split(";");
+								keys = removeDuplicateKeys(keys);
 							}
 						}
 						itr++;
@@ -290,7 +297,7 @@ public class CollectiveAnalysis {
 					Iterator<String> columnNnameKeyset = columnData1.keySet().iterator();
 					while (columnNnameKeyset.hasNext()) {
 						String columnName = columnNnameKeyset.next();
-						writer.print(columnName);
+						writer.print(fileKey1+"_"+columnName);
 						writer.print(",");
 					}
 					i++;
@@ -320,9 +327,20 @@ public class CollectiveAnalysis {
 					while (columnKeyItr.hasNext()) {
 						String columnkey = columnKeyItr.next();
 						String eachValue = columnData.get(columnkey);
-
+						String[] split = null;
 						if (eachValue.contains(",")) {
-							eachValue = String.format("\"%s\"", eachValue);
+							split = eachValue.split(",");
+							eachValue = "";
+							for(int ii=0; ii< split.length; ii++) {
+								eachValue += split[ii];
+							}
+						}
+						if (StringUtils.isNumeric(eachValue)) {
+							//eachValue = String.format("\"%s\"", eachValue);
+							//eachValue.replaceAll(",", "");
+							NumberFormat nf = NumberFormat.getInstance(Locale.UK);
+							nf.parse(eachValue).doubleValue();
+							//Integer.parseInt(eachValue);
 						}
 						if (!eachValue.matches("^[a-zA-Z0-9.,_\"\"]+$")) {
 							eachValue = "NA";
@@ -335,13 +353,59 @@ public class CollectiveAnalysis {
 			writer.flush();
 			writer.close();
 			System.out.println(rootPath + "/runOverview.csv" + " file written succesfully");
-		} catch (IOException e) {
+		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
+	private static String[] removeDuplicateKeys(String[] keys) {
+		
+		ArrayList<String> uniqueKeys = new ArrayList<String>();
+		ArrayList<String> duplicateKeys = new ArrayList<String>();
+		ArrayList<String> finalKeys = new ArrayList<String>();
+		for (String key : keys) {
+			if (!uniqueKeys.contains(key)) {
+				uniqueKeys.add(key);
+			} else if(!duplicateKeys.contains(key)) {
+				duplicateKeys.add(key);
+			}
+		}
+		if (duplicateKeys.size() > 0) {
+
+			Iterator<String> duplicateKeysItr = duplicateKeys.iterator();
+			while (duplicateKeysItr.hasNext()) {
+				String duplicateKey = duplicateKeysItr.next();
+				uniqueKeys.remove(duplicateKey);
+			}
+			Iterator<String> duplicateKeysItr1 = duplicateKeys.iterator();
+			while (duplicateKeysItr1.hasNext()) {
+				String duplicateKey = duplicateKeysItr1.next();
+				Iterator<String> uniqueKeysItr = null;
+				if (finalKeys.size() > 0) {
+					uniqueKeysItr = finalKeys.iterator();
+					finalKeys = new ArrayList<String>();
+				} else {
+					uniqueKeysItr = uniqueKeys.iterator();
+				}
+				while (uniqueKeysItr.hasNext()) {
+					String uniqueKey = uniqueKeysItr.next();
+					uniqueKey = duplicateKey + uniqueKey;
+					finalKeys.add(uniqueKey);
+				}
+			}
+			String[] finalKeyArray = new String[finalKeys.size()];
+			Object[] finalKeyArrayObject = finalKeys.toArray();
+			for(int i=0; i<finalKeys.size(); i++) {
+				 String key = finalKeyArrayObject[i].toString();
+				 finalKeyArray[i] = key;
+			}
+
+			return finalKeyArray;
+		}
+		return keys;
+	}
 	private static void initiateFileList() {
 		fileList = new LinkedHashSet<String>();
 		fileList.add("drt_customer_stats_drt");
