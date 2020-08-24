@@ -1,5 +1,8 @@
 package org.matsim.analysis;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,7 +29,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,99 +44,52 @@ public class CollectiveAnalysis {
 
 	public static void main(String[] args) {
 
-		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
+		JFrame frame = new JFrame();
+		frame.setTitle("Choose seperator");
+		frame.setSize(500, 250);
+		frame.setLocationRelativeTo(null);
+		frame.getContentPane().setLayout(new BorderLayout());
+		JPanel panel = new JPanel();
+		JLabel label = new JLabel("Choose the seperator");
+		panel.add(label);
 
-		JFileChooser chooser = new JFileChooser();
-		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		chooser.setDialogTitle("choose root directory");
-		chooser.showOpenDialog(null);
-		File rootPath = chooser.getSelectedFile();
-		File[] directories = new File(rootPath.toString()).listFiles(File::isDirectory);
-		File[] directories1 = directories;
-		for (int i = 0; i < directories1.length; i++) {
-			File dir = directories1[i];
-			if (dir.isHidden() || !dir.getName().contains("output-")) {
-				List<File> list = new ArrayList<File>(Arrays.asList(directories));
-				list.remove(dir);
-				directories = list.toArray(new File[0]);
-			}
-		}
-		ArrayList<String> paths = new ArrayList<String>();
-		for (int i = 0; i < directories.length; i++) {
-			paths = new ArrayList<String>();
-			File directory = directories[i];
-			File[] files = directory.listFiles(new FilenameFilter() {
-				public boolean accept(File dir, String filename) {
-					return filename.endsWith(".txt") || filename.endsWith(".csv");
+		String comboboxList[] = { "Comma ,", "Semicolon ;" };
+		JComboBox<String> comboBox = new JComboBox<String>(comboboxList);
+		panel.add(comboBox);
+
+		JButton okButton = new JButton("ok"); // added for ok button
+
+		panel.add(okButton);
+		panel.setVisible(true);
+		panel.setSize(500, 250);
+
+		frame.add(panel);
+		frame.setVisible(true);
+
+		okButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String separator = null;
+				//frame.setVisible(false);
+				frame.dispose();
+				Object item = comboBox.getSelectedItem();
+				System.out.println("choosen value "+item.toString());
+				String userOption = item.toString();
+				
+				switch (userOption) {
+				
+				  case "Comma ,":
+					  separator = ",";
+				    break;
+				    
+				  case "Semicolon ;":
+					  separator = ";";
+				    break;
 				}
-			});
-
-			String fileName = null;
-
-			for (int j = 0; j < files.length; j++) {
-				File file = files[j];
-				fileName = file.getName();
-				if (fileName.endsWith("drt_customer_stats_drt.csv") || fileName.endsWith("drt_vehicle_stats_drt.csv")
-						|| fileName.endsWith("modestats.txt") || fileName.endsWith("scorestats.txt")
-						|| fileName.endsWith("pkm_modestats.txt")) {
-
-					paths.add(directories[i] + "/" + fileName);
-
-				}
+				chooseFilePathAndRead(separator);
 			}
-			Collections.sort(paths, new Comparator<String>() {
-				@Override
-				public int compare(String s1, String s2) {
-					return s1.compareToIgnoreCase(s2);
-				}
-			});
-			Iterator<String> pathItr = paths.iterator();
-			String runId = null;
-			while (pathItr.hasNext()) {
-				String path = pathItr.next();
-				File filePath = new File(path);
-				String name = filePath.getName();
-				String[] splitDirectory = name.split("[.]");
-				runId = splitDirectory[0];
-				break;
-			}
-			runIdWithPath.put(runId, paths);
-		}
-		// sorting runids
-		LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted = new LinkedHashMap<>();
-		runIdWithPath.entrySet().stream().sorted(Map.Entry.comparingByKey())
-				.forEachOrdered(x -> runIdWithPathSorted.put(x.getKey(), x.getValue()));
-		Iterator<String> keyItr = runIdWithPathSorted.keySet().iterator();
-		while (keyItr.hasNext()) {
-			initiateFileList();
-			String key = keyItr.next();
-			ArrayList<String> value = runIdWithPathSorted.get(key);
-			Iterator<String> valItr = value.iterator();
-			ArrayList<String> fileNames = new ArrayList<String>();
-			File filePath = null;
-			while (valItr.hasNext()) {
-				String eachvalue = valItr.next();
-				filePath = new File(eachvalue);
-				String name = filePath.getName();
-				String[] path = name.split("[.]");
-				String filename = path[path.length - (path.length - 1)];
-				fileNames.add(filename);
-			}
-			fileList.removeAll(fileNames);
+		});
 
-			Iterator<String> fileListItr = fileList.iterator();
-			while (fileListItr.hasNext()) {
-				String eachvalue = fileListItr.next();
-				eachvalue = filePath.getParent() + "/" + eachvalue + ".txt";
-				value.add(eachvalue);
-			}
-
-			// value.addAll(fileList);
-
-			runIdWithPathSorted.put(key, value);
-		}
-		LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite = readDataFile(runIdWithPathSorted);
-		writeData(dataToWrite, rootPath);
 	}
 
 	private static LinkedHashMap<String, Map<String, Map<String, String>>> readDataFile(
@@ -266,7 +227,7 @@ public class CollectiveAnalysis {
 	}
 
 	// writing data to csv file
-	public static void writeData(LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite, File rootPath) {
+	public static void writeData(LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite, File rootPath, String separator) {
 
 		FileWriter fwriter;
 		try {
@@ -284,21 +245,21 @@ public class CollectiveAnalysis {
 					if (i == 1) {
 						writer.print("RunID");
 						writer.print(" ");
-						writer.print(",");
+						writer.print(separator);
 						writer.print(" ");
-						writer.print(",");
+						writer.print(separator);
 					}
 					writer.print(" ");
-					writer.print(",");
+					writer.print(separator);
 					writer.print(" ");
-					writer.print(",");
+					writer.print(separator);
 					String fileKey1 = fileKeyItr1.next();
 					Map<String, String> columnData1 = dataForRunId1.get(fileKey1);
 					Iterator<String> columnNnameKeyset = columnData1.keySet().iterator();
 					while (columnNnameKeyset.hasNext()) {
 						String columnName = columnNnameKeyset.next();
 						writer.print(fileKey1+"_"+columnName);
-						writer.print(",");
+						writer.print(separator);
 					}
 					i++;
 				}
@@ -310,18 +271,18 @@ public class CollectiveAnalysis {
 				String runId = ruIds.next();
 				writer.println();
 				writer.print(runId);
-				writer.print(",");
+				writer.print(separator);
 				writer.print(" ");
-				writer.print(",");
+				writer.print(separator);
 
 				Map<String, Map<String, String>> dataForRunId = dataToWrite.get(runId);
 				Iterator<String> fileKeyItr = dataForRunId.keySet().iterator();
 				while (fileKeyItr.hasNext()) {
 					String fileKey = fileKeyItr.next();
 					writer.print(" ");
-					writer.print(",");
+					writer.print(separator);
 					writer.print(fileKey);
-					writer.print(",");
+					writer.print(separator);
 					Map<String, String> columnData = dataForRunId.get(fileKey);
 					Iterator<String> columnKeyItr = columnData.keySet().iterator();
 					while (columnKeyItr.hasNext()) {
@@ -337,16 +298,14 @@ public class CollectiveAnalysis {
 						}
 						if (StringUtils.isNumeric(eachValue)) {
 							//eachValue = String.format("\"%s\"", eachValue);
-							//eachValue.replaceAll(",", "");
 							NumberFormat nf = NumberFormat.getInstance(Locale.UK);
 							nf.parse(eachValue).doubleValue();
-							//Integer.parseInt(eachValue);
 						}
 						if (!eachValue.matches("^[a-zA-Z0-9.,_\"\"]+$")) {
 							eachValue = "NA";
 						}
 						writer.print(eachValue);
-						writer.print(",");
+						writer.print(separator);
 					}
 				}
 			}
@@ -360,6 +319,9 @@ public class CollectiveAnalysis {
 
 	}
 
+	//duplicate keys will be created if the column name contains space(column name with space will be read as two columns, Eg. columns in scorestats.txt are avg. EXECUTED	avg. WORST	avg. AVG	avg. BEST),
+	//here avg. BEST will be read as two columns column 1:avg. column 2: BEST
+	//This method will identify such column names and rebuild the actual column name
 	private static String[] removeDuplicateKeys(String[] keys) {
 		
 		ArrayList<String> uniqueKeys = new ArrayList<String>();
@@ -406,6 +368,107 @@ public class CollectiveAnalysis {
 		}
 		return keys;
 	}
+	
+	private static void chooseFilePathAndRead(String separator) {
+
+		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
+
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		chooser.setDialogTitle("choose root directory");
+		chooser.showOpenDialog(null);
+
+		File rootPath = chooser.getSelectedFile();
+		File[] directories = new File(rootPath.toString()).listFiles(File::isDirectory);
+		File[] directories1 = directories;
+		for (int i = 0; i < directories1.length; i++) {
+			File dir = directories1[i];
+			if (dir.isHidden() || !dir.getName().contains("output-")) {
+				List<File> list = new ArrayList<File>(Arrays.asList(directories));
+				list.remove(dir);
+				directories = list.toArray(new File[0]);
+			}
+		}
+		ArrayList<String> paths = new ArrayList<String>();
+		for (int i = 0; i < directories.length; i++) {
+			paths = new ArrayList<String>();
+			File directory = directories[i];
+			File[] files = directory.listFiles(new FilenameFilter() {
+				public boolean accept(File dir, String filename) {
+					return filename.endsWith(".txt") || filename.endsWith(".csv");
+				}
+			});
+
+			String fileName = null;
+
+			for (int j = 0; j < files.length; j++) {
+				File file = files[j];
+				fileName = file.getName();
+				if (fileName.endsWith("drt_customer_stats_drt.csv") || fileName.endsWith("drt_vehicle_stats_drt.csv")
+						|| fileName.endsWith("modestats.txt") || fileName.endsWith("scorestats.txt")
+						|| fileName.endsWith("pkm_modestats.txt")) {
+
+					paths.add(directories[i] + "/" + fileName);
+
+				}
+			}
+			Collections.sort(paths, new Comparator<String>() {
+				@Override
+				public int compare(String s1, String s2) {
+					return s1.compareToIgnoreCase(s2);
+				}
+			});
+			Iterator<String> pathItr = paths.iterator();
+			String runId = null;
+			while (pathItr.hasNext()) {
+				String path = pathItr.next();
+				File filePath = new File(path);
+				String name = filePath.getName();
+				String[] splitDirectory = name.split("[.]");
+				runId = splitDirectory[0];
+				break;
+			}
+			runIdWithPath.put(runId, paths);
+		}
+		// sorting runids
+		LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted = new LinkedHashMap<>();
+		runIdWithPath.entrySet().stream().sorted(Map.Entry.comparingByKey())
+				.forEachOrdered(x -> runIdWithPathSorted.put(x.getKey(), x.getValue()));
+		Iterator<String> keyItr = runIdWithPathSorted.keySet().iterator();
+		while (keyItr.hasNext()) {
+			initiateFileList();
+			String key = keyItr.next();
+			ArrayList<String> value = runIdWithPathSorted.get(key);
+			Iterator<String> valItr = value.iterator();
+			ArrayList<String> fileNames = new ArrayList<String>();
+			File filePath = null;
+			while (valItr.hasNext()) {
+				String eachvalue = valItr.next();
+				filePath = new File(eachvalue);
+				String name = filePath.getName();
+				String[] path = name.split("[.]");
+				String filename = path[path.length - (path.length - 1)];
+				fileNames.add(filename);
+			}
+			fileList.removeAll(fileNames);
+
+			Iterator<String> fileListItr = fileList.iterator();
+			while (fileListItr.hasNext()) {
+				String eachvalue = fileListItr.next();
+				eachvalue = filePath.getParent() + "/" + eachvalue + ".txt";
+				value.add(eachvalue);
+			}
+
+			// value.addAll(fileList);
+
+			runIdWithPathSorted.put(key, value);
+		}
+		LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite = readDataFile(runIdWithPathSorted);
+		writeData(dataToWrite, rootPath, separator);
+
+	}
+
+
 	private static void initiateFileList() {
 		fileList = new LinkedHashSet<String>();
 		fileList.add("drt_customer_stats_drt");
@@ -414,5 +477,5 @@ public class CollectiveAnalysis {
 		fileList.add("pkm_modestats");
 		fileList.add("scorestats");
 	}
-
+	
 }
