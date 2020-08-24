@@ -45,12 +45,12 @@ public class CollectiveAnalysis {
 	public static void main(String[] args) {
 
 		JFrame frame = new JFrame();
-		frame.setTitle("Choose seperator");
+		frame.setTitle("Choose separator");
 		frame.setSize(500, 250);
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
-		JLabel label = new JLabel("Choose the seperator");
+		JLabel label = new JLabel("Choose the separator");
 		panel.add(label);
 
 		String comboboxList[] = { "Comma ,", "Semicolon ;" };
