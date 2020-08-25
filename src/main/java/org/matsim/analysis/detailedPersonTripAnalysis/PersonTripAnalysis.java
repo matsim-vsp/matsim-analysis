@@ -19,19 +19,23 @@
 
 package org.matsim.analysis.detailedPersonTripAnalysis;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.analysis.TripFilter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author ikaddoura
@@ -229,11 +233,11 @@ public class PersonTripAnalysis {
 
 			bw.newLine();
 
-			Set<Id<Person>> persons = basicHandler.getPersonId2tripNumber2tripMainMode().keySet().stream()
-					.filter(id -> !basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id))
-					.collect(Collectors.toSet());
+//			Set<Id<Person>> persons = basicHandler.getPersonId2tripNumber2tripMainMode().keySet().stream()
+//					.filter(id -> !basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id))
+//					.collect(Collectors.toSet());
 
-			for (Id<Person> id : persons) {
+			for (Id<Person> id : basicHandler.getPersonId2tripNumber2tripMainMode().keySet()) {
 				for (Integer trip : basicHandler.getPersonId2tripNumber2tripMainMode().get(id).keySet()) {
 
 					boolean considerTrip;

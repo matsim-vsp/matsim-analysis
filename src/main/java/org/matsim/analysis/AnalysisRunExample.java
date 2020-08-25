@@ -70,9 +70,11 @@ public class AnalysisRunExample {
 
 		String networkFile;
 		String populationFile;
+		String facilitiesFile;
 		
 		networkFile = runDirectory + runId + ".output_network.xml.gz";
 		populationFile = runDirectory + runId + ".output_plans.xml.gz";
+		facilitiesFile = runDirectory + runId + ".output_facilities.xml.gz";
 
 		Config config = ConfigUtils.createConfig();
 
@@ -81,6 +83,7 @@ public class AnalysisRunExample {
 		config.controler().setOutputDirectory(runDirectory);
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
+		config.facilities().setInputFile(facilitiesFile);
 		
 		return ScenarioUtils.loadScenario(config);
 	}

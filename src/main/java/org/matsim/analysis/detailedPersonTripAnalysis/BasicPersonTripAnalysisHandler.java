@@ -283,7 +283,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
 					
 					Map<Integer,Coord> tripNumber2originCoord = personId2tripNumber2originCoord.get(event.getPersonId());
-					tripNumber2originCoord.put(personId2currentTripNumber.get(event.getPersonId()), this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord());
+					Coord coordOrigin = null;
+					if (event.getFacilityId() != null && this.scenario.getActivityFacilities().getFacilities() != null) {
+						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
+					} else {
+						// the "old" way as backup
+						coordOrigin = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+					}
+					tripNumber2originCoord.put(personId2currentTripNumber.get(event.getPersonId()), coordOrigin);
 					personId2tripNumber2originCoord.put(event.getPersonId(), tripNumber2originCoord);
 					
 					Map<Integer,Coord> tripNumber2destinationCoord = personId2tripNumber2destinationCoord.get(event.getPersonId());
@@ -319,7 +326,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
 					
 					Map<Integer,Coord> tripNumber2originCoord = new HashMap<>();
-					tripNumber2originCoord.put(1, this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord());
+					Coord coordOrigin = null;
+					if (event.getFacilityId() != null && this.scenario.getActivityFacilities().getFacilities() != null) {
+						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
+					} else {
+						// the "old" way as backup
+						coordOrigin = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+					}
+					tripNumber2originCoord.put(1, coordOrigin);
 					personId2tripNumber2originCoord.put(event.getPersonId(), tripNumber2originCoord);
 					
 					Map<Integer,Double> tripNumber2tripDistance = new HashMap<>();
@@ -812,14 +826,20 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				}
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 
-				Coord destinationCoord = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+				Coord coordDestination = null;
+				if (event.getFacilityId() != null && this.scenario.getActivityFacilities().getFacilities() != null) {
+					coordDestination = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
+				} else {
+					// the "old" way as backup
+					coordDestination = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+				}
 
-				double beelineDistance = NetworkUtils.getEuclideanDistance(this.personId2tripNumber2originCoord.get(event.getPersonId()).get(tripNumber), destinationCoord);
+				double beelineDistance = NetworkUtils.getEuclideanDistance(this.personId2tripNumber2originCoord.get(event.getPersonId()).get(tripNumber), coordDestination);
 				Map<Integer, Double> tripNumber2beelinedistance = personId2tripNumber2tripBeelineDistance.get(event.getPersonId());
 				tripNumber2beelinedistance.put(tripNumber, beelineDistance);
 
 				Map<Integer, Coord> tripNumber2destinationCoord = personId2tripNumber2destinationCoord.get(event.getPersonId());
-				tripNumber2destinationCoord.put(tripNumber, destinationCoord);
+				tripNumber2destinationCoord.put(tripNumber, coordDestination);
 			}	
 		}
 	}
