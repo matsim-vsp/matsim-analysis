@@ -189,18 +189,26 @@ public class PersonTripAnalysis {
 		}
 
 	}
+	
+	public void printTripInformation(String outputPath,
+			 String mode,
+			 BasicPersonTripAnalysisHandler basicHandler,
+			 TripFilter tripFilter) {
+		printTripInformation(outputPath, mode, 0, basicHandler, tripFilter);
+		
+	}
 
 	public void printTripInformation(String outputPath,
-									 String mode,
+									 String mainMode, int minimumNumberOfTripModes,
 									 BasicPersonTripAnalysisHandler basicHandler,
 									 TripFilter tripFilter) {
 
 		boolean ignoreModes = false;
-		if (mode == null) {
-			mode = "all_transport_modes";
+		if (mainMode == null) {
+			mainMode = "all_transport_modes";
 			ignoreModes = true;
 		}
-
+		
 		String tripFilterFileName;
 		if (tripFilter == null) {
 			tripFilterFileName = "";
@@ -208,7 +216,11 @@ public class PersonTripAnalysis {
 			tripFilterFileName = tripFilter.toFileName();
 		}
 
-		String fileName = outputPath + "trip_info_" + mode + tripFilterFileName + ".csv";
+		String interModalTripFilteringFileName = "";
+		if (minimumNumberOfTripModes > 1) {
+			interModalTripFilteringFileName = "_moreThan" + minimumNumberOfTripModes + "intermodalTrips";
+		}
+		String fileName = outputPath + "trip_info_" + mainMode + tripFilterFileName + interModalTripFilteringFileName + ".csv";
 		File file = new File(fileName);
 
 		try {
@@ -246,8 +258,9 @@ public class PersonTripAnalysis {
 					} else {
 						considerTrip = tripFilter.considerTrip(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip), basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip));
 					}
-					if (considerTrip) {
-						if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
+										
+					if (considerTrip && basicHandler.getPersonId2tripNumber2tripModes().get(id).get(trip).split(",").length >= minimumNumberOfTripModes) {
+						if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mainMode)) {
 
 							String tripMainMode = basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip);
 
@@ -352,9 +365,21 @@ public class PersonTripAnalysis {
 			e.printStackTrace();
 		}
 	}
+	
+	public void printAggregatedResults(String outputPath,
+			   String mode,
+			   AgentFilter agentFilter,
+			   TripFilter tripFilter,
+			   Map<Id<Person>, Double> personId2userBenefit,
+			   BasicPersonTripAnalysisHandler basicHandler) {
+		
+		printAggregatedResults(outputPath, mode, 0, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+		
+	}
 
 	public void printAggregatedResults(String outputPath,
 									   String mode,
+									   int minimumNumberOfTripModes,
 									   AgentFilter agentFilter,
 									   TripFilter tripFilter,
 									   Map<Id<Person>, Double> personId2userBenefit,
@@ -368,15 +393,21 @@ public class PersonTripAnalysis {
 
 		String fileName = null;
 		if (agentFilter == null && tripFilter == null) {
-			fileName = outputPath + "aggregated_info_" + mode + ".csv";
+			fileName = outputPath + "aggregated_info_" + mode;
 		} else if (agentFilter != null && tripFilter == null) {
-			fileName = outputPath + "aggregated_info_" + mode + agentFilter.toFileName() + ".csv";
+			fileName = outputPath + "aggregated_info_" + mode + agentFilter.toFileName();
 		} else if (agentFilter == null && tripFilter != null) {
-			fileName = outputPath + "aggregated_info_" + mode + tripFilter.toFileName() + ".csv";
+			fileName = outputPath + "aggregated_info_" + mode + tripFilter.toFileName();
 		} else {
-			fileName = outputPath + "aggregated_info_" + mode + agentFilter.toFileName() + tripFilter.toFileName() + ".csv";
+			fileName = outputPath + "aggregated_info_" + mode + agentFilter.toFileName() + tripFilter.toFileName();
 		}
-		File file = new File(fileName);
+		
+		String interModalTripFilteringFileName = "";
+		if (minimumNumberOfTripModes > 1) {
+			interModalTripFilteringFileName = "_moreThan" + minimumNumberOfTripModes + "intermodalTrips";
+		}
+		
+		File file = new File(fileName + interModalTripFilteringFileName + ".csv");
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -403,31 +434,33 @@ public class PersonTripAnalysis {
 
 							if (tripFilter == null || tripFilter.considerTrip(basicHandler.getPersonId2tripNumber2originCoord().get(id).get(trip), basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip))) {
 								
-								// now, filter by mode
-								if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
+								if (basicHandler.getPersonId2tripNumber2tripModes().get(id).get(trip).split(",").length >= minimumNumberOfTripModes) {
+									// now, filter by mode
+									if (ignoreModes || basicHandler.getPersonId2tripNumber2tripMainMode().get(id).get(trip).equals(mode)) {
 
-									mode_trips++;
+										mode_trips++;
 
-									if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
-										if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
-											mode_StuckAndAbortTrips++;
+										if (basicHandler.getPersonId2tripNumber2stuckAbort().containsKey(id) && basicHandler.getPersonId2tripNumber2stuckAbort().get(id).containsKey(trip)) {
+											if (basicHandler.getPersonId2tripNumber2stuckAbort().get(id).get(trip)) {
+												mode_StuckAndAbortTrips++;
+											}
 										}
-									}
 
-									if (basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id)) {
-										stuckAndAbortEvents = basicHandler.getPersonId2stuckAndAbortEvents().get(id);
-									}
+										if (basicHandler.getPersonId2stuckAndAbortEvents().containsKey(id)) {
+											stuckAndAbortEvents = basicHandler.getPersonId2stuckAndAbortEvents().get(id);
+										}
 
-									if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
-										mode_TravelTime = mode_TravelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
-									}
+										if (basicHandler.getPersonId2tripNumber2travelTime().containsKey(id) && basicHandler.getPersonId2tripNumber2travelTime().get(id).containsKey(trip)) {
+											mode_TravelTime = mode_TravelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
+										}
 
-									if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
-										mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
-									}
+										if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+											mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
+										}
 
-									if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
-										mode_TravelDistance = mode_TravelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
+										if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
+											mode_TravelDistance = mode_TravelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
+										}
 									}
 								}
 							}
@@ -787,4 +820,5 @@ public class PersonTripAnalysis {
 		}
 		return parameter2values;
 	}
+
 }
