@@ -284,7 +284,9 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					
 					Map<Integer,Coord> tripNumber2originCoord = personId2tripNumber2originCoord.get(event.getPersonId());
 					Coord coordOrigin = null;
-					if (event.getFacilityId() != null && this.scenario.getActivityFacilities().getFacilities() != null) {
+					if (event.getFacilityId() != null
+							&& this.scenario.getActivityFacilities().getFacilities() != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null) {
 						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
 					} else {
 						// the "old" way as backup
@@ -327,7 +329,9 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					
 					Map<Integer,Coord> tripNumber2originCoord = new HashMap<>();
 					Coord coordOrigin = null;
-					if (event.getFacilityId() != null && this.scenario.getActivityFacilities().getFacilities() != null) {
+					if (event.getFacilityId() != null
+							&& this.scenario.getActivityFacilities().getFacilities() != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null) {
 						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
 					} else {
 						// the "old" way as backup
@@ -827,7 +831,9 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 
 				Coord coordDestination = null;
-				if (event.getFacilityId() != null && this.scenario.getActivityFacilities().getFacilities() != null) {
+				if (event.getFacilityId() != null
+						&& this.scenario.getActivityFacilities().getFacilities() != null
+						&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null) {
 					coordDestination = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
 				} else {
 					// the "old" way as backup
