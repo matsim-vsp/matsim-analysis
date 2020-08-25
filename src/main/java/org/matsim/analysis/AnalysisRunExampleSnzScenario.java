@@ -168,12 +168,19 @@ public class AnalysisRunExampleSnzScenario {
 		tripFilter1a.preProcess(scenario1);
 		tripFilters.add(tripFilter1a);
 		
-		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("trips-in-area");
+		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("origin-or-destination-in-area");
 		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
 		tripFilter1b.preProcess(scenario1);
 		tripFilter1b.setBuffer(Double.valueOf(bufferMAroundTripFilterShp));
 		tripFilter1b.setTripConsiderType(TripConsiderType.OriginOrDestination);
 		tripFilters.add(tripFilter1b);
+		
+		TripAnalysisFilter tripFilter1c = new TripAnalysisFilter("origin-and-destination-in-area");
+		tripFilter1c.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
+		tripFilter1c.preProcess(scenario1);
+		tripFilter1c.setBuffer(Double.valueOf(0));
+		tripFilter1c.setTripConsiderType(TripConsiderType.OriginAndDestination);
+		tripFilters.add(tripFilter1c);
 		
 		final List<VehicleFilter> vehicleFilters = new ArrayList<>();
 
