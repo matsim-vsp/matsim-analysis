@@ -1,6 +1,5 @@
 language: java
 jdk: openjdk13
-dist: trusty
 
 env:
   global:
