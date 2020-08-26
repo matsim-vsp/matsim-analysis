@@ -82,7 +82,7 @@ public class TripAnalysisFilter implements TripFilter {
 		
 		if (origin == null || destination == null) {
 			if (this.originDestinationNullCounter <= 5) {
-				log.warn("Origin or destination null. Can't interpret this trip. Origin: " + origin + "--> Destination: " +  destination);
+				log.warn("Origin or destination null. Probably a stucking agent. Can't interpret this trip. Origin: " + origin + "--> Destination: " +  destination);
 				if (this.originDestinationNullCounter == 5) {
 					log.warn("Further warnings of this type will not be printed out.");
 				}

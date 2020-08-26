@@ -38,11 +38,11 @@ public class RunPersonTripAnalysis {
 
 	public static void main(String[] args) {
 		
-		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
-		String runId = "snzDrtO443g";
+//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443g/";
+//		String runId = "snzDrtO443g";
 		
-//		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
-//		String runId = "snzDrtO443l";
+		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
+		String runId = "snzDrtO443l";
 		
 //		String outputDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO442g/";
 //		String runId = "snzDrtO442g";

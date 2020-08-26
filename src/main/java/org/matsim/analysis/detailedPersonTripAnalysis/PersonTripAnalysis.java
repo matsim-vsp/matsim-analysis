@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.analysis.TripFilter;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
@@ -279,7 +280,6 @@ public class PersonTripAnalysis {
 									departureTime = String.valueOf(basicHandler.getPersonId2tripNumber2departureTime().get(id).get(trip));
 								}
 
-
 								String arrivalTime = "unknown";
 								if (basicHandler.getPersonId2tripNumber2arrivalTime().containsKey(id) && basicHandler.getPersonId2tripNumber2arrivalTime().get(id).containsKey(trip)) {
 									arrivalTime = String.valueOf(basicHandler.getPersonId2tripNumber2arrivalTime().get(id).get(trip));
@@ -312,12 +312,20 @@ public class PersonTripAnalysis {
 
 								String tripDestinationCoordinateX = "unknown";
 								if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
-									tripDestinationCoordinateX = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getX());
+									Coord coord = basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip);
+									if (coord != null) { // stucking agents will not have a destination coordinate
+										double xCoord = coord.getX();
+										tripDestinationCoordinateX = String.valueOf(xCoord);
+									}
 								}
 
 								String tripDestinationCoordinateY = "unknown";
 								if (basicHandler.getPersonId2tripNumber2destinationCoord().containsKey(id) && basicHandler.getPersonId2tripNumber2destinationCoord().get(id).containsKey(trip)) {
-									tripDestinationCoordinateY = String.valueOf(basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip).getY());
+									Coord coord = basicHandler.getPersonId2tripNumber2destinationCoord().get(id).get(trip);
+									if (coord != null) {
+										double yCoord = coord.getY();
+										tripDestinationCoordinateY = String.valueOf(yCoord);
+									}
 								}
 
 								String beelineDistance = "unknown";

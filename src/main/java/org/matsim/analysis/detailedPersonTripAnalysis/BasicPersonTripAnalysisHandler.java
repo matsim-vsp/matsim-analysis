@@ -286,7 +286,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					Coord coordOrigin = null;
 					if (event.getFacilityId() != null
 							&& this.scenario.getActivityFacilities().getFacilities() != null
-							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null) {
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord() != null) {
 						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
 					} else {
 						// the "old" way as backup
@@ -331,7 +332,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					Coord coordOrigin = null;
 					if (event.getFacilityId() != null
 							&& this.scenario.getActivityFacilities().getFacilities() != null
-							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null) {
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord() != null) {
 						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
 					} else {
 						// the "old" way as backup
@@ -833,7 +835,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				Coord coordDestination = null;
 				if (event.getFacilityId() != null
 						&& this.scenario.getActivityFacilities().getFacilities() != null
-						&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null) {
+						&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null
+						&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord() != null) {
 					coordDestination = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
 				} else {
 					// the "old" way as backup
