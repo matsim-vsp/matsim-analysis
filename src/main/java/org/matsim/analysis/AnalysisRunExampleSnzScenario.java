@@ -104,47 +104,47 @@ public class AnalysisRunExampleSnzScenario {
 			
 			// Vulkaneifel
 			
-//			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO321g/";
-//			runId = "snzDrtO321g";		
-//			
-//			runDirectoryToCompareWith = null;
-//			runIdToCompareWith = null;
-//			
-//			visualizationScriptInputDirectory = null;
-//			
-//			scenarioCRS = "EPSG:25832";
-//			
-//			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v1/shp-files/hexagon-grid-3000.shp";
-//			shapFileZonesCRS = "EPSG:25832";
-//			zoneId = "id";
-//						
-//			shapeFileAgentFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
-//			
-//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
-//			shapeFileTripFilterCRS = "EPSG:25832";
-//			bufferMAroundTripFilterShp = "2000";
+			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO321g/";
+			runId = "snzDrtO321g";		
+			
+			runDirectoryToCompareWith = null;
+			runIdToCompareWith = null;
+			
+			visualizationScriptInputDirectory = null;
+			
+			scenarioCRS = "EPSG:25832";
+			
+			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v1/shp-files/hexagon-grid-3000.shp";
+			shapFileZonesCRS = "EPSG:25832";
+			zoneId = "id";
+						
+			shapeFileAgentFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
+			
+			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
+			shapeFileTripFilterCRS = "EPSG:25832";
+			bufferMAroundTripFilterShp = "2000";
 
 			// Gladbeck
 
-			runDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
-			runId = "snzDrtO443l";
-
-			runDirectoryToCompareWith = null;
-			runIdToCompareWith = null;
-
-			visualizationScriptInputDirectory = null;
-
-			scenarioCRS = "EPSG:25832";
-
-			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/shp-files/hexagon-grid-1000.shp";
-			shapFileZonesCRS = "EPSG:25832";
-			zoneId = "id";
-
-			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
-
-			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
-			shapeFileTripFilterCRS = "EPSG:25832";
-			bufferMAroundTripFilterShp = "2000";
+//			runDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
+//			runId = "snzDrtO443l";
+//
+//			runDirectoryToCompareWith = null;
+//			runIdToCompareWith = null;
+//
+//			visualizationScriptInputDirectory = null;
+//
+//			scenarioCRS = "EPSG:25832";
+//
+//			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/shp-files/hexagon-grid-1000.shp";
+//			shapFileZonesCRS = "EPSG:25832";
+//			zoneId = "id";
+//
+//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
+//
+//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
+//			shapeFileTripFilterCRS = "EPSG:25832";
+//			bufferMAroundTripFilterShp = "2000";
 
 		}
 		
