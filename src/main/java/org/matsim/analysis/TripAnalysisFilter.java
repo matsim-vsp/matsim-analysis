@@ -100,7 +100,7 @@ public class TripAnalysisFilter implements TripFilter {
 		boolean originWithinProvidedGeometry = false;
 		Point originPoint = MGC.coord2Point(origin);
 		for (Geometry geometry : zoneFeatures.values()) {
-			if (originPoint.within(geometry)) {
+			if (originPoint.isWithinDistance(geometry, buffer)) {
 				originWithinProvidedGeometry = true;
 				break;
 			}
@@ -108,7 +108,7 @@ public class TripAnalysisFilter implements TripFilter {
 		boolean destinationWithinProvidedGeometry = false;
 		Point destinationPoint = MGC.coord2Point(destination);
 		for (Geometry geometry : zoneFeatures.values()) {
-			if (destinationPoint.within(geometry)) {
+			if (destinationPoint.isWithinDistance(geometry, buffer)) {
 				destinationWithinProvidedGeometry = true;
 				break;
 			}
@@ -195,8 +195,8 @@ public class TripAnalysisFilter implements TripFilter {
 			int counter = 0;
 			for (SimpleFeature feature : features) {
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
-                Geometry geometryWithBuffer = geometry.buffer(buffer);
-                zoneFeatures.put(String.valueOf(counter), geometryWithBuffer);
+//                Geometry geometryWithBuffer = geometry.buffer(buffer);
+                zoneFeatures.put(String.valueOf(counter), geometry);
                 counter++;
             }
 			log.info("Reading shape file... Done.");	
