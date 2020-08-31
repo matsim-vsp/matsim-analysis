@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.matsim.analysis.TripAnalysisFilter.TripConsiderType.OriginAndDestination;
 import static org.matsim.analysis.TripAnalysisFilter.TripConsiderType.OriginOrDestination;
 
 public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
@@ -137,6 +138,13 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 		tripFilter1b.setTripConsiderType(OriginOrDestination);
 		tripFilter1b.preProcess(scenario1);
 		tripFilters.add(tripFilter1b);
+
+		TripAnalysisFilter tripFilter1c = new TripAnalysisFilter("C");
+		tripFilter1c.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
+		tripFilter1c.setBuffer(0);
+		tripFilter1c.setTripConsiderType(OriginAndDestination);
+		tripFilter1c.preProcess(scenario1);
+		tripFilters.add(tripFilter1c);
 
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
