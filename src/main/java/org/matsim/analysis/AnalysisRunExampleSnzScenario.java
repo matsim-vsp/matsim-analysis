@@ -107,8 +107,8 @@ public class AnalysisRunExampleSnzScenario {
 			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO321g/";
 			runId = "snzDrtO321g";		
 			
-			runDirectoryToCompareWith = null;
-			runIdToCompareWith = null;
+			runDirectoryToCompareWith = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO320x/";
+			runIdToCompareWith = "snzDrtO320x";
 			
 			visualizationScriptInputDirectory = null;
 			
