@@ -41,60 +41,79 @@ import org.apache.commons.lang3.StringUtils;
 public class CollectiveAnalysis {
 
 	static LinkedHashSet<String> fileList = new LinkedHashSet<String>();
+	static String directoryToScanForRuns = null;
+	static String separator = null;
+	static String[] filesList = null;
 
 	public static void main(String[] args) {
+		String filesToCopy = null;
+		if (args.length != 0) {
+			directoryToScanForRuns = args[0];
+			separator = args[1];
+			filesToCopy = args[2];
+		}
+		String[] filesToCopyList = null;
+		if (filesToCopy != null) {
+			filesToCopyList = filesToCopy.split(",");
+			//filesList = new String[filesToCopyList.length];
+			filesList = filesToCopyList;
+		}
 
-		JFrame frame = new JFrame();
-		frame.setTitle("Choose separator");
-		frame.setSize(500, 250);
-		frame.setLocationRelativeTo(null);
-		frame.getContentPane().setLayout(new BorderLayout());
-		JPanel panel = new JPanel();
-		JLabel label = new JLabel("Choose the separator");
-		panel.add(label);
+		if (separator == null) {
 
-		String comboboxList[] = { "Comma ,", "Semicolon ;" };
-		JComboBox<String> comboBox = new JComboBox<String>(comboboxList);
-		panel.add(comboBox);
+			JFrame frame = new JFrame();
+			frame.setTitle("Choose separator");
+			frame.setSize(500, 250);
+			frame.setLocationRelativeTo(null);
+			frame.getContentPane().setLayout(new BorderLayout());
+			JPanel panel = new JPanel();
+			JLabel label = new JLabel("Choose the separator");
+			panel.add(label);
 
-		JButton okButton = new JButton("ok"); // added for ok button
+			String comboboxList[] = { "Comma ,", "Semicolon ;" };
+			JComboBox<String> comboBox = new JComboBox<String>(comboboxList);
+			panel.add(comboBox);
 
-		panel.add(okButton);
-		panel.setVisible(true);
-		panel.setSize(500, 250);
+			JButton okButton = new JButton("ok"); // added for ok button
 
-		frame.add(panel);
-		frame.setVisible(true);
+			panel.add(okButton);
+			panel.setVisible(true);
+			panel.setSize(500, 250);
 
-		okButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String separator = null;
-				//frame.setVisible(false);
-				frame.dispose();
-				Object item = comboBox.getSelectedItem();
-				System.out.println("choosen value "+item.toString());
-				String userOption = item.toString();
-				
-				switch (userOption) {
-				
-				  case "Comma ,":
-					  separator = ",";
-				    break;
-				    
-				  case "Semicolon ;":
-					  separator = ";";
-				    break;
+			frame.add(panel);
+			frame.setVisible(true);
+
+			okButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String separator = null;
+					// frame.setVisible(false);
+					frame.dispose();
+					Object item = comboBox.getSelectedItem();
+					System.out.println("choosen value " + item.toString());
+					String userOption = item.toString();
+
+					switch (userOption) {
+
+					case "Comma ,":
+						separator = ",";
+						break;
+
+					case "Semicolon ;":
+						separator = ";";
+						break;
+					}
+					chooseFilePathAndRead(separator);
 				}
-				chooseFilePathAndRead(separator);
-			}
-		});
-
+			});
+		} else {
+			chooseFilePathAndRead(separator);
+		}
 	}
 
 	private static LinkedHashMap<String, Map<String, Map<String, String>>> readDataFile(
 			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
-		//            runID       filename    column   value
+		// runID filename column value
 		LinkedHashMap<String, Map<String, Map<String, String>>> toPrint = new LinkedHashMap<>();
 		BufferedReader br;
 		String line = null;
@@ -154,7 +173,7 @@ public class CollectiveAnalysis {
 	}
 
 	// Taking a particular file and its last line values from each runID
-							//   runId      fileName     column   value
+	// runId fileName column value
 	private static LinkedHashMap<String, Map<String, Map<String, String>>> organiseDataTable(
 			LinkedHashMap<String, Map<String, Map<String, String>>> toPrint) {
 		initiateFileList();
@@ -227,7 +246,8 @@ public class CollectiveAnalysis {
 	}
 
 	// writing data to csv file
-	public static void writeData(LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite, File rootPath, String separator) {
+	public static void writeData(LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite, File rootPath,
+			String separator) {
 
 		FileWriter fwriter;
 		try {
@@ -258,7 +278,7 @@ public class CollectiveAnalysis {
 					Iterator<String> columnNnameKeyset = columnData1.keySet().iterator();
 					while (columnNnameKeyset.hasNext()) {
 						String columnName = columnNnameKeyset.next();
-						writer.print(fileKey1+"_"+columnName);
+						writer.print(fileKey1 + "_" + columnName);
 						writer.print(separator);
 					}
 					i++;
@@ -292,12 +312,12 @@ public class CollectiveAnalysis {
 						if (eachValue.contains(",")) {
 							split = eachValue.split(",");
 							eachValue = "";
-							for(int ii=0; ii< split.length; ii++) {
+							for (int ii = 0; ii < split.length; ii++) {
 								eachValue += split[ii];
 							}
 						}
 						if (StringUtils.isNumeric(eachValue)) {
-							//eachValue = String.format("\"%s\"", eachValue);
+							// eachValue = String.format("\"%s\"", eachValue);
 							NumberFormat nf = NumberFormat.getInstance(Locale.UK);
 							nf.parse(eachValue).doubleValue();
 						}
@@ -319,18 +339,21 @@ public class CollectiveAnalysis {
 
 	}
 
-	//duplicate keys will be created if the column name contains space(column name with space will be read as two columns, Eg. columns in scorestats.txt are avg. EXECUTED	avg. WORST	avg. AVG	avg. BEST),
-	//here avg. BEST will be read as two columns column 1:avg. column 2: BEST
-	//This method will identify such column names and rebuild the actual column name
+	// duplicate keys will be created if the column name contains space(column name
+	// with space will be read as two columns, Eg. columns in scorestats.txt are
+	// avg. EXECUTED avg. WORST avg. AVG avg. BEST),
+	// here avg. BEST will be read as two columns column 1:avg. column 2: BEST
+	// This method will identify such column names and rebuild the actual column
+	// name
 	private static String[] removeDuplicateKeys(String[] keys) {
-		
+
 		ArrayList<String> uniqueKeys = new ArrayList<String>();
 		ArrayList<String> duplicateKeys = new ArrayList<String>();
 		ArrayList<String> finalKeys = new ArrayList<String>();
 		for (String key : keys) {
 			if (!uniqueKeys.contains(key)) {
 				uniqueKeys.add(key);
-			} else if(!duplicateKeys.contains(key)) {
+			} else if (!duplicateKeys.contains(key)) {
 				duplicateKeys.add(key);
 			}
 		}
@@ -359,27 +382,33 @@ public class CollectiveAnalysis {
 			}
 			String[] finalKeyArray = new String[finalKeys.size()];
 			Object[] finalKeyArrayObject = finalKeys.toArray();
-			for(int i=0; i<finalKeys.size(); i++) {
-				 String key = finalKeyArrayObject[i].toString();
-				 finalKeyArray[i] = key;
+			for (int i = 0; i < finalKeys.size(); i++) {
+				String key = finalKeyArrayObject[i].toString();
+				finalKeyArray[i] = key;
 			}
 
 			return finalKeyArray;
 		}
 		return keys;
 	}
-	
+
 	private static void chooseFilePathAndRead(String separator) {
 
 		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
+		File rootPath = null;
+		if (directoryToScanForRuns == null) {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			chooser.setDialogTitle("choose root directory");
+			chooser.showOpenDialog(null);
 
-		JFileChooser chooser = new JFileChooser();
-		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		chooser.setDialogTitle("choose root directory");
-		chooser.showOpenDialog(null);
+			rootPath = chooser.getSelectedFile();
+		} else {
+			rootPath = new File(directoryToScanForRuns);
+		}
 
-		File rootPath = chooser.getSelectedFile();
 		File[] directories = new File(rootPath.toString()).listFiles(File::isDirectory);
+
 		File[] directories1 = directories;
 		for (int i = 0; i < directories1.length; i++) {
 			File dir = directories1[i];
@@ -398,18 +427,35 @@ public class CollectiveAnalysis {
 					return filename.endsWith(".txt") || filename.endsWith(".csv");
 				}
 			});
-
+			ArrayList<String> fileListToCompare = new ArrayList<String>();
+			// loop and exclude unnecessary files
+			if (filesList != null) {
+				for (int k = 0; k < filesList.length; k++) {
+					String filename = filesList[k];
+					fileListToCompare.add(filename);
+				}
+			}else {
+				fileListToCompare.add("drt_customer_stats_drt");
+				fileListToCompare.add("drt_vehicle_stats_drt");
+				fileListToCompare.add("modestats");
+				fileListToCompare.add("scorestats");
+				fileListToCompare.add("pkm_modestats");
+			}
 			String fileName = null;
-
 			for (int j = 0; j < files.length; j++) {
 				File file = files[j];
 				fileName = file.getName();
-				if (fileName.endsWith("drt_customer_stats_drt.csv") || fileName.endsWith("drt_vehicle_stats_drt.csv")
-						|| fileName.endsWith("modestats.txt") || fileName.endsWith("scorestats.txt")
-						|| fileName.endsWith("pkm_modestats.txt")) {
-
+				String[] fileNames = fileName.split("[.]");
+				String fileNameToCompare = fileNames[1];
+//				if (fileName.endsWith("drt_customer_stats_drt.csv") || fileName.endsWith("drt_vehicle_stats_drt.csv")
+//						|| fileName.endsWith("modestats.txt") || fileName.endsWith("scorestats.txt")
+//						|| fileName.endsWith("pkm_modestats.txt")) {
+//
+//					paths.add(directories[i] + "/" + fileName);
+//
+//				}
+				if(fileListToCompare.contains(fileNameToCompare)) {
 					paths.add(directories[i] + "/" + fileName);
-
 				}
 			}
 			Collections.sort(paths, new Comparator<String>() {
@@ -468,7 +514,6 @@ public class CollectiveAnalysis {
 
 	}
 
-
 	private static void initiateFileList() {
 		fileList = new LinkedHashSet<String>();
 		fileList.add("drt_customer_stats_drt");
@@ -477,5 +522,5 @@ public class CollectiveAnalysis {
 		fileList.add("pkm_modestats");
 		fileList.add("scorestats");
 	}
-	
+
 }
