@@ -47,16 +47,18 @@ public class CollectiveAnalysis {
 
 	public static void main(String[] args) {
 		String filesToCopy = null;
-		if (args.length != 0) {
+		if (args.length >= 2) {
 			directoryToScanForRuns = args[0];
 			separator = args[1];
-			filesToCopy = args[2];
 		}
-		String[] filesToCopyList = null;
-		if (filesToCopy != null) {
-			filesToCopyList = filesToCopy.split(",");
-			//filesList = new String[filesToCopyList.length];
-			filesList = filesToCopyList;
+		if (args.length == 3) {
+			filesToCopy = args[2];
+			String[] filesToCopyList = null;
+			if (filesToCopy != null && !filesToCopy.equals("null")) {
+				filesToCopyList = filesToCopy.split(",");
+				//filesList = new String[filesToCopyList.length];
+				filesList = filesToCopyList;
+			}
 		}
 
 		if (separator == null) {
