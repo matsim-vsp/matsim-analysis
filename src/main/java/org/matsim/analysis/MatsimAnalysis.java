@@ -43,6 +43,7 @@ import org.matsim.analysis.od.ODAnalysis;
 import org.matsim.analysis.od.ODEventAnalysisHandler;
 import org.matsim.analysis.pngSequence2Video.MATSimVideoUtils;
 import org.matsim.analysis.shapes.Network2Shape;
+import org.matsim.analysis.vehicleOperatingTimes.OperatingTimesEventHandler;
 import org.matsim.analysis.visualizationScripts.VisualizationScriptAdjustment;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -96,12 +97,13 @@ public class MatsimAnalysis {
 	// policy case
 	private Scenario scenario1;
 	private List<AgentFilter> agentFilters;
-	private List<TripFilter> tripFilters1;
-	
+	private List<TripFilter> tripFilters;
+	private List<VehicleFilter> vehicleFilters;
+
 	// base case (optional)
 	private Scenario scenario0;
 	
-	private final String outputDirectoryName = "analysis-v2.8";
+	private final String outputDirectoryName = "analysis-v3.1";
 	private final String stageActivitySubString = "interaction";
 
 	public void run() {
@@ -145,6 +147,13 @@ public class MatsimAnalysis {
 		log.info("Run directory to compare with: " + runDirectoryToCompareWith);
 		log.info("Run ID to compare with: " + runIdToCompareWith);
 	
+
+		if (this.vehicleFilters == null) {
+			this.vehicleFilters = new ArrayList<>();
+			VehicleFilter vehicleFilter = null;
+			this.vehicleFilters.add(vehicleFilter);
+		}
+
 		// #####################################
 		// Create and add the event handlers
 		// #####################################
@@ -154,11 +163,12 @@ public class MatsimAnalysis {
 		BasicPersonTripAnalysisHandler basicHandler1 = null;
 		DelayAnalysis delayAnalysis1 = null;
 
-		LinkDemandEventHandler trafficVolumeAnalysis1 = null;
-		DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis1 = null;
+		List<LinkDemandEventHandler> trafficVolumeAnalysis1 = new ArrayList<>();
+		List<DynamicLinkDemandEventHandler> dynamicTrafficVolumeAnalysis1 = new ArrayList<>();
 		MoneyExtCostHandler personMoneyHandler1 = null;
 		ActDurationHandler actHandler1 = null;
 		ODEventAnalysisHandler odHandler1 = null;
+		List<OperatingTimesEventHandler> operatingTimesHandler1 = new ArrayList<>();
 
 		if (scenario1 != null) {
 			basicHandler1 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
@@ -167,8 +177,16 @@ public class MatsimAnalysis {
 			delayAnalysis1 = new DelayAnalysis();
 			delayAnalysis1.setScenario(scenario1);
 			
-			trafficVolumeAnalysis1 = new LinkDemandEventHandler(scenario1.getNetwork());
-			dynamicTrafficVolumeAnalysis1 = new DynamicLinkDemandEventHandler(scenario1.getNetwork());
+			for (VehicleFilter vehicleFilter : this.vehicleFilters) {
+				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
+				trafficVolumeAnalysis1.add(trafficVolumeAnalysis);
+
+				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(vehicleFilter);
+				dynamicTrafficVolumeAnalysis1.add(dynamicTrafficVolumeAnalysis);
+				
+				OperatingTimesEventHandler operatingTimesHandler = new OperatingTimesEventHandler(vehicleFilter);
+				operatingTimesHandler1.add(operatingTimesHandler);
+			}
 			
 			personMoneyHandler1 = new MoneyExtCostHandler();
 			
@@ -179,22 +197,30 @@ public class MatsimAnalysis {
 			events1 = EventsUtils.createEventsManager();
 			events1.addHandler(basicHandler1);
 			events1.addHandler(delayAnalysis1);
-			events1.addHandler(trafficVolumeAnalysis1);
-			events1.addHandler(dynamicTrafficVolumeAnalysis1);
+			for (LinkDemandEventHandler trafficVolumeAnalysis : trafficVolumeAnalysis1) {
+				events1.addHandler(trafficVolumeAnalysis);
+			}
+			for (DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis : dynamicTrafficVolumeAnalysis1) {
+				events1.addHandler(dynamicTrafficVolumeAnalysis);
+			}
 			events1.addHandler(personMoneyHandler1);
 			events1.addHandler(actHandler1);
 			events1.addHandler(odHandler1);
+			for (OperatingTimesEventHandler opTimesHandler : operatingTimesHandler1) {
+				events1.addHandler(opTimesHandler);
+			}
 		}
 		
 		EventsManager events0 = null;
 		
 		BasicPersonTripAnalysisHandler basicHandler0 = null;
 		DelayAnalysis delayAnalysis0 = null;
-		LinkDemandEventHandler trafficVolumeAnalysis0 = null;
-		DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis0 = null;
+		List<LinkDemandEventHandler> trafficVolumeAnalysis0 = new ArrayList<>();
+		List<DynamicLinkDemandEventHandler> dynamicTrafficVolumeAnalysis0 = new ArrayList<>();
 		MoneyExtCostHandler personMoneyHandler0 = null;
 		ActDurationHandler actHandler0 = null;
 		ODEventAnalysisHandler odHandler0 = null;
+		List<OperatingTimesEventHandler> operatingTimesHandler0 = new ArrayList<>();
 		
 		if (scenario0 != null) {
 			basicHandler0 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
@@ -203,8 +229,16 @@ public class MatsimAnalysis {
 			delayAnalysis0 = new DelayAnalysis();
 			delayAnalysis0.setScenario(scenario0);
 
-			trafficVolumeAnalysis0 = new LinkDemandEventHandler(scenario0.getNetwork());
-			dynamicTrafficVolumeAnalysis0 = new DynamicLinkDemandEventHandler(scenario0.getNetwork());
+			for (VehicleFilter vehicleFilter : this.vehicleFilters) {
+				LinkDemandEventHandler trafficVolumeAnalysis = new LinkDemandEventHandler(vehicleFilter);
+				trafficVolumeAnalysis0.add(trafficVolumeAnalysis);
+
+				DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis = new DynamicLinkDemandEventHandler(vehicleFilter);
+				dynamicTrafficVolumeAnalysis0.add(dynamicTrafficVolumeAnalysis);
+				
+				OperatingTimesEventHandler operatingTimesHandler = new OperatingTimesEventHandler(vehicleFilter);
+				operatingTimesHandler0.add(operatingTimesHandler);
+			}
 			
 			personMoneyHandler0 = new MoneyExtCostHandler();
 			
@@ -215,11 +249,18 @@ public class MatsimAnalysis {
 			events0 = EventsUtils.createEventsManager();
 			events0.addHandler(basicHandler0);
 			events0.addHandler(delayAnalysis0);
-			events0.addHandler(trafficVolumeAnalysis0);
-			events0.addHandler(dynamicTrafficVolumeAnalysis0);
+			for (LinkDemandEventHandler trafficVolumeAnalysis : trafficVolumeAnalysis0) {
+				events0.addHandler(trafficVolumeAnalysis);
+			}
+			for (DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis : dynamicTrafficVolumeAnalysis0) {
+				events0.addHandler(dynamicTrafficVolumeAnalysis);
+			}
 			events0.addHandler(personMoneyHandler0);
 			events0.addHandler(actHandler0);
 			events0.addHandler(odHandler0);
+			for (OperatingTimesEventHandler opTimesHandler : operatingTimesHandler0) {
+				events0.addHandler(opTimesHandler);
+			}
 		}
 
 		// #####################################
@@ -244,8 +285,16 @@ public class MatsimAnalysis {
 			personId2userBenefit1 = getPersonId2UserBenefit(scenario1.getPopulation());
 			
 			if (agentFilters != null) {
-				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1.getPopulation(), filter, mainModeIdentifier);
+				for (AgentFilter agentFilter : agentFilters) {
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, agentFilter, null, mainModeIdentifier);
+					modeAnalysis1.run();
+					modeAnalysisList1.add(modeAnalysis1);
+				}
+			}
+
+			if (tripFilters != null) {
+				for (TripFilter tripFilter : tripFilters) {
+					ModeAnalysis modeAnalysis1 = new ModeAnalysis(scenario1, null, tripFilter, mainModeIdentifier);
 					modeAnalysis1.run();
 					modeAnalysisList1.add(modeAnalysis1);
 				}
@@ -258,8 +307,16 @@ public class MatsimAnalysis {
 			personId2userBenefit0 = getPersonId2UserBenefit(scenario0.getPopulation());
 			
 			if (agentFilters != null) {
-				for (AgentFilter filter : agentFilters) {
-					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0.getPopulation(), filter, mainModeIdentifier);
+				for (AgentFilter agentFilter : agentFilters) {
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, agentFilter, null, mainModeIdentifier);
+					modeAnalysis0.run();
+					modeAnalysisList0.add(modeAnalysis0);
+				}
+			}
+
+			if (tripFilters != null) {
+				for (TripFilter tripFilter : tripFilters) {
+					ModeAnalysis modeAnalysis0 = new ModeAnalysis(scenario0, null, tripFilter, mainModeIdentifier);
 					modeAnalysis0.run();
 					modeAnalysisList0.add(modeAnalysis0);
 				}
@@ -284,7 +341,8 @@ public class MatsimAnalysis {
 				modeAnalysisList1,
 				modes,
 				odHandler1,
-				tripFilters1);
+				tripFilters,
+				operatingTimesHandler1);
 		
 		log.info("Printing results...");
 		if (scenario0 != null) printResults(scenario0,
@@ -299,7 +357,8 @@ public class MatsimAnalysis {
 				modeAnalysisList0,
 				modes,
 				odHandler0,
-				tripFilters1);
+				tripFilters,
+				operatingTimesHandler0);
 
 		// #####################################
 		// Scenario comparison
@@ -319,17 +378,11 @@ public class MatsimAnalysis {
 				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, agentFilter);
 				
 				try {
-					if (this.tripFilters1 == null) {					
-						TripAnalysisFilter tripFilter1 = new TripAnalysisFilter("");
-						tripFilter1.preProcess(this.scenario1);
-						scenarioComparisonFiltered.analyzeByMode(tripFilter1);
+					// do not apply trip filter in addition to person filter
+					TripAnalysisFilter tripFilter1 = new TripAnalysisFilter("");
+					tripFilter1.preProcess(this.scenario1);
+					scenarioComparisonFiltered.analyzeByMode(tripFilter1);
 
-					} else {
-						for (TripFilter tripFilter : this.tripFilters1) {
-							scenarioComparisonFiltered.analyzeByMode(tripFilter);
-						}
-					}
-					
 					scenarioComparisonFiltered.analyzeByScore(0.0);
 					scenarioComparisonFiltered.analyzeByScore(1.0);
 					scenarioComparisonFiltered.analyzeByScore(10.0);
@@ -339,7 +392,23 @@ public class MatsimAnalysis {
 					e.printStackTrace();
 				}
 			}
-		
+
+			for (TripFilter tripFilter : this.tripFilters) {
+
+				// do not apply person filter in addition to trip filter
+				AgentAnalysisFilter filter1 = new AgentAnalysisFilter("");
+				filter1.preProcess(scenario1);
+				agentFilters.add(filter1);
+
+				PersonTripScenarioComparison scenarioComparisonFiltered = new PersonTripScenarioComparison(this.homeActivityPrefix, personTripScenarioComparisonOutputDirectory, scenario1, basicHandler1, scenario0, basicHandler0, modes, filter1);
+
+				try {
+					scenarioComparisonFiltered.analyzeByMode(tripFilter);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
 		}
 
 		// #####################################
@@ -432,15 +501,15 @@ public class MatsimAnalysis {
 			Map<Id<Person>, Double> personId2userBenefit,
 			BasicPersonTripAnalysisHandler basicHandler,
 			DelayAnalysis delayAnalysis,
-			LinkDemandEventHandler trafficVolumeAnalysis,
-			DynamicLinkDemandEventHandler dynamicTrafficVolumeAnalysis,
+			List<LinkDemandEventHandler> trafficVolumeAnalysis,
+			List<DynamicLinkDemandEventHandler> dynamicTrafficVolumeAnalysis,
 			MoneyExtCostHandler personMoneyHandler,
 			ActDurationHandler actHandler,
 			List<ModeAnalysis> modeAnalysisList,
 			List<String> modes,
 			ODEventAnalysisHandler odHandler,
-			List<TripFilter> tripFilters
-			) {
+			List<TripFilter> tripFilters,
+			List<OperatingTimesEventHandler> operatingTimesHandler) {
 		
 		// #####################################
 		// Print results: person / trip analysis
@@ -457,7 +526,9 @@ public class MatsimAnalysis {
 			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, basicHandler, tripFilter);
 			for (String mode : modes) {
 				analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, basicHandler, tripFilter);
+				analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, 2, basicHandler, tripFilter);
 			}
+			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, 2, basicHandler, tripFilter);
 		}
 
 		// person-based analysis
@@ -468,15 +539,27 @@ public class MatsimAnalysis {
 			}
 		}
 		
-		// TODO: Add combined agent and trip filters...
-
 		// aggregated analysis
-		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, personId2userBenefit, basicHandler);
-		for (String mode : modes) {
-			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, personId2userBenefit, basicHandler);
+		for (AgentFilter agentFilter : agentFilters) {
+			TripFilter tripFilter = null;
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			for (String mode : modes) {
+				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, 2, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			}
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, agentFilter, tripFilter, personId2userBenefit, basicHandler, delayAnalysis);
 		}
-		analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, personId2userBenefit, basicHandler, delayAnalysis);
 		
+		for (TripFilter tripFilter : tripFilters) {
+			AgentFilter agentFilter = null;
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			for (String mode : modes) {
+				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, 2, agentFilter, tripFilter, personId2userBenefit, basicHandler);
+			}
+			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, agentFilter, tripFilter, personId2userBenefit, basicHandler, delayAnalysis);
+		}
+				
 		// time-specific trip distance analysis
 		for (String mode : modes) {
 			SortedMap<Double, List<Double>> departureTime2traveldistance = analysis.getParameter2Values(mode, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
@@ -501,10 +584,14 @@ public class MatsimAnalysis {
 		String trafficVolumeAnalysisOutputDirectoryWithPrefix = trafficVolumeAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".";
 		
 		// daily traffic volumes
-		trafficVolumeAnalysis.printResults(trafficVolumeAnalysisOutputDirectoryWithPrefix + "link_dailyTrafficVolume.csv");
+		for (LinkDemandEventHandler linkDemandEventHandler : trafficVolumeAnalysis) {
+			linkDemandEventHandler.printResults(trafficVolumeAnalysisOutputDirectoryWithPrefix);
+		}
 		
 		// hourly traffic volumes
-		dynamicTrafficVolumeAnalysis.printResults(trafficVolumeAnalysisOutputDirectoryWithPrefix);
+		for (DynamicLinkDemandEventHandler dynamicLinkDemandEventHandler : dynamicTrafficVolumeAnalysis) {
+			dynamicLinkDemandEventHandler.printResults(trafficVolumeAnalysisOutputDirectoryWithPrefix);
+		}
 
 		// #####################################
 		// Print results: spatial analysis
@@ -517,7 +604,11 @@ public class MatsimAnalysis {
 			String spatialAnalysisOutputDirectoryWithPrefix = spatialAnalysisOutputDirectory + scenario.getConfig().controler().getRunId() + ".";
 			
 			GISAnalyzer gisAnalysis = new GISAnalyzer(scenario, shapeFileZones, scalingFactor, homeActivityPrefix, zonesCRS, scenarioCRS, modes);
-			gisAnalysis.analyzeZoneTollsUserBenefits(spatialAnalysisOutputDirectoryWithPrefix, "tolls_userBenefits_travelTime_modes_zones.shp", personId2userBenefit, personMoneyHandler.getPersonId2toll(), basicHandler);
+			try {
+				gisAnalysis.analyzeZoneTollsUserBenefits(spatialAnalysisOutputDirectoryWithPrefix, "tolls_userBenefits_travelTime_modes_zones.shp", personId2userBenefit, personMoneyHandler.getPersonId2toll(), basicHandler);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		// #####################################
@@ -617,10 +708,22 @@ public class MatsimAnalysis {
 		// #####################################
 		// Print OD analysis
 		// #####################################
+		
 		ODAnalysis odAnalysis = new ODAnalysis(analysisOutputDirectory, scenario.getNetwork(), scenario.getConfig().controler().getRunId(), this.shapeFileZones, this.zonesCRS, this.zoneId, this.modes, this.scalingFactor);
 		odAnalysis.setPrintODSHPfiles(printODSHPfiles);
 		odAnalysis.setPrintTripSHPfiles(printTripSHPfiles);
 		odAnalysis.process(odHandler);
+		
+		// #####################################
+		// Print Operating Times analysis
+		// #####################################
+		
+		String operatingTimesOutputDirectory = analysisOutputDirectory + "vehicle-operating-times/";
+		createDirectory(operatingTimesOutputDirectory);
+
+		for (OperatingTimesEventHandler opTimesHandler : operatingTimesHandler) {
+			opTimesHandler.printResults(operatingTimesOutputDirectory + scenario.getConfig().controler().getRunId() + ".");
+		}
 	}
 	
 	private void createDirectory(String directory) {
@@ -717,8 +820,8 @@ public class MatsimAnalysis {
 		this.agentFilters = filters;
 	}
 
-	public void setTripFilters(List<TripFilter> tripFilters1) {
-		this.tripFilters1 = tripFilters1;
+	public void setTripFilters(List<TripFilter> tripFilters) {
+		this.tripFilters = tripFilters;
 	}
 
 	public void setScenario0(Scenario scenario0) {
@@ -751,6 +854,10 @@ public class MatsimAnalysis {
 
 	public void setPrintTripSHPfiles(boolean printTripSHPfiles) {
 		this.printTripSHPfiles = printTripSHPfiles;
+	}
+
+	public void setVehicleFilters(List<VehicleFilter> vehicleFilters) {
+		this.vehicleFilters = vehicleFilters;
 	}
 
 }

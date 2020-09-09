@@ -99,6 +99,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private int warnCnt2 = 0;
 	private int warnCnt3 = 0;
 	private int warnCnt4 = 0;
+	private int stuckPersonWarnCounter;
+	private int stuckPersonWarnCounter2;
 
 	
 	public void setScenario(Scenario scenario) {
@@ -281,7 +283,17 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
 					
 					Map<Integer,Coord> tripNumber2originCoord = personId2tripNumber2originCoord.get(event.getPersonId());
-					tripNumber2originCoord.put(personId2currentTripNumber.get(event.getPersonId()), this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord());
+					Coord coordOrigin = null;
+					if (event.getFacilityId() != null
+							&& this.scenario.getActivityFacilities().getFacilities() != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord() != null) {
+						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
+					} else {
+						// the "old" way as backup
+						coordOrigin = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+					}
+					tripNumber2originCoord.put(personId2currentTripNumber.get(event.getPersonId()), coordOrigin);
 					personId2tripNumber2originCoord.put(event.getPersonId(), tripNumber2originCoord);
 					
 					Map<Integer,Coord> tripNumber2destinationCoord = personId2tripNumber2destinationCoord.get(event.getPersonId());
@@ -317,7 +329,17 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
 					
 					Map<Integer,Coord> tripNumber2originCoord = new HashMap<>();
-					tripNumber2originCoord.put(1, this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord());
+					Coord coordOrigin = null;
+					if (event.getFacilityId() != null
+							&& this.scenario.getActivityFacilities().getFacilities() != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null
+							&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord() != null) {
+						coordOrigin = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
+					} else {
+						// the "old" way as backup
+						coordOrigin = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+					}
+					tripNumber2originCoord.put(1, coordOrigin);
 					personId2tripNumber2originCoord.put(event.getPersonId(), tripNumber2originCoord);
 					
 					Map<Integer,Double> tripNumber2tripDistance = new HashMap<>();
@@ -565,14 +587,27 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		double endTime;
 		if (this.scenario.getConfig().qsim().getEndTime().isUndefined()) {
 			endTime = 30 * 3600.;
-			log.warn("Trying to deal with person stuck events. Assuming " + endTime + " to be the simulation end time. If you are using a different value, set the qsim end time in your run script, e.g. config.qsim().setEndTime(24 * 3600.);");
+			if (this.stuckPersonWarnCounter <= 5) {
+				log.warn("Trying to deal with person stuck events. Assuming " + endTime + " to be the simulation end time. If you are using a different value, set the qsim end time in your run script, e.g. config.qsim().setEndTime(24 * 3600.);");
+				if (this.stuckPersonWarnCounter == 5) {
+					log.warn("Further warnings of this type will not be printed.");
+				}
+				this.stuckPersonWarnCounter++;
+			}
+			
 		} else {
 			endTime = this.scenario.getConfig().qsim().getEndTime().seconds();
 		}
 		
 		boolean removeStuckVehicles = false;
 		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() == false) {
-			log.warn("Trying to deal with person stuck events. Assuming stucking vehicles not to be removed. If you are removing stucking vehicles, set the qsim parameter in your run script accordingly.");
+			if (this.stuckPersonWarnCounter2 <= 5) {
+				log.warn("Trying to deal with person stuck events. Assuming stucking vehicles not to be removed. If you are removing stucking vehicles, set the qsim parameter in your run script accordingly.");
+				if (this.stuckPersonWarnCounter2 == 5) {
+					log.warn("Further warnings of this type will not be printed out.");
+				}
+				this.stuckPersonWarnCounter2++;
+			}
 		} else {
 			removeStuckVehicles = true;
 		}
@@ -797,14 +832,23 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				}
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 
-				Coord destinationCoord = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+				Coord coordDestination = null;
+				if (event.getFacilityId() != null
+						&& this.scenario.getActivityFacilities().getFacilities() != null
+						&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()) != null
+						&& this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord() != null) {
+					coordDestination = this.scenario.getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
+				} else {
+					// the "old" way as backup
+					coordDestination = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+				}
 
-				double beelineDistance = NetworkUtils.getEuclideanDistance(this.personId2tripNumber2originCoord.get(event.getPersonId()).get(tripNumber), destinationCoord);
+				double beelineDistance = NetworkUtils.getEuclideanDistance(this.personId2tripNumber2originCoord.get(event.getPersonId()).get(tripNumber), coordDestination);
 				Map<Integer, Double> tripNumber2beelinedistance = personId2tripNumber2tripBeelineDistance.get(event.getPersonId());
 				tripNumber2beelinedistance.put(tripNumber, beelineDistance);
 
 				Map<Integer, Coord> tripNumber2destinationCoord = personId2tripNumber2destinationCoord.get(event.getPersonId());
-				tripNumber2destinationCoord.put(tripNumber, destinationCoord);
+				tripNumber2destinationCoord.put(tripNumber, coordDestination);
 			}	
 		}
 	}

@@ -19,17 +19,15 @@
 
 package org.matsim.analysis;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 /**
 * @author ikaddoura
 */
 
-public interface TripFilter {
-	public boolean considerTrip(Coord origin, Coord destination);
-	public boolean considerTrip(TripStructureUtils.Trip trip, Scenario scenario);
+public interface VehicleFilter {
+	public boolean considerVehicle(Id<Vehicle> vehicleId);
 	public String toFileName();
 }
 

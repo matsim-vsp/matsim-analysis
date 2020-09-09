@@ -102,7 +102,8 @@ public class MATSimVideoUtils {
 						image = ImageIO.read(new File(pngFile));
 
 					} catch (IOException e2){
-						log.warn("Couldn't find png for iteration " + i + "." );
+						if (counterNoImage <= 5) log.warn("Couldn't find png for iteration " + i + "." );
+						if (counterNoImage == 5) log.warn("Further warnings of this type will not be printed out.");
 						counterNoImage++;
 					}
 				}

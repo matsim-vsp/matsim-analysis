@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.TripAnalysisFilter.TripConsiderType;
+import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -48,6 +49,7 @@ public class AnalysisRunExampleSnzScenario {
 		String zoneId = null;
 		String shapeFileTripFilter = null;
 		String shapeFileTripFilterCRS = null;
+		String bufferMAroundTripFilterShp = null;
 
 		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.walk, TransportMode.non_network_walk, "access_walk", "egress_walk"}; // to be able to analyze old runs
 		final int scalingFactor = 4;
@@ -74,7 +76,9 @@ public class AnalysisRunExampleSnzScenario {
 			
 			shapeFileTripFilter = args[10];
 			shapeFileTripFilterCRS = args[11];
-									
+
+			bufferMAroundTripFilterShp = args[12];
+
 		} else {
 			
 			// Berlin
@@ -100,11 +104,11 @@ public class AnalysisRunExampleSnzScenario {
 			
 			// Vulkaneifel
 			
-			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrt342/";
-			runId = "snzDrt342";		
+			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO321g/";
+			runId = "snzDrtO321g";		
 			
-			runDirectoryToCompareWith = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrt341/";
-			runIdToCompareWith = "snzDrt341";
+			runDirectoryToCompareWith = "../runs-svn/avoev/snz-vulkaneifel/output-snzDrtO320x/";
+			runIdToCompareWith = "snzDrtO320x";
 			
 			visualizationScriptInputDirectory = null;
 			
@@ -118,7 +122,30 @@ public class AnalysisRunExampleSnzScenario {
 			
 			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
 			shapeFileTripFilterCRS = "EPSG:25832";
-			
+			bufferMAroundTripFilterShp = "2000";
+
+			// Gladbeck
+
+//			runDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
+//			runId = "snzDrtO443l";
+//
+//			runDirectoryToCompareWith = null;
+//			runIdToCompareWith = null;
+//
+//			visualizationScriptInputDirectory = null;
+//
+//			scenarioCRS = "EPSG:25832";
+//
+//			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/shp-files/hexagon-grid-1000.shp";
+//			shapFileZonesCRS = "EPSG:25832";
+//			zoneId = "id";
+//
+//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
+//
+//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
+//			shapeFileTripFilterCRS = "EPSG:25832";
+//			bufferMAroundTripFilterShp = "2000";
+
 		}
 		
 		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
@@ -126,11 +153,11 @@ public class AnalysisRunExampleSnzScenario {
 		
 		List<AgentFilter> agentFilters = new ArrayList<>();
 		
-		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("all-persons");
+		AgentAnalysisFilter filter1a = new AgentAnalysisFilter("");
 		filter1a.preProcess(scenario1);
 		agentFilters.add(filter1a);
 		
-		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("residents");
+		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("residents-in-area");
 		filter1b.setZoneFile(shapeFileAgentFilter);
 		filter1b.setRelevantActivityType(homeActivityPrefix);
 		filter1b.preProcess(scenario1);
@@ -138,17 +165,35 @@ public class AnalysisRunExampleSnzScenario {
 		
 		List<TripFilter> tripFilters = new ArrayList<>();
 		
-		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("all-trips");
+		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("");
 		tripFilter1a.preProcess(scenario1);
 		tripFilters.add(tripFilter1a);
 		
-		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("certain-trips");
+		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("origin-or-destination-in-area");
 		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
 		tripFilter1b.preProcess(scenario1);
-		tripFilter1b.setBuffer(2000.);
+		tripFilter1b.setBuffer(Double.valueOf(bufferMAroundTripFilterShp));
 		tripFilter1b.setTripConsiderType(TripConsiderType.OriginOrDestination);
 		tripFilters.add(tripFilter1b);
 		
+		TripAnalysisFilter tripFilter1c = new TripAnalysisFilter("origin-and-destination-in-area");
+		tripFilter1c.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
+		tripFilter1c.preProcess(scenario1);
+		tripFilter1c.setBuffer(Double.valueOf(0));
+		tripFilter1c.setTripConsiderType(TripConsiderType.OriginAndDestination);
+		tripFilters.add(tripFilter1c);
+		
+		final List<VehicleFilter> vehicleFilters = new ArrayList<>();
+
+		VehicleAnalysisFilter vehicleAnalysisFilter0 = null;
+		vehicleFilters.add(vehicleAnalysisFilter0);
+
+		VehicleAnalysisFilter vehicleAnalysisFilter1 = new VehicleAnalysisFilter("drt-vehicles", "drt", StringComparison.Contains);
+		vehicleFilters.add(vehicleAnalysisFilter1);
+
+		VehicleAnalysisFilter vehicleAnalysisFilter2 = new VehicleAnalysisFilter("pt-vehicles", "tr", StringComparison.Contains);
+		vehicleFilters.add(vehicleAnalysisFilter2);
+
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
 			modes.add(mode);
@@ -160,7 +205,8 @@ public class AnalysisRunExampleSnzScenario {
 		
 		analysis.setAgentFilters(agentFilters);		
 		analysis.setTripFilters(tripFilters);
-		
+		analysis.setVehicleFilters(vehicleFilters);
+
 		analysis.setScenarioCRS(scenarioCRS);
 		analysis.setScalingFactor(scalingFactor);
 		analysis.setModes(modes);
@@ -182,6 +228,7 @@ public class AnalysisRunExampleSnzScenario {
 		
 		String networkFile = runDirectory + runId + ".output_network.xml.gz";
 		String populationFile = runDirectory + runId + ".output_plans.xml.gz";
+		String facilitiesFile = runDirectory + runId + ".output_facilities.xml.gz";
 
 		Config config = ConfigUtils.createConfig();
 		
@@ -190,6 +237,7 @@ public class AnalysisRunExampleSnzScenario {
 		config.controler().setOutputDirectory(runDirectory);
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
+		config.facilities().setInputFile(facilitiesFile);
 		
 		return ScenarioUtils.loadScenario(config);
 	}

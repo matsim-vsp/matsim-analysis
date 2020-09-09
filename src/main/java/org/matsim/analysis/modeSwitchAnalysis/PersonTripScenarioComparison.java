@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -191,7 +192,7 @@ public class PersonTripScenarioComparison {
 		int personCounter = 0;
 		for (Id<Person> personId : basicHandler1.getPersonId2tripNumber2tripMainMode().keySet()) {
 			
-			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
+			String subpopulationOfPerson = PopulationUtils.getSubpopulation(scenario1.getPopulation().getPersons().get(personId));
 						
 			if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 				Map<Integer, String> tripNr2TripMainMode = basicHandler1.getPersonId2tripNumber2tripMainMode().get(personId);
@@ -210,7 +211,11 @@ public class PersonTripScenarioComparison {
 						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripMainMode().get(personId) == null) {
 							throw new RuntimeException("Person " + personId + " from run directory1 doesn't exist in run directory0. Are you comparing the same scenario? Aborting...");
 						}
-
+						
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripMainMode().get(personId).get(tripNr) == null) {
+							log.warn("Person " + personId + "'s trip number " + tripNr + " from run directory1 doesn't exist in run directory0. Probably a stucking agent...");
+						}
+						
 						String mode0 = "unknown";
 						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripMainMode().get(personId).get(tripNr) == null) {
 							log.warn("Could not identify the trip mode of person " + personId + " and trip number " + tripNr + ". Setting mode to 'unknown'.");
@@ -228,14 +233,55 @@ public class PersonTripScenarioComparison {
 							stuck1 = "yes";
 						}
 						
+						String tripModes0 = "unknown";
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) != null) {
+							tripModes0 = basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr);
+						}
+						String tripModes1 = "unknown";
+						if (basicHandler1.getPersonId2tripNumber2tripModes().get(personId) != null &&  basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) != null) {
+							tripModes1 = basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr);
+						}
+						String beelineDistance0 = "unknown";
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) != null) {
+							beelineDistance0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr));
+						}
+						String beelineDistance1 = "unknown";
+						if (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId) != null && basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) != null) {
+							beelineDistance1 = String.valueOf(basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr));
+						}
+						String mainModeDistance0 = "unknown";
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) != null) {
+							mainModeDistance0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr));
+						}
+						String mainModeDistance1 = "unknown";
+						if (basicHandler1.getPersonId2tripNumber2tripDistance().get(personId) != null && basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) != null) {
+							mainModeDistance1 = String.valueOf(basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr));
+						}
+						String allLegsTravelTime0 = "unknown";
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
+							allLegsTravelTime0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
+						}
+						String allLegsTravelTime1 = "unknown";
+						if (basicHandler1.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
+							allLegsTravelTime1 = String.valueOf(basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
+						}
+						String payments0 = "unknown";
+						if (basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) != null) {
+							payments0 = String.valueOf(basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr));
+						}
+						String payments1 = "unknown";
+						if (basicHandler1.getPersonId2tripNumber2payment().get(personId) != null && basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) != null) {
+							payments1 = String.valueOf(basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr));
+						}
+						
 						bufferedWriter.get("all").write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
 								+ stuck0 + ";" + stuck1 + ";"
 								+ mode0 + ";" + mode1 + ";" 
-								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";"
-								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-								+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-								+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-								+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+								+ tripModes0 + ";" + tripModes1 + ";"
+								+ beelineDistance0 + ";" + beelineDistance1 + ";"
+								+ mainModeDistance0 + ";" + mainModeDistance1 + ";"
+								+ allLegsTravelTime0 + ";" + allLegsTravelTime1 + ";"
+								+ payments0 + ";" + payments1 + ";"
 								);
 						bufferedWriter.get("all").newLine();
 						
@@ -250,12 +296,12 @@ public class PersonTripScenarioComparison {
 								String modeSwitchType = "x-TO-" + modeA;
 								bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
 										+ stuck0 + ";" + stuck1 + ";"
-										+ mode0 + ";" + mode1 + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+										+ mode0 + ";" + mode1 + ";" 
+										+ tripModes0 + ";" + tripModes1 + ";"
+										+ beelineDistance0 + ";" + beelineDistance1 + ";"
+										+ mainModeDistance0 + ";" + mainModeDistance1 + ";"
+										+ allLegsTravelTime0 + ";" + allLegsTravelTime1 + ";"
+										+ payments0 + ";" + payments1 + ";"
 										);
 								bufferedWriter.get(modeSwitchType).newLine();
 								
@@ -283,12 +329,12 @@ public class PersonTripScenarioComparison {
 								String modeSwitchType = modeA + "-TO-x";
 								bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
 										+ stuck0 + ";" + stuck1 + ";"
-										+ mode0 + ";" + mode1 + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+										+ mode0 + ";" + mode1 + ";" 
+										+ tripModes0 + ";" + tripModes1 + ";"
+										+ beelineDistance0 + ";" + beelineDistance1 + ";"
+										+ mainModeDistance0 + ";" + mainModeDistance1 + ";"
+										+ allLegsTravelTime0 + ";" + allLegsTravelTime1 + ";"
+										+ payments0 + ";" + payments1 + ";"
 										);
 								bufferedWriter.get(modeSwitchType).newLine();
 								
@@ -315,13 +361,13 @@ public class PersonTripScenarioComparison {
 		                	if (mode1.equals(modeA) && mode0.equals(modeA)) {
 								String modeSwitchType = modeA + "-TO-" + modeA;
 								bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-										+ stuck0 + ";" + stuck1 + ";" 
-										+ mode0 + ";" + mode1 + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-										+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+										+ stuck0 + ";" + stuck1 + ";"
+										+ mode0 + ";" + mode1 + ";" 
+										+ tripModes0 + ";" + tripModes1 + ";"
+										+ beelineDistance0 + ";" + beelineDistance1 + ";"
+										+ mainModeDistance0 + ";" + mainModeDistance1 + ";"
+										+ allLegsTravelTime0 + ";" + allLegsTravelTime1 + ";"
+										+ payments0 + ";" + payments1 + ";"
 										);
 								bufferedWriter.get(modeSwitchType).newLine();
 								
@@ -357,16 +403,16 @@ public class PersonTripScenarioComparison {
 		                	// mode
 
 		    				if (mode1.equals(modeA) || mode0.equals(modeA)) {
-		    					// at least one trip was a car trip
+
 		    					bufferedWriter.get(modeA).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-				    				+ stuck0 + ";" + stuck1 + ";" 
-				    				+ mode0 + ";" + mode1 + ";"
-				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";"
-				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-				    				+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
-				    				);
+		    							+ stuck0 + ";" + stuck1 + ";"
+										+ mode0 + ";" + mode1 + ";" 
+										+ tripModes0 + ";" + tripModes1 + ";"
+										+ beelineDistance0 + ";" + beelineDistance1 + ";"
+										+ mainModeDistance0 + ";" + mainModeDistance1 + ";"
+										+ allLegsTravelTime0 + ";" + allLegsTravelTime1 + ";"
+										+ payments0 + ";" + payments1 + ";"
+										);
 		    					bufferedWriter.get(modeA).newLine();
 		    				}
 							
@@ -377,25 +423,29 @@ public class PersonTripScenarioComparison {
 										// A --> B
 										String modeSwitchType = modeA + "-TO-" + modeB;
 										bufferedWriter.get(modeSwitchType).write(personId + ";" + subpopulationOfPerson + ";" + tripNr + ";"
-												+ stuck0 + ";" + stuck1 + ";" 
+												+ stuck0 + ";" + stuck1 + ";"
 												+ mode0 + ";" + mode1 + ";" 
-												+ basicHandlerToCompareWith.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripModes().get(personId).get(tripNr) + ";"
-												+ basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) + ";"
-												+ basicHandlerToCompareWith.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2tripDistance().get(personId).get(tripNr) + ";"
-												+ basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) + ";"
-												+ basicHandlerToCompareWith.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";" + basicHandler1.getPersonId2tripNumber2payment().get(personId).get(tripNr) + ";"
+												+ tripModes0 + ";" + tripModes1 + ";"
+												+ beelineDistance0 + ";" + beelineDistance1 + ";"
+												+ mainModeDistance0 + ";" + mainModeDistance1 + ";"
+												+ allLegsTravelTime0 + ";" + allLegsTravelTime1 + ";"
+												+ payments0 + ";" + payments1 + ";"
 												);
 										bufferedWriter.get(modeSwitchType).newLine();
 										
-										double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-										switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
-										
-										if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
-											double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
-											switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
+										if (basicHandler1.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null
+												&& basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId) != null && basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) != null) {
 											
-											double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
-											switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
+											double ttDiff = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+											switchType2tripTTwithStuckingAgents.get(modeSwitchType).add(ttDiff);
+											
+											if (stuck0.equals("no") && stuck1.equals("no") && !mode0.equals("unknown") && !mode1.equals("unknown")) {
+												double ttDiffnoStuck = basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr) - basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr);
+												switchType2tripTTwithoutStuckingAgents.get(modeSwitchType).add(ttDiffnoStuck);
+												
+												double beelineSpeedDiffnoStuck = (basicHandler1.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandler1.getPersonId2tripNumber2travelTime().get(personId).get(tripNr)) - (basicHandlerToCompareWith.getPersonId2tripNumber2tripBeelineDistance().get(personId).get(tripNr) / basicHandlerToCompareWith.getPersonId2tripNumber2travelTime().get(personId).get(tripNr));
+												switchType2tripBeelineSpeedWithoutStuckingAgents.get(modeSwitchType).add(beelineSpeedDiffnoStuck);
+											}
 										}
 									}										
 								}
@@ -524,7 +574,7 @@ public class PersonTripScenarioComparison {
 	        
 			for (Id<Person> personId : scenario1.getPopulation().getPersons().keySet()) {
 				
-				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
+				String subpopulationOfPerson = PopulationUtils.getSubpopulation(scenario1.getPopulation().getPersons().get(personId));
 				if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 					double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -591,7 +641,7 @@ public class PersonTripScenarioComparison {
 	        
 			for (Id<Person> personId : scenario1.getPopulation().getPersons().keySet()) {
 				
-				String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
+				String subpopulationOfPerson = PopulationUtils.getSubpopulation(scenario1.getPopulation().getPersons().get(personId));
 				if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 					boolean analyzePerson = true;
 					if (basicHandler1.getPersonId2tripNumber2stuckAbort().get(personId) != null) {
@@ -686,7 +736,7 @@ public class PersonTripScenarioComparison {
 	        
 	        	for (Id<Person> personId : switchType2agents.get(modeA + "-TO-" + modeA).keySet()) {
 					
-	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
+	    			String subpopulationOfPerson = PopulationUtils.getSubpopulation(scenario1.getPopulation().getPersons().get(personId));
 					if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 						double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -750,7 +800,7 @@ public class PersonTripScenarioComparison {
 	        
 	        	for (Id<Person> personId : switchType2agents.get("x-TO-" + modeA).keySet()) {
 	        		
-	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
+	    			String subpopulationOfPerson = PopulationUtils.getSubpopulation(scenario1.getPopulation().getPersons().get(personId));
 					if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 	        			double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -813,7 +863,7 @@ public class PersonTripScenarioComparison {
 	        
 	        	for (Id<Person> personId : switchType2agents.get(modeA + "-TO-x").keySet()) {
 					
-	    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
+	    			String subpopulationOfPerson = PopulationUtils.getSubpopulation(scenario1.getPopulation().getPersons().get(personId));
 					if (agentFilter.considerAgent(scenario1.getPopulation().getPersons().get(personId))) {
 						double score0 = scenarioToCompareWith.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 				        double score1 = scenario1.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
@@ -929,7 +979,7 @@ public class PersonTripScenarioComparison {
         			homeX = this.personId2homeActCoord.get(personId).getX();
         			homeY = this.personId2homeActCoord.get(personId).getY();
         		}
-    			String subpopulationOfPerson = (String) scenario1.getPopulation().getPersons().get(personId).getAttributes().getAttribute(scenario1.getConfig().plans().getSubpopulationAttributeName());
+    			String subpopulationOfPerson = PopulationUtils.getSubpopulation(scenario1.getPopulation().getPersons().get(personId));
 				writer.write(personId + ";" + subpopulationOfPerson  + ";"
         + homeX
         + ";" + homeY

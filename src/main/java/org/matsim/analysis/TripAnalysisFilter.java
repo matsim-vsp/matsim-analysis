@@ -29,7 +29,11 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -49,6 +53,7 @@ public class TripAnalysisFilter implements TripFilter {
 	private final String filterName;
 	private double buffer = 0.;
 	private TripConsiderType tripConsiderType = TripConsiderType.OriginAndDestination;
+	private int originDestinationNullCounter;
 	
 	public enum TripConsiderType { OriginAndDestination, OriginOrDestination }
 	
@@ -62,6 +67,13 @@ public class TripAnalysisFilter implements TripFilter {
 	}
 
 	@Override
+	public boolean considerTrip(TripStructureUtils.Trip trip, Scenario scenario) {
+		Coord origin = getCoordFromActivity(trip.getOriginActivity(), scenario);
+		Coord destination = getCoordFromActivity(trip.getDestinationActivity(), scenario);
+		return considerTrip(origin, destination);
+	}
+
+	@Override
 	public boolean considerTrip(Coord origin, Coord destination) {
 		
 		if (dataPreprocessed == false) {
@@ -69,7 +81,13 @@ public class TripAnalysisFilter implements TripFilter {
 		}
 		
 		if (origin == null || destination == null) {
-			log.warn("Origin or destination null. Can't interpret this trip. Origin: " + origin + "--> Destination: " +  destination);
+			if (this.originDestinationNullCounter <= 5) {
+				log.warn("Origin or destination null. Probably a stucking agent. Can't interpret this trip. Origin: " + origin + "--> Destination: " +  destination);
+				if (this.originDestinationNullCounter == 5) {
+					log.warn("Further warnings of this type will not be printed out.");
+				}
+				this.originDestinationNullCounter++;
+			}
 			return false;
 		}
 		
@@ -82,7 +100,7 @@ public class TripAnalysisFilter implements TripFilter {
 		boolean originWithinProvidedGeometry = false;
 		Point originPoint = MGC.coord2Point(origin);
 		for (Geometry geometry : zoneFeatures.values()) {
-			if (originPoint.within(geometry)) {
+			if (originPoint.isWithinDistance(geometry, buffer)) {
 				originWithinProvidedGeometry = true;
 				break;
 			}
@@ -90,7 +108,7 @@ public class TripAnalysisFilter implements TripFilter {
 		boolean destinationWithinProvidedGeometry = false;
 		Point destinationPoint = MGC.coord2Point(destination);
 		for (Geometry geometry : zoneFeatures.values()) {
-			if (destinationPoint.within(geometry)) {
+			if (destinationPoint.isWithinDistance(geometry, buffer)) {
 				destinationWithinProvidedGeometry = true;
 				break;
 			}
@@ -177,8 +195,8 @@ public class TripAnalysisFilter implements TripFilter {
 			int counter = 0;
 			for (SimpleFeature feature : features) {
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
-                Geometry geometryWithBuffer = geometry.buffer(buffer);
-                zoneFeatures.put(String.valueOf(counter), geometryWithBuffer);
+//                Geometry geometryWithBuffer = geometry.buffer(buffer);
+                zoneFeatures.put(String.valueOf(counter), geometry);
                 counter++;
             }
 			log.info("Reading shape file... Done.");	
@@ -194,5 +212,24 @@ public class TripAnalysisFilter implements TripFilter {
 		this.tripConsiderType = tripConsiderType;
 	}
 
+	// there is PopulationUtils.decideOnCoordForActivity, but it throws exceptions when the coord of a activityFacility is null
+	// not sure whether this is a problem, keeping the existing Joschka methods from TripsAndLegsCSVWriter
+
+	// copy from TripsAndLegsCSVWriter
+	private Coord getCoordFromActivity(Activity activity, Scenario scenario) {
+		if (activity.getCoord() != null) {
+			return activity.getCoord();
+		} else if (activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId())) {
+			Coord coord = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
+			return coord != null ? coord : this.getCoordFromLink(activity.getLinkId(), scenario);
+		} else {
+			return this.getCoordFromLink(activity.getLinkId(), scenario);
+		}
+	}
+
+	// copy from TripsAndLegsCSVWriter
+	private Coord getCoordFromLink(Id<Link> linkId, Scenario scenario) {
+		return scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord();
+	}
 }
 

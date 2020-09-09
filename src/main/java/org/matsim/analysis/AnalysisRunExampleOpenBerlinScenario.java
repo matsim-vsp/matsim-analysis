@@ -126,6 +126,8 @@ public class AnalysisRunExampleOpenBerlinScenario {
 	
 		String networkFile = runDirectory + runId + ".output_network.xml.gz";
 		String populationFile = runDirectory + runId + ".output_plans.xml.gz";
+		String facilitiesFile = runDirectory + runId + ".output_facilities.xml.gz";
+
 		
 		Config config = ConfigUtils.createConfig();
 
@@ -134,6 +136,7 @@ public class AnalysisRunExampleOpenBerlinScenario {
 		config.controler().setOutputDirectory(runDirectory);
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
+		config.facilities().setInputFile(facilitiesFile);
 		
 		return ScenarioUtils.loadScenario(config);
 	}
