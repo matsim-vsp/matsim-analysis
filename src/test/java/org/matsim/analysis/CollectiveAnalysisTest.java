@@ -20,43 +20,33 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import javax.swing.JFileChooser;
-
-import org.junit.Rule;
-import org.matsim.testcases.MatsimTestUtils;
+import org.junit.Test;
 
 public class CollectiveAnalysisTest {
 
 	static String directoryToScanForRuns = null;
 	static ArrayList<String> runIds = new ArrayList<String>();
 	static LinkedHashSet<String> fileList = new LinkedHashSet<String>();
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
 
-//	@Test
-//	public void testAnalysisOutputs() {
-//		chooseFilePathAndRead();
-//		
-//	}
-
-	public static void main(String[] args) {
-		chooseFilePathAndRead();
+	@Test
+	public void testAnalysisOutputs() {
+		CollectiveAnalysisTest.main((new String[]{"C:\\Users\\Aravind\\svn"}));
 	}
 
-	private static void chooseFilePathAndRead() {
+	public static void main(String[] args) {
+		directoryToScanForRuns = args[0];
+		File file = new File(directoryToScanForRuns);
+		if (directoryToScanForRuns != null && file.exists()) {
+			chooseFilePathAndRead(directoryToScanForRuns);
+		}
+		
+	}
+
+	private static void chooseFilePathAndRead(String directoryToScanForRuns2) {
 
 		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
 		File rootPath = null;
-		if (directoryToScanForRuns == null) {
-			JFileChooser chooser = new JFileChooser();
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			chooser.setDialogTitle("choose root directory");
-			chooser.showOpenDialog(null);
-
-			rootPath = chooser.getSelectedFile();
-		} else {
-			rootPath = new File(directoryToScanForRuns);
-		}
+		rootPath = new File(directoryToScanForRuns2);
 
 		File[] directories = new File(rootPath.toString()).listFiles(File::isDirectory);
 
@@ -181,7 +171,6 @@ public class CollectiveAnalysisTest {
 					File file = new File(filePath);
 					// File directoryToCopy = new File(userDirectory +
 					// "/test/input/org/matsim/analysis/");
-
 					File filePathToWrite = new File(
 							userDirectory + "/test/input/org/matsim/analysis/run-overview/" + file.getName());
 
