@@ -1,0 +1,6 @@
+runId;iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;directDistance_m_mean;totalTravelTime_mean;rejections;rejectionRate
+snzDrt343;1;0;�;�;�;�;�;�;�;�;�;0;�
+snzDrt343;2;0;�;�;�;�;�;�;�;�;�;0;�
+snzDrt343;3;0;�;�;�;�;�;�;�;�;�;0;�
+snzDrt343;499;6006;268.56;1320;606.65;374;233;917.63;10234.56;9491.73;1186.19;0;0
+snzDrt343;500;6007;264.03;1274;592.6;368;230;918.03;10240.98;9493.96;1182.06;0;0
