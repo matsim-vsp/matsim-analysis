@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class CollectiveAnalysisTest {
+public class RunsOverviewTest {
 
 	static String directoryToScanForRuns = null;
 	static ArrayList<String> runIds = new ArrayList<String>();
@@ -30,7 +30,7 @@ public class CollectiveAnalysisTest {
 
 	@Test
 	public void testAnalysisOutputs() {
-		CollectiveAnalysisTest.main((new String[]{"C:\\Users\\Aravind\\svn"}));
+		RunsOverviewTest.main((new String[]{"C:\\Users\\Aravind\\svn"}));
 	}
 
 	public static void main(String[] args) {

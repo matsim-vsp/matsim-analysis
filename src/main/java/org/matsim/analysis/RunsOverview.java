@@ -38,7 +38,7 @@ import javax.swing.JPanel;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class CollectiveAnalysis {
+public class RunsOverview {
 
 	static LinkedHashSet<String> fileList = new LinkedHashSet<String>();
 	static String directoryToScanForRuns = null;
