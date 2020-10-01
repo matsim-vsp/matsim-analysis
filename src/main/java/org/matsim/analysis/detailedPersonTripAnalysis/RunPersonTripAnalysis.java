@@ -85,9 +85,11 @@ public class RunPersonTripAnalysis {
 		events.addHandler(handler1);
 		
 		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
+		events.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		
+		events.finishProcessing();
+
 		PersonTripAnalysis personTripAnalysis = new PersonTripAnalysis();
 		TripAnalysisFilter tripFilter = new TripAnalysisFilter("origin-and-destination-in-area");
 
