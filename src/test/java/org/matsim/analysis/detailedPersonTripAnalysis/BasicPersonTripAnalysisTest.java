@@ -178,10 +178,11 @@ public class BasicPersonTripAnalysisTest {
 		events.addHandler(basicHandler);
 		
 		log.info("Reading the events file...");
-		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
+		events.initProcessing();
 		reader.readFile(eventsFile);
-		
+		events.finishProcessing();
+
 		log.info("Reading the events file... Done.");
 		
 		return basicHandler;

@@ -71,7 +71,9 @@ public class PersonTripAnalysisTest {
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
+		events.initProcessing();
 		reader.readFile(eventsFile);
+		events.finishProcessing();
 		log.info("Reading the events file... Done.");
 				
 		// plans

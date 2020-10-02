@@ -63,8 +63,10 @@ public class RunLinkDemandAnalysis {
 		
 		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
+		events.initProcessing();
 		reader.readFile(eventsFile);
-		
+		events.finishProcessing();
+
 		handler1.printResults(outputDirectory + runId + ".");
 		handler2.printResults(outputDirectory + runId + ".");
 	}

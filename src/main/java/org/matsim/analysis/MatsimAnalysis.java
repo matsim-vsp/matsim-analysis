@@ -266,10 +266,18 @@ public class MatsimAnalysis {
 		// #####################################
 		// Read the events file
 		// #####################################
-		
-		if (scenario1 != null) readEventsFile(runDirectory, runId, events1);
-		if (scenario0 != null) readEventsFile(runDirectoryToCompareWith, runIdToCompareWith, events0);
-				
+
+		if (scenario1 != null){
+			events1.initProcessing();
+			readEventsFile(runDirectory, runId, events1);
+			events1.finishProcessing();
+		}
+		if (scenario0 != null){
+			events0.initProcessing();
+			readEventsFile(runDirectoryToCompareWith, runIdToCompareWith, events0);
+			events0.finishProcessing();
+		}
+
 		// #####################################
 		// Post process and read plans file
 		// #####################################
