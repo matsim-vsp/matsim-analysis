@@ -26,28 +26,29 @@
 			<param name="mode" value="drt"/>
 			<param name="numberOfThreads" value="1"/>
 			<param name="operationalScheme" value="serviceAreaBased"/>
-			<param name="drtServiceAreaShapeFile" value="./equil-zone/equi-zone.shp" />
+			<param name="drtServiceAreaShapeFile" value="./equil-zone/equi-zone.shp"/>
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="stopDuration" value="60.0"/>
 			<param name="transitStopFile" value="null"/>
 			<param name="useModeFilteredSubnetwork" value="false"/>
 			<param name="vehiclesFile" value="./drtVehicles.xml"/>
 			<param name="writeDetailedCustomerStats" value="true"/>
-			<parameterset type="minCostFlowRebalancing">
-				<param name="cellSize" value="2000.0"/>
-				<param name="targetAlpha" value="0.5"/>
-				<param name="targetBeta" value="0.5"/>
+			<parameterset type="zonalSystem">
+				<param name="zonesGeneration" value="GridFromNetwork"/>
+				<param name="cellSize" value="2000"/>
 			</parameterset>
-		</parameterset>
-	</module>
-	<module name="drtfares" >
-		<parameterset type="drtfare" >
-			<!-- drt fare per meter (fee = positive value) -->
-			<param name="distanceFare_m" value="0.0015" />
-			<!-- Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value). -->
-			<param name="minFarePerTrip" value="4.0" />
-			<!-- transport mode for which the fare applies. Default: drt -->
-			<param name="mode" value="drt" />
+			<parameterset type="rebalancing">
+				<parameterset type="minCostFlowRebalancingStrategy">
+					<param name="targetAlpha" value="0.5"/>
+					<param name="targetBeta" value="0.5"/>
+				</parameterset>
+			</parameterset>
+			<parameterset type="drtfare">
+				<!-- drt fare per meter (fee = positive value) -->
+				<param name="distanceFare_m" value="0.0015"/>
+				<!-- Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value). -->
+				<param name="minFarePerTrip" value="4.0"/>
+			</parameterset>
 		</parameterset>
 	</module>
 	<module name="dvrp" >
