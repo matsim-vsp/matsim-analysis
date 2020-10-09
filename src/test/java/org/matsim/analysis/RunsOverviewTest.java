@@ -24,22 +24,12 @@ import org.junit.Test;
 
 public class RunsOverviewTest {
 
-	static String directoryToScanForRuns = null;
 	static ArrayList<String> runIds = new ArrayList<String>();
 	static LinkedHashSet<String> fileList = new LinkedHashSet<String>();
 
 	@Test
 	public void testAnalysisOutputs() {
-		RunsOverviewTest.main((new String[]{"C:\\Users\\Aravind\\svn"}));
-	}
-
-	public static void main(String[] args) {
-		directoryToScanForRuns = args[0];
-		File file = new File(directoryToScanForRuns);
-		if (directoryToScanForRuns != null && file.exists()) {
-			chooseFilePathAndRead(directoryToScanForRuns);
-		}
-		
+		chooseFilePathAndRead("test/input/org/matsim/analysis/run-overview");
 	}
 
 	private static void chooseFilePathAndRead(String directoryToScanForRuns2) {
