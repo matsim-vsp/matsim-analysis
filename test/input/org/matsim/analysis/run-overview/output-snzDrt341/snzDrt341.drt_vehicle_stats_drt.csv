@@ -1,9 +1,3 @@
-runId;iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;directDistance_m_mean;totalTravelTime_mean;rejections;rejectionRate
-snzDrt341;1;0;�;�;�;�;�;�;�;�;�;0;�
-snzDrt341;2;0;�;�;�;�;�;�;�;�;�;0;�
-snzDrt341;3;0;�;�;�;�;�;�;�;�;�;0;�
-snzDrt341;499;0;�;�;�;�;�;�;�;�;�;0;�
-snzDrt341;500;0;�;�;�;�;�;�;�;�;�;0;�
 runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t;l_det
 snzDrt341;1;10000;0;0;�;0;0;0;0;�;�
 snzDrt341;2;10000;0;0;�;0;0;0;0;�;�

@@ -35,16 +35,7 @@ public class RunsOverviewTest {
 					"../matsim-analysis/test/input/org/matsim/analysis/run-overview/runOverviewToCompare.csv"));
 			CSVParser csvParserRunOverviewToCompare = new CSVParser(brTwo, CSVFormat.DEFAULT);
 			for (CSVRecord csvRecord : csvParserRunOverview) {
-				System.out.println(csvRecord.get(4));
 				for (CSVRecord csvRecordToCompare : csvParserRunOverviewToCompare) {
-					System.out.println("---" + csvRecordToCompare.get(4));
-					System.out.println("record " + csvRecordToCompare.getRecordNumber());
-
-					char[] arra1 = csvRecordToCompare.get(43).toCharArray();
-					char[] arra2 = csvRecord.get(43).toCharArray();
-
-					System.out.println("first " + arra1);
-					System.out.println("second " + arra2);
 
 					if (csvRecordToCompare.getRecordNumber() > 1) {
 
