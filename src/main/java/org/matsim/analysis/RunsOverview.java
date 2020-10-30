@@ -45,6 +45,10 @@ public class RunsOverview {
 	static String separator = null;
 	static String[] filesList = null;
 
+	public RunsOverview() {
+		directoryToScanForRuns = "../matsim-analysis/test/input/org/matsim/analysis/run-overview";
+		separator = ",";
+	}
 	public static void main(String[] args) {
 		String filesToCopy = null;
 		if (args.length >= 2) {
@@ -394,7 +398,7 @@ public class RunsOverview {
 		return keys;
 	}
 
-	private static void chooseFilePathAndRead(String separator) {
+	public static void chooseFilePathAndRead(String separator) {
 
 		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
 		File rootPath = null;
