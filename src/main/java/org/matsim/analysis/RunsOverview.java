@@ -40,16 +40,20 @@ import org.apache.commons.lang3.StringUtils;
 
 public class RunsOverview {
 
-	static LinkedHashSet<String> fileList = new LinkedHashSet<String>();
-	static String directoryToScanForRuns = null;
-	static String separator = null;
-	static String[] filesList = null;
+	LinkedHashSet<String> fileList = new LinkedHashSet<String>();
+	String directoryToScanForRuns = null;
+	String separator = ",";
+	Set<String> filesList = null;
 
-	public RunsOverview() {
-		directoryToScanForRuns = "../matsim-analysis/test/input/org/matsim/analysis/run-overview";
-		separator = ",";
+	public RunsOverview(String directoryToScanForRuns, String separator, Set<String> filesList) {
+		this.directoryToScanForRuns = directoryToScanForRuns;
+		this.separator = separator;
+		this.filesList = filesList;
 	}
+
 	public static void main(String[] args) {
+		String directoryToScanForRuns = null;
+		String separator = null;
 		String filesToCopy = null;
 		if (args.length >= 2) {
 			directoryToScanForRuns = args[0];
@@ -109,15 +113,15 @@ public class RunsOverview {
 						separator = ";";
 						break;
 					}
-					chooseFilePathAndRead(separator);
+					chooseFilePathAndRead();
 				}
 			});
 		} else {
-			chooseFilePathAndRead(separator);
+			chooseFilePathAndRead();
 		}
 	}
 
-	private static LinkedHashMap<String, Map<String, Map<String, String>>> readDataFile(
+	private LinkedHashMap<String, Map<String, Map<String, String>>> readDataFile(
 			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
 		// runID filename column value
 		LinkedHashMap<String, Map<String, Map<String, String>>> toPrint = new LinkedHashMap<>();
@@ -180,9 +184,8 @@ public class RunsOverview {
 
 	// Taking a particular file and its last line values from each runID
 	// runId fileName column value
-	private static LinkedHashMap<String, Map<String, Map<String, String>>> organiseDataTable(
+	private LinkedHashMap<String, Map<String, Map<String, String>>> organiseDataTable(
 			LinkedHashMap<String, Map<String, Map<String, String>>> toPrint) {
-		initiateFileList();
 		// TreeMap sort key by default
 		Map<String, Map<String, String>> lastLine = new TreeMap<String, Map<String, String>>();
 		Iterator<String> fileListItr = fileList.iterator();
@@ -219,7 +222,7 @@ public class RunsOverview {
 	// working with only one file for each runID
 	// Here we only check if all the files are having the same columns, if any
 	// column is missing add that column with NA as value
-	private static Map<String, Map<String, String>> organiseData(Map<String, Map<String, String>> lastLine) {
+	private Map<String, Map<String, String>> organiseData(Map<String, Map<String, String>> lastLine) {
 		LinkedHashSet<String> columnName = new LinkedHashSet<String>();
 
 		Set<String> runIdKey = lastLine.keySet();
@@ -252,7 +255,7 @@ public class RunsOverview {
 	}
 
 	// writing data to csv file
-	public static void writeData(LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite, File rootPath,
+	public void writeData(LinkedHashMap<String, Map<String, Map<String, String>>> dataToWrite, File rootPath,
 			String separator) {
 
 		FileWriter fwriter;
@@ -351,7 +354,7 @@ public class RunsOverview {
 	// here avg. BEST will be read as two columns column 1:avg. column 2: BEST
 	// This method will identify such column names and rebuild the actual column
 	// name
-	private static String[] removeDuplicateKeys(String[] keys) {
+	private String[] removeDuplicateKeys(String[] keys) {
 
 		ArrayList<String> uniqueKeys = new ArrayList<String>();
 		ArrayList<String> duplicateKeys = new ArrayList<String>();
@@ -398,7 +401,7 @@ public class RunsOverview {
 		return keys;
 	}
 
-	public static void chooseFilePathAndRead(String separator) {
+	public void chooseFilePathAndRead() {
 
 		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
 		File rootPath = null;
@@ -488,7 +491,6 @@ public class RunsOverview {
 				.forEachOrdered(x -> runIdWithPathSorted.put(x.getKey(), x.getValue()));
 		Iterator<String> keyItr = runIdWithPathSorted.keySet().iterator();
 		while (keyItr.hasNext()) {
-			initiateFileList();
 			String key = keyItr.next();
 			ArrayList<String> value = runIdWithPathSorted.get(key);
 			Iterator<String> valItr = value.iterator();
@@ -520,13 +522,14 @@ public class RunsOverview {
 
 	}
 
-	private static void initiateFileList() {
-		fileList = new LinkedHashSet<String>();
+	public static Set<String> getDefaultDrtRunFileSet() {
+		Set<String> fileList = new LinkedHashSet<String>();
 		fileList.add("drt_customer_stats_drt");
 		fileList.add("drt_vehicle_stats_drt");
 		fileList.add("modestats");
 		fileList.add("pkm_modestats");
 		fileList.add("scorestats");
+		return fileList;
 	}
 
 }

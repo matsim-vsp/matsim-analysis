@@ -22,8 +22,10 @@ public class RunsOverviewTest {
 	@Test
 	public void testAnalysisOutputs() {
 
-		RunsOverview runOverview = new RunsOverview();
-		runOverview.chooseFilePathAndRead(",");
+		RunsOverview runOverview = new RunsOverview(
+				"../matsim-analysis/test/input/org/matsim/analysis/run-overview",
+				",", RunsOverview.getDefaultDrtRunFileSet());
+		runOverview.chooseFilePathAndRead();
 		BufferedReader brOne;
 		BufferedReader brTwo;
 
