@@ -18,14 +18,16 @@ public class RunsOverviewTest {
 	static ArrayList<String> runIds = new ArrayList<String>();
 	static LinkedHashSet<String> fileList = new LinkedHashSet<String>();
 
-	@SuppressWarnings("static-access")
+	//TODO: Add test with custom file list, including at least one file not set up ijn the default initialiseFileList / RunsOverview.getDefaultDrtRunFileSet()
+	// long-term TODO: find better solution than RunsOverview.getDefaultDrtRunFileSet()
+
 	@Test
 	public void testAnalysisOutputs() {
 
 		RunsOverview runOverview = new RunsOverview(
 				"../matsim-analysis/test/input/org/matsim/analysis/run-overview",
 				",", RunsOverview.getDefaultDrtRunFileSet());
-		runOverview.chooseFilePathAndRead();
+		runOverview.run();
 		BufferedReader brOne;
 		BufferedReader brTwo;
 

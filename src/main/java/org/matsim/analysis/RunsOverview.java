@@ -54,22 +54,16 @@ public class RunsOverview {
 	public static void main(String[] args) {
 		String directoryToScanForRuns = null;
 		String separator = null;
-		String filesToCopy = null;
-		if (args.length >= 2) {
-			directoryToScanForRuns = args[0];
-			separator = args[1];
-		}
-		if (args.length == 3) {
-			filesToCopy = args[2];
-			String[] filesToCopyList = null;
-			if (filesToCopy != null && !filesToCopy.equals("null")) {
-				filesToCopyList = filesToCopy.split(",");
-				//filesList = new String[filesToCopyList.length];
-				filesList = filesToCopyList;
-			}
-		}
+		Set<String> filesList;
 
-		if (separator == null) {
+		if (args.length < 2) {
+			// not sufficient arguments to do anything, start GUI to make the user specify arguments
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			chooser.setDialogTitle("choose root directory");
+			chooser.showOpenDialog(null);
+
+			directoryToScanForRuns = chooser.getSelectedFile().getPath();
 
 			JFrame frame = new JFrame();
 			frame.setTitle("Choose separator");
@@ -93,31 +87,41 @@ public class RunsOverview {
 			frame.add(panel);
 			frame.setVisible(true);
 
-			okButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String separator = null;
-					// frame.setVisible(false);
-					frame.dispose();
-					Object item = comboBox.getSelectedItem();
-					System.out.println("choosen value " + item.toString());
-					String userOption = item.toString();
+			String finalDirectoryToScanForRuns = directoryToScanForRuns;
+			okButton.addActionListener(e -> {
+				String separator1 = null;
+				// frame.setVisible(false);
+				frame.dispose();
+				Object item = comboBox.getSelectedItem();
+				System.out.println("choosen value " + item.toString());
+				String userOption = item.toString();
 
-					switch (userOption) {
+				switch (userOption) {
 
 					case "Comma ,":
-						separator = ",";
+						separator1 = ",";
 						break;
 
 					case "Semicolon ;":
-						separator = ";";
+						separator1 = ";";
 						break;
-					}
-					chooseFilePathAndRead();
 				}
+				(new RunsOverview(finalDirectoryToScanForRuns, separator1, getDefaultDrtRunFileSet())).run();
 			});
 		} else {
-			chooseFilePathAndRead();
+			directoryToScanForRuns = args[0];
+			separator = args[1];
+			if (args.length == 3) {
+				String filesToCopy = args[2];
+				String[] filesToCopyList = null;
+				if (filesToCopy != null && !filesToCopy.equals("null")) {
+					filesToCopyList = filesToCopy.split(",");
+					filesList = Set.of(filesToCopyList);
+				}
+			} else {
+				filesList = getDefaultDrtRunFileSet();
+			}
+			(new RunsOverview(directoryToScanForRuns, separator, getDefaultDrtRunFileSet())).run();
 		}
 	}
 
@@ -186,6 +190,7 @@ public class RunsOverview {
 	// runId fileName column value
 	private LinkedHashMap<String, Map<String, Map<String, String>>> organiseDataTable(
 			LinkedHashMap<String, Map<String, Map<String, String>>> toPrint) {
+		fileList = getDefaultDrtRunFileSet(); // TODO: This is the initialiseFileList method renamed. This method call here is evil. It does not care which files the user has set up, instead it only works with the default list
 		// TreeMap sort key by default
 		Map<String, Map<String, String>> lastLine = new TreeMap<String, Map<String, String>>();
 		Iterator<String> fileListItr = fileList.iterator();
@@ -401,7 +406,7 @@ public class RunsOverview {
 		return keys;
 	}
 
-	public void chooseFilePathAndRead() {
+	public void run() {
 
 		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
 		File rootPath = null;
@@ -439,10 +444,11 @@ public class RunsOverview {
 			ArrayList<String> fileListToCompare = new ArrayList<String>();
 			// loop and exclude unnecessary files
 			if (filesList != null) {
-				for (int k = 0; k < filesList.length; k++) {
-					String filename = filesList[k];
-					fileListToCompare.add(filename);
-				}
+//				for (int k = 0; k < filesList.size(); k++) {
+//					String filename = filesList[k];
+//					fileListToCompare.add(filename);
+//				}
+				fileListToCompare.addAll(filesList);
 			}else {
 				fileListToCompare.add("drt_customer_stats_drt");
 				fileListToCompare.add("drt_vehicle_stats_drt");
@@ -491,6 +497,7 @@ public class RunsOverview {
 				.forEachOrdered(x -> runIdWithPathSorted.put(x.getKey(), x.getValue()));
 		Iterator<String> keyItr = runIdWithPathSorted.keySet().iterator();
 		while (keyItr.hasNext()) {
+			fileList = getDefaultDrtRunFileSet(); // TODO: This is the initialiseFileList method renamed. This method call here is evil. It does not care which files the user has set up, instead it only works with the default list
 			String key = keyItr.next();
 			ArrayList<String> value = runIdWithPathSorted.get(key);
 			Iterator<String> valItr = value.iterator();
@@ -522,8 +529,8 @@ public class RunsOverview {
 
 	}
 
-	public static Set<String> getDefaultDrtRunFileSet() {
-		Set<String> fileList = new LinkedHashSet<String>();
+	public static LinkedHashSet<String> getDefaultDrtRunFileSet() {
+		LinkedHashSet<String> fileList = new LinkedHashSet<String>();
 		fileList.add("drt_customer_stats_drt");
 		fileList.add("drt_vehicle_stats_drt");
 		fileList.add("modestats");
