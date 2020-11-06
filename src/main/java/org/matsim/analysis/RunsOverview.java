@@ -441,44 +441,17 @@ public class RunsOverview {
 					return filename.endsWith(".txt") || filename.endsWith(".csv");
 				}
 			});
-			ArrayList<String> fileListToCompare = new ArrayList<String>();
-			// loop and exclude unnecessary files
-			if (filesList != null) {
-//				for (int k = 0; k < filesList.size(); k++) {
-//					String filename = filesList[k];
-//					fileListToCompare.add(filename);
-//				}
-				fileListToCompare.addAll(filesList);
-			}else {
-				fileListToCompare.add("drt_customer_stats_drt");
-				fileListToCompare.add("drt_vehicle_stats_drt");
-				fileListToCompare.add("modestats");
-				fileListToCompare.add("scorestats");
-				fileListToCompare.add("pkm_modestats");
-			}
 			String fileName = null;
 			for (int j = 0; j < files.length; j++) {
 				File file = files[j];
 				fileName = file.getName();
 				String[] fileNames = fileName.split("[.]");
 				String fileNameToCompare = fileNames[1];
-//				if (fileName.endsWith("drt_customer_stats_drt.csv") || fileName.endsWith("drt_vehicle_stats_drt.csv")
-//						|| fileName.endsWith("modestats.txt") || fileName.endsWith("scorestats.txt")
-//						|| fileName.endsWith("pkm_modestats.txt")) {
-//
-//					paths.add(directories[i] + "/" + fileName);
-//
-//				}
-				if(fileListToCompare.contains(fileNameToCompare)) {
+				if(filesList.contains(fileNameToCompare)) {
 					paths.add(directories[i] + "/" + fileName);
 				}
 			}
-			Collections.sort(paths, new Comparator<String>() {
-				@Override
-				public int compare(String s1, String s2) {
-					return s1.compareToIgnoreCase(s2);
-				}
-			});
+			Collections.sort(paths, (s1, s2) -> s1.compareToIgnoreCase(s2));
 			Iterator<String> pathItr = paths.iterator();
 			String runId = null;
 			while (pathItr.hasNext()) {
