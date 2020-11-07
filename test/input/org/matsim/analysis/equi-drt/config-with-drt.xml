@@ -16,8 +16,6 @@
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
-			<param name="estimatedBeelineDistanceFactor" value="1.3"/>
-			<param name="estimatedDrtSpeed" value="8.333333333333334"/>
 			<param name="idleVehiclesReturnToDepots" value="false"/>
 			<param name="maxTravelTimeAlpha" value="1.7"/>
 			<param name="maxTravelTimeBeta" value="120.0"/>
