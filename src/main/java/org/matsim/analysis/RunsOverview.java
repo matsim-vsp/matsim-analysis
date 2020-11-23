@@ -168,16 +168,16 @@ public class RunsOverview {
 		LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted = new LinkedHashMap<>();
 		runIdWithPath.entrySet().stream().sorted(Map.Entry.comparingByKey())
 				.forEachOrdered(x -> runIdWithPathSorted.put(x.getKey(), x.getValue()));
-		String[][] matrix = readFiles(runIdWithPathSorted, fileList);
+		String[][] matrix = readFiles(runIdWithPathSorted);
 		String[][] matrixToPrint = addColumnTitles(matrix, columNames);
 		writeData(matrixToPrint, getDirectoryToScanForRuns(), separator);
 	}
 
-	public String[][] readFiles(LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted, ArrayList<String> files) {
+	public String[][] readFiles(LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
 		String line = null;
 		Set<String> keySet = runIdWithPathSorted.keySet();
 		Iterator<String> keyItr = keySet.iterator();
-		LinkedHashMap<String, ArrayList<String>> mappedFilesAndColumns = mapFilesAndColumns(runIdWithPathSorted, files);
+		LinkedHashMap<String, ArrayList<String>> mappedFilesAndColumns = mapFilesAndColumns(runIdWithPathSorted);
 		String[][] matrix = new String[keySet.size() + 1][100];
 		int rowCount = 1;
 		int columnCount = 0;
@@ -280,7 +280,7 @@ public class RunsOverview {
 
 	// this method is to map files with respective column names
 	public LinkedHashMap<String, ArrayList<String>> mapFilesAndColumns(
-			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted, ArrayList<String> files) {
+			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
 		String line = null;
 		String[] columnTitles = null;
 		int columnSize = 0;
@@ -338,7 +338,7 @@ public class RunsOverview {
 				}
 				itr++;
 			}
-			if (itr == files.size() && columnSize == prevColumnSize)
+			if (itr != 0 && columnSize == prevColumnSize)
 				break;
 
 		}
