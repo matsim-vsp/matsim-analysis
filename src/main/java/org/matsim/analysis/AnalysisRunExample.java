@@ -34,10 +34,10 @@ public class AnalysisRunExample {
 			
 	public static void main(String[] args) throws IOException {
 			
-		final String runDirectory = "/path-to-run-directory/";
-		final String runId = "run-id";		
-		final String modesString = "car,pt";
-		final String scenarioCRS = "EPSG:1234";
+		final String runDirectory = "C:\\Users\\cluac\\MATSimScenarios\\Berlin\\output\\001";
+		final String runId = null;		
+		final String modesString = "car,pt,walk,bike";
+		final String scenarioCRS = null;
 		
 		Scenario scenario1 = loadScenario(runDirectory, runId, scenarioCRS);
 		
@@ -72,9 +72,9 @@ public class AnalysisRunExample {
 		String populationFile;
 		String facilitiesFile;
 		
-		networkFile = runDirectory + runId + ".output_network.xml.gz";
-		populationFile = runDirectory + runId + ".output_plans.xml.gz";
-		facilitiesFile = runDirectory + runId + ".output_facilities.xml.gz";
+		networkFile = runDirectory  + "output_network.xml.gz";
+		populationFile = runDirectory  + "output_plans.xml.gz";
+		facilitiesFile = runDirectory  + "output_facilities.xml.gz";
 
 		Config config = ConfigUtils.createConfig();
 
