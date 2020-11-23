@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -15,15 +15,13 @@ import org.junit.Test;
 
 public class RunsOverviewTest {
 
-	static ArrayList<String> runIds = new ArrayList<String>();
-	static LinkedHashSet<String> fileList = new LinkedHashSet<String>();
-
-	@SuppressWarnings("static-access")
 	@Test
 	public void testAnalysisOutputs() {
 
-		RunsOverview runOverview = new RunsOverview();
-		runOverview.chooseFilePathAndRead(",");
+		String directoryToScanForRuns = "../matsim-analysis/test/input/org/matsim/analysis/run-overview";
+		RunsOverview analysis = new RunsOverview(getFileList());
+		analysis.setDirectoryToScanForRuns(directoryToScanForRuns);
+		analysis.run(analysis.getSeparator(), analysis.getDirectoryToScanForRuns());
 		BufferedReader brOne;
 		BufferedReader brTwo;
 
@@ -37,10 +35,6 @@ public class RunsOverviewTest {
 			for (CSVRecord csvRecord : csvParserRunOverview) {
 				for (CSVRecord csvRecordToCompare : csvParserRunOverviewToCompare) {
 
-//						String val1 = "0.22";
-//						String val2 = "1.22";
-//						Assert.assertArrayEquals("failure" + " fails", val1.toCharArray(),
-//								val2.toCharArray());
 					String fileNameOne = (!(csvRecord.get(3).length() > 1) ? "Row" : csvRecord.get(3));
 					String runID = csvRecord.get(0);
 
@@ -173,4 +167,16 @@ public class RunsOverviewTest {
 		}
 
 	}
+
+	private ArrayList<String> getFileList() {
+		ArrayList<String> fileList = new ArrayList<String>();
+		fileList.add("drt_customer_stats_drt.csv");
+		fileList.add("drt_vehicle_stats_drt.csv");
+		fileList.add("modestats.txt");
+		fileList.add("pkm_modestats.txt");
+		fileList.add("scorestats.txt");
+		Collections.sort(fileList, (s1, s2) -> s1.compareToIgnoreCase(s2));
+		return fileList;
+	}
+
 }
