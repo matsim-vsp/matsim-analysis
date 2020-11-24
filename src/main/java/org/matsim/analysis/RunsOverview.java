@@ -419,10 +419,7 @@ public class RunsOverview {
 		int count = 0;
 		while (titlesItr.hasNext()) {
 			if (count < 4) {
-				matrix[0][0] = null;
-				matrix[0][1] = null;
-				matrix[0][2] = null;
-				matrix[0][3] = null;
+				matrix[0][count] = null;
 			} else {
 				matrix[0][count] = titlesItr.next();
 			}
