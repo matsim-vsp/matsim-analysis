@@ -104,7 +104,7 @@ public class ModeAnalysisTest {
 				
 		Assert.assertEquals("wrong number of trips", 1, analysis.getMode2TripCounterFiltered().get(TransportMode.car), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong number of trips", 2, analysis.getMode2TripCounterFiltered().get("pt"), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong number of trips", 1, analysis.getMode2TripCounterFiltered().get(TransportMode.transit_walk), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong number of trips", 1, analysis.getMode2TripCounterFiltered().get(TransportMode.walk), MatsimTestUtils.EPSILON);
 	}
 
 	@Ignore

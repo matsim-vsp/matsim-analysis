@@ -4,9 +4,9 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -168,10 +168,9 @@ public class BasicPersonTripAnalysisTest {
 	
 	public BasicPersonTripAnalysisHandler analyseScenario(String eventsFile, Scenario scenario) {
 
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
 		final String stageActivitySubString = "interaction";
 		
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(helpLegModes, stageActivitySubString);	
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(stageActivitySubString, new DefaultAnalysisMainModeIdentifier());	
 		basicHandler.setScenario(scenario);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -203,4 +202,22 @@ public class BasicPersonTripAnalysisTest {
 			System.out.println("tripNumber2tripDistance: " + basicHandler.getPersonId2tripNumber2tripDistance().get(person.getId()));
 		}
 	}
+	
+	@Test
+	public void testMainModeIdentification() {
+		
+		final String stageActivitySubString = "interaction";
+
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(stageActivitySubString, new DefaultAnalysisMainModeIdentifier());
+		Assert.assertEquals("Wrong main mode: ", "bike", basicHandler.getMainMode("bike"));
+		Assert.assertEquals("Wrong main mode: ", "walk", basicHandler.getMainMode("walk-walk"));
+		Assert.assertEquals("Wrong main mode: ", "pt", basicHandler.getMainMode("walk-pt-walk"));
+		Assert.assertEquals("Wrong main mode: ", "car", basicHandler.getMainMode("walk-car-walk"));
+		Assert.assertEquals("Wrong main mode: ", "pt", basicHandler.getMainMode("walk-pt-walk-drt-walk"));
+		Assert.assertEquals("Wrong main mode: ", "pt", basicHandler.getMainMode("walk-drt2-walk-pt-walk"));
+		Assert.assertEquals("Wrong main mode: ", "pt", basicHandler.getMainMode("walk-drt-walk-pt-walk-drt-walk"));
+
+	}
+	
+	
 }

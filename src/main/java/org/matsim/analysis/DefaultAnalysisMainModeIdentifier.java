@@ -72,16 +72,16 @@ public final class DefaultAnalysisMainModeIdentifier implements AnalysisMainMode
 			} else {
 				continue;
 			}
-			if (mode.equals(TransportMode.non_network_walk) || mode.equals("access_walk") || mode.equals("egress_walk")) {
+			if (mode.equals(TransportMode.non_network_walk) || mode.equals("access_walk") || mode.equals("egress_walk")) { // for backward compatibility
 				// skip, this is only a helper mode for access, egress and pt transfers
 				continue;
 			}
 			if (mode.equals(TransportMode.transit_walk)) {
-				mode = TransportMode.transit_walk; // this is considered as 'transit_walk' and not pt!!!
+				mode = TransportMode.walk; // this is considered as 'transit_walk' and not pt!!!
 			} else {
 				for (String drtMode: drtModes) {
 					if (mode.equals(drtMode + "_fallback")) {// transit_walk / drt_walk / ... to be replaced by _fallback soon
-						mode = drtMode;
+						mode = TransportMode.walk;
 					}
 				}
 			}

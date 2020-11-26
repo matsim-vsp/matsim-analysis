@@ -32,8 +32,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class AnalysisRunExampleSnzScenario {
-	private static final Logger log = Logger.getLogger(AnalysisRunExampleSnzScenario.class);
+public class AnalysisRunExampleSnzScenarioIntermodal {
+	private static final Logger log = Logger.getLogger(AnalysisRunExampleSnzScenarioIntermodal.class);
 			
 	public static void main(String[] args) throws IOException {
 			
@@ -54,7 +54,7 @@ public class AnalysisRunExampleSnzScenario {
 		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.walk, TransportMode.non_network_walk, "access_walk", "egress_walk"}; // to be able to analyze old runs
 		final int scalingFactor = 4;
 		final String homeActivityPrefix = "home";
-		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + TransportMode.bike + "," + TransportMode.walk + "," + TransportMode.ride + "," + TransportMode.drt;
+		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + TransportMode.bike + "," + TransportMode.walk + "," + TransportMode.ride + "," + TransportMode.drt + ",pt_w_drt_used";
 
 		if (args.length > 0) {
 
@@ -213,7 +213,7 @@ public class AnalysisRunExampleSnzScenario {
 		analysis.setHelpLegModes(helpLegModes);
 		analysis.setZoneInformation(shapeFileZones, shapFileZonesCRS, zoneId);
 		analysis.setVisualizationScriptInputDirectory(visualizationScriptInputDirectory);
-
+		analysis.setMainModeIdentifier(new IntermodalPtDrtRouterAnalysisModeIdentifier());
 		analysis.run();
 	}
 	

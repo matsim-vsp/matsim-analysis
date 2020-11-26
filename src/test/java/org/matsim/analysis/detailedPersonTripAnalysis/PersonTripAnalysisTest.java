@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -60,10 +61,9 @@ public class PersonTripAnalysisTest {
 		
 		// standard events analysis
 	
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.non_network_walk};
 		final String stageActivitySubString = "interaction";
 		
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(helpLegModes, stageActivitySubString);	
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(stageActivitySubString, new DefaultAnalysisMainModeIdentifier());	
 		basicHandler.setScenario(scenario);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -116,7 +116,7 @@ public class PersonTripAnalysisTest {
 			line = br.readLine();
 			while(line != null) {
 				if (line.startsWith("person")) {
-					Assert.assertTrue("Output changed!?", line.equals("person Id;trip no.;trip main mode;trip modes (excl. help leg modes);stuck and abort trip (yes/no);departure time (trip) [sec];arrival time (trip) [sec];travel time (trip) [sec];in-vehicle time (trip) [sec];travel distance (trip) [m];origin X coordinate (trip);origin Y coordinate (trip);destination X coordinate (trip);destination Y coordinate (trip);beeline distance (trip) [m];money payments (trip) [monetary units]"));
+					Assert.assertTrue("Output changed!?", line.equals("person Id;trip no.;trip main mode;leg modes;stuck and abort trip (yes/no);departure time (trip) [sec];arrival time (trip) [sec];travel time (trip) [sec];in-vehicle time (trip) [sec];travel distance (trip) [m];origin X coordinate (trip);origin Y coordinate (trip);destination X coordinate (trip);destination Y coordinate (trip);beeline distance (trip) [m];money payments (trip) [monetary units]"));
 				} else {
 					tripInfos.add(line.split(";"));
 				}
