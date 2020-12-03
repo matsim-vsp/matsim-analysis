@@ -14,8 +14,8 @@ import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -33,7 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class RunsOverview {
 
-	ArrayList<String> fileList;
+	Set<String> fileList;
 	String separator = ",";
 	String directoryToScanForRuns;
 	String[] filesList;
@@ -45,7 +45,7 @@ public class RunsOverview {
 	ArrayList<String> columNames;
 	HashMap<String, Integer> fileColumCount;
 
-	public RunsOverview(ArrayList<String> fileList) {
+	public RunsOverview(Set<String> fileList) {
 		this.fileList = fileList;
 	}
 
@@ -126,11 +126,7 @@ public class RunsOverview {
 	}
 
 	public void addFilesinList(String[] filesArray) {
-		fileList = new ArrayList<String>();
-		for (int k = 0; k < filesArray.length; k++) {
-			fileList.add(filesArray[k]);
-		}
-		Collections.sort(fileList, (s1, s2) -> s1.compareToIgnoreCase(s2));
+		fileList = Set.of(filesArray);
 	}
 
 	public void run(String separator, String directoryToScanForRuns) {
@@ -350,13 +346,13 @@ public class RunsOverview {
 	// ========================================================================================================================================================================
 
 	private void initiateDefaultFileList() {
-		fileList = new ArrayList<String>();
+		fileList = new HashSet<String>();
 		fileList.add("drt_customer_stats_drt.csv");
 		fileList.add("drt_vehicle_stats_drt.csv");
 		fileList.add("modestats.txt");
 		fileList.add("pkm_modestats.txt");
 		fileList.add("scorestats.txt");
-		Collections.sort(fileList, (s1, s2) -> s1.compareToIgnoreCase(s2));
+//		Collections.sort(fileList, (s1, s2) -> s1.compareToIgnoreCase(s2));
 	}
 
 	private void decideEachFileColumnsCount(String fileName, int noOfColumns) {

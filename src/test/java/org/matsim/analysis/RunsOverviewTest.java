@@ -4,8 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -168,14 +168,45 @@ public class RunsOverviewTest {
 
 	}
 
-	private ArrayList<String> getFileList() {
-		ArrayList<String> fileList = new ArrayList<String>();
+	//@Test
+	public void testAnalysisOutputsFourFiles() {
+		String directoryToScanForRuns = "../matsim-analysis/test/input/org/matsim/analysis/run-overview";
+		RunsOverview analysis = new RunsOverview(getFileList());
+		analysis.setDirectoryToScanForRuns(directoryToScanForRuns);
+		analysis.run(analysis.getSeparator(), analysis.getDirectoryToScanForRuns());
+		BufferedReader brOne;
+		BufferedReader brTwo;
+	}
+	
+	private Set<String> getFileList() {
+		Set<String> fileList = new HashSet<String>();
 		fileList.add("drt_customer_stats_drt.csv");
 		fileList.add("drt_vehicle_stats_drt.csv");
 		fileList.add("modestats.txt");
 		fileList.add("pkm_modestats.txt");
 		fileList.add("scorestats.txt");
-		Collections.sort(fileList, (s1, s2) -> s1.compareToIgnoreCase(s2));
+		return fileList;
+	}
+	
+	
+	private Set<String> getTwoFileList() {
+		Set<String> fileList = new HashSet<String>();
+		fileList.add("modestats.txt");
+		fileList.add("scorestats.txt");
+		return fileList;
+	}
+	
+	private Set<String> getThreeFileList() {
+		Set<String> fileList = new HashSet<String>();
+		fileList.add("drt_customer_stats_drt.csv");
+		fileList.add("pkm_modestats.txt");
+		fileList.add("scorestats.txt");
+		return fileList;
+	}
+	
+	private Set<String> getOneFile() {
+		Set<String> fileList = new HashSet<String>();
+		fileList.add("scorestats.txt");
 		return fileList;
 	}
 
