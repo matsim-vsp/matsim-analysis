@@ -43,7 +43,7 @@ public class RunsOverview {
 	int pkm_modestats;
 	int scorestats;
 	ArrayList<String> columNames;
-	HashMap<String, Integer> fileColumCount;
+	HashMap<String, Integer> fileColumnCount;
 
 	public RunsOverview(Set<String> fileList) {
 		this.fileList = fileList;
@@ -278,7 +278,7 @@ public class RunsOverview {
 	// this method is to map files with respective column names
 	public LinkedHashMap<String, ArrayList<String>> mapFilesAndColumns(
 			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
-		fileColumCount = new HashMap<String, Integer>();
+		fileColumnCount = new HashMap<String, Integer>();
 		String line = null;
 		String[] columnTitles = null;
 		int columnSize = 0;
@@ -357,14 +357,13 @@ public class RunsOverview {
 
 	private void decideEachFileColumnsCount(String fileName, int noOfColumns) {
 
-		fileColumCount.put(fileName, noOfColumns);
+		fileColumnCount.put(fileName, noOfColumns);
 
 	}
 
 	private int findOutColumnCount(String fileName) {
-		int returValue = 0;
-		returValue = fileColumCount.get(fileName);
-		return returValue;
+
+		return fileColumnCount.get(fileName);
 
 	}
 
