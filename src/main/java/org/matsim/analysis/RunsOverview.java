@@ -43,6 +43,7 @@ public class RunsOverview {
 	int pkm_modestats;
 	int scorestats;
 	ArrayList<String> columNames;
+	HashMap<String, Integer> fileColumCount;
 
 	public RunsOverview(ArrayList<String> fileList) {
 		this.fileList = fileList;
@@ -155,7 +156,7 @@ public class RunsOverview {
 			String[] nameSplit = dirName.split("-");
 			Iterator<String> filesItr;
 			if (fileList == null) {
-				initiateFileList();
+				initiateDefaultFileList();
 			}
 			filesItr = fileList.iterator();
 			while (filesItr.hasNext()) {
@@ -281,6 +282,7 @@ public class RunsOverview {
 	// this method is to map files with respective column names
 	public LinkedHashMap<String, ArrayList<String>> mapFilesAndColumns(
 			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
+		fileColumCount = new HashMap<String, Integer>();
 		String line = null;
 		String[] columnTitles = null;
 		int columnSize = 0;
@@ -331,7 +333,7 @@ public class RunsOverview {
 					mappedFilesAndColumns = mapColumnTitlesToFiles(columnTitles, fileName[1], filesWithColumnNames);
 //					}
 				} catch (FileNotFoundException e) {
-					itr=0;
+					itr = 0;
 					break;
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -347,7 +349,7 @@ public class RunsOverview {
 
 	// ========================================================================================================================================================================
 
-	private void initiateFileList() {
+	private void initiateDefaultFileList() {
 		fileList = new ArrayList<String>();
 		fileList.add("drt_customer_stats_drt.csv");
 		fileList.add("drt_vehicle_stats_drt.csv");
@@ -359,57 +361,13 @@ public class RunsOverview {
 
 	private void decideEachFileColumnsCount(String fileName, int noOfColumns) {
 
-		switch (fileName) {
-
-		case "drt_customer_stats_drt":
-			drt_customer_stats_drt = noOfColumns;
-			break;
-
-		case "drt_vehicle_stats_drt":
-			drt_vehicle_stats_drt = noOfColumns;
-			break;
-
-		case "modestats":
-			modestats = noOfColumns;
-			break;
-
-		case "pkm_modestats":
-			pkm_modestats = noOfColumns;
-			break;
-
-		case "scorestats":
-			scorestats = noOfColumns;
-			break;
-
-		}
+		fileColumCount.put(fileName, noOfColumns);
 
 	}
 
 	private int findOutColumnCount(String fileName) {
 		int returValue = 0;
-		switch (fileName) {
-
-		case "drt_customer_stats_drt":
-			returValue = drt_customer_stats_drt;
-			break;
-
-		case "drt_vehicle_stats_drt":
-			returValue = drt_vehicle_stats_drt;
-			break;
-
-		case "modestats":
-			returValue = modestats;
-			break;
-
-		case "pkm_modestats":
-			returValue = pkm_modestats;
-			break;
-
-		case "scorestats":
-			returValue = scorestats;
-			break;
-
-		}
+		returValue = fileColumCount.get(fileName);
 		return returValue;
 
 	}
