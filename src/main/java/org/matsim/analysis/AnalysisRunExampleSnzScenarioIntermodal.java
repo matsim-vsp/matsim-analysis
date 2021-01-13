@@ -32,8 +32,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class AnalysisRunExampleSnzScenario {
-	private static final Logger log = Logger.getLogger(AnalysisRunExampleSnzScenario.class);
+public class AnalysisRunExampleSnzScenarioIntermodal {
+	private static final Logger log = Logger.getLogger(AnalysisRunExampleSnzScenarioIntermodal.class);
 			
 	public static void main(String[] args) throws IOException {
 			
@@ -54,7 +54,7 @@ public class AnalysisRunExampleSnzScenario {
 		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.walk, TransportMode.non_network_walk, "access_walk", "egress_walk"}; // to be able to analyze old runs
 		final int scalingFactor = 4;
 		final String homeActivityPrefix = "home";
-		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + TransportMode.bike + "," + TransportMode.walk + "," + TransportMode.ride + "," + TransportMode.drt;
+		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + TransportMode.bike + "," + TransportMode.walk + "," + TransportMode.ride + "," + TransportMode.drt + ",pt_w_drt_used";
 
 		if (args.length > 0) {
 
@@ -104,50 +104,47 @@ public class AnalysisRunExampleSnzScenario {
 			
 			// Vulkaneifel
 			
-//			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/u19-runs/output_Vu-DRT-u19-drt-400-dep0630-a/";
-//			runId = "Vu-DRT-u19-drt-400-dep0630-a";		
-//			
-////			runDirectoryToCompareWith = "../runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/";
-////			runIdToCompareWith = "Vu-BC";
-//			
-//			runDirectoryToCompareWith = null;
-//			runIdToCompareWith = null;
-//			
-//			visualizationScriptInputDirectory = null;
-//			
-//			scenarioCRS = "EPSG:25832";
-//			
-//			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v1/shp-files/hexagon-grid-3000.shp";
-//			shapFileZonesCRS = "EPSG:25832";
-//			zoneId = "id";
-//						
-//			shapeFileAgentFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
-//			
-//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
-//			shapeFileTripFilterCRS = "EPSG:25832";
-//			bufferMAroundTripFilterShp = "2000";
+			runDirectory = "../runs-svn/avoev/snz-vulkaneifel/output-Vu-DRT-1n/";
+			runId = "Vu-DRT-1n";		
+			
+			runDirectoryToCompareWith = "../runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/";
+			runIdToCompareWith = "Vu-BC";
+			
+			visualizationScriptInputDirectory = null;
+			
+			scenarioCRS = "EPSG:25832";
+			
+			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v1/shp-files/hexagon-grid-3000.shp";
+			shapFileZonesCRS = "EPSG:25832";
+			zoneId = "id";
+						
+			shapeFileAgentFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
+			
+			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/vulkaneifel/v0/vulkaneifel.shp";
+			shapeFileTripFilterCRS = "EPSG:25832";
+			bufferMAroundTripFilterShp = "2000";
 
 			// Gladbeck
 
-			runDirectory = "../runs-svn/avoev/snz-gladbeck/output-Gl-DRT-6/";
-			runId = "Gl-DRT-6";
-
-			runDirectoryToCompareWith = "../runs-svn/avoev/snz-gladbeck/output-Gl-BC/";
-			runIdToCompareWith = "Gl-BC";
-
-			visualizationScriptInputDirectory = null;
-
-			scenarioCRS = "EPSG:25832";
-
-			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/shp-files/hexagon-grid-1000.shp";
-			shapFileZonesCRS = "EPSG:25832";
-			zoneId = "id";
-
-			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/area_B_en_detail.shp";
-
-			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/area_B_en_detail.shp";
-			shapeFileTripFilterCRS = "EPSG:25832";
-			bufferMAroundTripFilterShp = "2000";
+//			runDirectory = "../runs-svn/avoev/snz-gladbeck/output-snzDrtO443l/";
+//			runId = "snzDrtO443l";
+//
+//			runDirectoryToCompareWith = null;
+//			runIdToCompareWith = null;
+//
+//			visualizationScriptInputDirectory = null;
+//
+//			scenarioCRS = "EPSG:25832";
+//
+//			shapeFileZones = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/shp-files/hexagon-grid-1000.shp";
+//			shapFileZonesCRS = "EPSG:25832";
+//			zoneId = "id";
+//
+//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
+//
+//			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
+//			shapeFileTripFilterCRS = "EPSG:25832";
+//			bufferMAroundTripFilterShp = "2000";
 
 		}
 		
@@ -216,7 +213,7 @@ public class AnalysisRunExampleSnzScenario {
 		analysis.setHelpLegModes(helpLegModes);
 		analysis.setZoneInformation(shapeFileZones, shapFileZonesCRS, zoneId);
 		analysis.setVisualizationScriptInputDirectory(visualizationScriptInputDirectory);
-
+		analysis.setMainModeIdentifier(new IntermodalPtDrtRouterAnalysisModeIdentifier());
 		analysis.run();
 	}
 	

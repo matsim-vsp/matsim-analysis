@@ -29,8 +29,6 @@ import org.junit.Test;
 import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.av.robotaxi.fares.drt.DrtFareModule;
-import org.matsim.contrib.av.robotaxi.fares.drt.DrtFaresConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -56,13 +54,16 @@ public class MatsimAnalysisRunDrtTest {
 	public final void test1() {
 		
 		{
-			Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "equi-drt/config-with-drt.xml", new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new DrtFaresConfigGroup());
+			Config config = ConfigUtils.loadConfig(
+					testUtils.getPackageInputDirectory() + "equi-drt/config-with-drt.xml",
+					new MultiModeDrtConfigGroup(), new DvrpConfigGroup());
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output1");
 			config.controler().setRunId("run1");
 			config.controler().setLastIteration(1);
 
-			DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(), config.plansCalcRoute());
-			
+			DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
+					config.plansCalcRoute());
+
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
 			routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
@@ -70,9 +71,8 @@ public class MatsimAnalysisRunDrtTest {
 			Controler controler = new Controler(scenario);		
 			controler.addOverridingModule(new MultiModeDrtModule());
 			controler.addOverridingModule(new DvrpModule());
-			controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(controler.getConfig())));				
-			controler.addOverridingModule(new DrtFareModule());
-						
+			controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(controler.getConfig())));
+
 			controler.run();
 		}
 		

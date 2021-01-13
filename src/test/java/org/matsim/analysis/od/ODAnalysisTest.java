@@ -76,8 +76,10 @@ public class ODAnalysisTest {
 			events.addHandler(handler1);
 
 			MatsimEventsReader reader = new MatsimEventsReader(events);
+			events.initProcessing();
 			reader.readFile(runDirectory + runId + ".output_events.xml.gz");
-			
+			events.finishProcessing();
+
 			Config config = ConfigUtils.createConfig();
 			config.network().setInputFile(networkFile);
 			config.network().setInputCRS("GK4");

@@ -19,6 +19,7 @@
 
 package org.matsim.analysis.detailedPersonTripAnalysis;
 
+import org.matsim.analysis.DefaultAnalysisMainModeIdentifier;
 import org.matsim.analysis.TripAnalysisFilter;
 import org.matsim.analysis.TripAnalysisFilter.TripConsiderType;
 import org.matsim.api.core.v01.Scenario;
@@ -60,7 +61,6 @@ public class RunPersonTripAnalysis {
 		String shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck/v0/gladbeck.shp";
 		String crs = "EPSG:25832";
 		
-		final String[] helpLegModes = {TransportMode.transit_walk, TransportMode.walk, TransportMode.non_network_walk, "access_walk", "egress_walk"}; // to be able to analyze old runs
 		final String stageActivitySubString = "interaction";
 		
 		String networkFile = outputDirectory + runId + ".output_network.xml.gz";
@@ -78,16 +78,18 @@ public class RunPersonTripAnalysis {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		BasicPersonTripAnalysisHandler handler1 = new BasicPersonTripAnalysisHandler(helpLegModes, stageActivitySubString);
+		BasicPersonTripAnalysisHandler handler1 = new BasicPersonTripAnalysisHandler(stageActivitySubString, new DefaultAnalysisMainModeIdentifier());
 		handler1.setScenario(scenario);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler1);
 		
 		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
+		events.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		
+		events.finishProcessing();
+
 		PersonTripAnalysis personTripAnalysis = new PersonTripAnalysis();
 		TripAnalysisFilter tripFilter = new TripAnalysisFilter("origin-and-destination-in-area");
 
@@ -98,7 +100,6 @@ public class RunPersonTripAnalysis {
 		
 		personTripAnalysis.printTripInformation(outputDirectory + runId + ".", TransportMode.pt, handler1, null);
 		personTripAnalysis.printTripInformation(outputDirectory + runId + ".", TransportMode.pt, handler1, tripFilter);
-		personTripAnalysis.printTripInformation(outputDirectory + runId + ".", TransportMode.pt, 2, handler1, tripFilter);		
 	}
 
 }

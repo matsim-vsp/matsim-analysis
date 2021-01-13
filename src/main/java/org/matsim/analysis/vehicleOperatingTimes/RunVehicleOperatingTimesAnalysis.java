@@ -43,8 +43,11 @@ public class RunVehicleOperatingTimesAnalysis {
 		
 		String eventsFile = outputDirectory + runId + ".output_events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
+
+		events.initProcessing();
 		reader.readFile(eventsFile);
-		
+		events.finishProcessing();
+
 		handler.printResults(outputDirectory + runId + ".");
 	}
 

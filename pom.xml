@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.matsim-vsp</groupId>
     <artifactId>matsim-analysis</artifactId>
-    <version>v3.1</version>
+    <version>v3.2</version>
 
     <name>MATSim analysis project</name>
     <description>MATSim analysis project</description>
 
     <properties>
         <!-- release> -->
-        <!-- <matsim.version>12.0-SNAPSHOT</matsim.version>  -->
+         <matsim.version>13.0-SNAPSHOT</matsim.version>
         <!--weekly "release":-->
-        <matsim.version>13.0-2020w24-SNAPSHOT</matsim.version>
+		<!--        <matsim.version>13.0-2020w24-SNAPSHOT</matsim.version>-->
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,17 +32,22 @@
  				<enabled>true</enabled>
  			</releases>		
         </repository>
-        <repository>
-            <!-- Repository for MATSim releases (MATSim is not on Maven central) -->
-            <id>matsim</id>
-            <url>https://dl.bintray.com/matsim/matsim</url>
-        </repository>
-        <repository>
-            <!-- For MATSim snapshots: -->
-            <id>ojo-snapshots</id>
-            <url>http://oss.jfrog.org/libs-snapshot</url>
-        </repository>
-    </repositories>
+		<repository>
+			<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
+			<id>matsim</id>
+			<url>https://dl.bintray.com/matsim/matsim</url>
+		</repository>
+		<repository>
+			<!-- For MATSim snapshots: -->
+			<id>ojo-snapshots</id>
+			<url>http://oss.jfrog.org/libs-snapshot</url>
+		</repository>
+
+		<repository>
+			<id>SBB</id>
+			<url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
+		</repository>
+	</repositories>
 
     <dependencies>
         <dependency>
@@ -56,7 +61,7 @@
             <!-- Include the JUnit testing library.  Not transitive. -->
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
 

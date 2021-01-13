@@ -89,22 +89,6 @@
 		<!-- Specifies how often the counts comparison should be calculated and written. -->
 		<param name="writeCountsInterval" value="10" />
 	</module>
-	<module name="drtfares" >
-		<parameterset type="drtfare" >
-			<!-- Basefare per Trip (fare = positive value) -->
-			<param name="basefare" value="0.0" />
-			<!-- Daily subscription fee (fee = positive value) -->
-			<param name="dailySubscriptionFee" value="0.0" />
-			<!-- drt fare per meter (fee = positive value) -->
-			<param name="distanceFare_m" value="0.0015" />
-			<!-- Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value). -->
-			<param name="minFarePerTrip" value="4.0" />
-			<!-- transport mode for which the fare applies. Default: drt -->
-			<param name="mode" value="drt" />
-			<!-- drt fare per hour (fee = positive value) -->
-			<param name="timeFare_h" value="0.0" />
-		</parameterset>
-	</module>
 	<module name="dvrp" >
 		<!-- Mode of which the network will be used for throwing events and hence calculating travel times. Default is car. -->
 		<param name="mobsimMode" value="car" />
@@ -160,10 +144,6 @@
 			<param name="changeStartLinkToLastLinkInSchedule" value="true" />
 			<!-- allows to configure a service area per drt mode.Used with serviceArea Operational Scheme -->
 			<param name="drtServiceAreaShapeFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/shp-files/shp-berlkoenig-area/berlkoenig-area.shp" />
-			<!-- Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3. -->
-			<param name="estimatedBeelineDistanceFactor" value="1.3" />
-			<!-- Beeline-speed estimate for DRT. Used in analysis, optimisation constraints and in plans file, [m/s]. The default value is 25 km/h -->
-			<param name="estimatedDrtSpeed" value="8.333333333333334" />
 			<!-- Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink() -->
 			<param name="idleVehiclesReturnToDepots" value="false" />
 			<!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
@@ -183,15 +163,28 @@
 			<!-- If true, the max travel and wait times of a submitted request are considered hard constraints (the request gets rejected if one of the constraints is violated). If false, the max travel and wait times are considered soft constraints (insertion of a request that violates one of the constraints is allowed, but its cost is increased by additional penalty to make it relatively less attractive). Penalisation of insertions can be customised by injecting a customised InsertionCostCalculator.PenaltyCalculator -->
 			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false" />
 			<!-- Bus stop duration. Must be positive. -->
-			<param name="stopDuration" value="60.0" />
+			<param name="stopDuration" value="60.0"/>
 			<!-- Stop locations file (transit schedule format, but without lines) for DRT stops. Used only for the stopbased mode -->
-			<param name="transitStopFile" value="null" />
+			<param name="transitStopFile" value="null"/>
 			<!-- Limit the operation of vehicles to links (of the 'dvrp_routing' network) with 'allowedModes' containing this 'mode'. For backward compatibility, the value is set to false by default - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network. The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes) -->
-			<param name="useModeFilteredSubnetwork" value="false" />
+			<param name="useModeFilteredSubnetwork" value="false"/>
 			<!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
-			<param name="vehiclesFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/berlin-drt-v5.5-10pct/input/berlin-drt-v5.5.drt-1000vehicles-4seats.xml.gz" />
+			<param name="vehiclesFile"
+				   value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/avoev/berlin-drt-v5.5-10pct/input/berlin-drt-v5.5.drt-1000vehicles-4seats.xml.gz"/>
 			<!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
-			<param name="writeDetailedCustomerStats" value="true" />
+			<param name="writeDetailedCustomerStats" value="true"/>
+			<parameterset type="drtfare">
+				<!-- Basefare per Trip (fare = positive value) -->
+				<param name="basefare" value="0.0"/>
+				<!-- Daily subscription fee (fee = positive value) -->
+				<param name="dailySubscriptionFee" value="0.0"/>
+				<!-- drt fare per meter (fee = positive value) -->
+				<param name="distanceFare_m" value="0.0015"/>
+				<!-- Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value). -->
+				<param name="minFarePerTrip" value="4.0"/>
+				<!-- drt fare per hour (fee = positive value) -->
+				<param name="timeFare_h" value="0.0"/>
+			</parameterset>
 		</parameterset>
 	</module>
 	<module name="network" >
@@ -10191,8 +10184,6 @@
 		<param name="usePersonIdForMissingVehicleId" value="true" />
 		<!-- If false, the qsim accumulates fractional flows up to one flow unit in every time step.  If true, flows are updated only if an agent wants to enter the link or an agent is added to buffer. Default is true. -->
 		<param name="usingFastCapacityUpdate" value="true" />
-		<!-- if the qsim should use as many runners as there are threads (Christoph's dissertation version) or more of them, together with a thread pool (seems to be faster in some situations, but is not tested). -->
-		<param name="usingThreadpool" value="true" />
 		<!-- Defines what happens if an agent wants to depart, but the specified vehicle is not available. One of: teleport wait exception  -->
 		<param name="vehicleBehavior" value="teleport" />
 		<!-- If vehicles should all be the same default vehicle, or come from the vehicles file, or something else.  Possible values:  defaultVehicle modeVehicleTypesFromVehiclesData fromVehiclesData -->

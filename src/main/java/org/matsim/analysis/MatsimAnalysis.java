@@ -103,7 +103,7 @@ public class MatsimAnalysis {
 	// base case (optional)
 	private Scenario scenario0;
 	
-	private final String outputDirectoryName = "analysis-v3.1";
+	private final String outputDirectoryName = "analysis-v3.2";
 	private final String stageActivitySubString = "interaction";
 
 	public void run() {
@@ -171,7 +171,7 @@ public class MatsimAnalysis {
 		List<OperatingTimesEventHandler> operatingTimesHandler1 = new ArrayList<>();
 
 		if (scenario1 != null) {
-			basicHandler1 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
+			basicHandler1 = new BasicPersonTripAnalysisHandler(this.stageActivitySubString, this.mainModeIdentifier);
 			basicHandler1.setScenario(scenario1);
 
 			delayAnalysis1 = new DelayAnalysis();
@@ -223,7 +223,7 @@ public class MatsimAnalysis {
 		List<OperatingTimesEventHandler> operatingTimesHandler0 = new ArrayList<>();
 		
 		if (scenario0 != null) {
-			basicHandler0 = new BasicPersonTripAnalysisHandler(this.helpLegModes, this.stageActivitySubString);
+			basicHandler0 = new BasicPersonTripAnalysisHandler(this.stageActivitySubString, this.mainModeIdentifier);
 			basicHandler0.setScenario(scenario0);
 
 			delayAnalysis0 = new DelayAnalysis();
@@ -266,10 +266,18 @@ public class MatsimAnalysis {
 		// #####################################
 		// Read the events file
 		// #####################################
-		
-		if (scenario1 != null) readEventsFile(runDirectory, runId, events1);
-		if (scenario0 != null) readEventsFile(runDirectoryToCompareWith, runIdToCompareWith, events0);
-				
+
+		if (scenario1 != null){
+			events1.initProcessing();
+			readEventsFile(runDirectory, runId, events1);
+			events1.finishProcessing();
+		}
+		if (scenario0 != null){
+			events0.initProcessing();
+			readEventsFile(runDirectoryToCompareWith, runIdToCompareWith, events0);
+			events0.finishProcessing();
+		}
+
 		// #####################################
 		// Post process and read plans file
 		// #####################################
@@ -526,9 +534,7 @@ public class MatsimAnalysis {
 			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, basicHandler, tripFilter);
 			for (String mode : modes) {
 				analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, basicHandler, tripFilter);
-				analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, mode, 2, basicHandler, tripFilter);
 			}
-			analysis.printTripInformation(personTripAnalysisOutputDirectoryWithPrefix, null, 2, basicHandler, tripFilter);
 		}
 
 		// person-based analysis
@@ -545,7 +551,6 @@ public class MatsimAnalysis {
 			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, agentFilter, tripFilter, personId2userBenefit, basicHandler);
 			for (String mode : modes) {
 				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, agentFilter, tripFilter, personId2userBenefit, basicHandler);
-				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, 2, agentFilter, tripFilter, personId2userBenefit, basicHandler);
 			}
 			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, agentFilter, tripFilter, personId2userBenefit, basicHandler, delayAnalysis);
 		}
@@ -555,7 +560,6 @@ public class MatsimAnalysis {
 			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, null, agentFilter, tripFilter, personId2userBenefit, basicHandler);
 			for (String mode : modes) {
 				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, agentFilter, tripFilter, personId2userBenefit, basicHandler);
-				analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, mode, 2, agentFilter, tripFilter, personId2userBenefit, basicHandler);
 			}
 			analysis.printAggregatedResults(personTripAnalysisOutputDirectoryWithPrefix, agentFilter, tripFilter, personId2userBenefit, basicHandler, delayAnalysis);
 		}

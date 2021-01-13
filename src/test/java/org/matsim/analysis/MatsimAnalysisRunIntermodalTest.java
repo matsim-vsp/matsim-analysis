@@ -83,6 +83,53 @@ public class MatsimAnalysisRunIntermodalTest {
 		log.info("Done.");
 	}
 	
+	@Test
+	public final void test2() {
+		
+		final String runId = "berlin-drt-v5.5-1pct";
+		final String runDirectory = testUtils.getPackageInputDirectory() +  "intermodal-test-run/";
+
+		final Scenario scenario1 = loadScenario(runDirectory, runId);
+		
+		final List<AgentFilter> agentFilters = new ArrayList<>();
+		
+		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("B");
+		filter1b.preProcess(scenario1);
+		agentFilters.add(filter1b);
+		
+		final List<TripFilter> tripFilters = new ArrayList<>();
+		
+		TripAnalysisFilter tripAnalysisFilter0 = new TripAnalysisFilter("no-filter");
+		tripAnalysisFilter0.preProcess(scenario1);
+		tripFilters.add(tripAnalysisFilter0);
+		
+		final List<String> modes = new ArrayList<>();
+		modes.add(TransportMode.car);
+		modes.add(TransportMode.pt);
+		modes.add("bicycle");
+		modes.add("pt_w_drt_used");
+		
+		final String homeActivityPrefix = "h";
+		final int scalingFactor = 100;
+
+		MatsimAnalysis analysis = new MatsimAnalysis();
+		analysis.setScenarioCRS("EPSG:31468");
+		analysis.setPrintTripSHPfiles(true);
+		analysis.setScenario1(scenario1);
+		analysis.setScenario0(null);
+		analysis.setHomeActivityPrefix(homeActivityPrefix);
+		analysis.setScalingFactor(scalingFactor);
+		analysis.setAgentFilters(agentFilters);
+		analysis.setTripFilters(tripFilters);
+		analysis.setModes(modes);
+		analysis.setVisualizationScriptInputDirectory("./visualization-scripts/");
+		analysis.setAnalysisOutputDirectory(testUtils.getOutputDirectory());
+		analysis.setMainModeIdentifier(new IntermodalPtDrtRouterAnalysisModeIdentifier());
+		analysis.run();
+	
+		log.info("Done.");
+	}
+	
 	private static Scenario loadScenario(String runDirectory, String runId) {
 		
 		if (runDirectory == null) {
