@@ -1,48 +1,18 @@
 package org.matsim.analysis;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.*;
 
 public class RunsOverview {
 
 	Set<String> fileList;
-	String separator = ",";
-	String directoryToScanForRuns;
-	String[] filesList;
-	int drt_customer_stats_drt;
-	int drt_vehicle_stats_drt;
-	int modestats;
-	int pkm_modestats;
-	int scorestats;
-	ArrayList<String> columNames;
+	ArrayList<String> columnNames;
 	HashMap<String, Integer> fileColumnCount;
 
 	public RunsOverview(Set<String> fileList) {
@@ -52,14 +22,16 @@ public class RunsOverview {
 	public static void main(String[] args) {
 
 		RunsOverview analysis = new RunsOverview(null);
-		String filesToCopy = null;
+		String filesToCopy;
+		String separator = ",";
+		String directoryToScanForRuns = "";
 		if (args.length >= 2) {
-			analysis.setDirectoryToScanForRuns(args[0]);
-			analysis.setSeparator(args[1]);
+			directoryToScanForRuns = args[0];
+			separator = args[1];
 		}
 		if (args.length == 3) {
 			filesToCopy = args[2];
-			String[] filesToCopyList = null;
+			String[] filesToCopyList;
 			if (filesToCopy != null && !filesToCopy.equals("null")) {
 				filesToCopyList = filesToCopy.split(",");
 				analysis.addFilesinList(filesToCopyList);
@@ -77,8 +49,9 @@ public class RunsOverview {
 			JLabel label = new JLabel("Choose the separator");
 			panel.add(label);
 
-			String comboboxList[] = { "Comma ,", "Semicolon ;" };
-			JComboBox<String> comboBox = new JComboBox<String>(comboboxList);
+			String[] comboboxList;
+			comboboxList = new String[]{ "Comma ,", "Semicolon ;" };
+			JComboBox<String> comboBox = new JComboBox<>(comboboxList);
 			panel.add(comboBox);
 
 			JButton okButton = new JButton("ok"); // added for ok button
@@ -90,38 +63,32 @@ public class RunsOverview {
 			frame.add(panel);
 			frame.setVisible(true);
 
-			okButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String separator = null;
-					// frame.setVisible(false);
-					frame.dispose();
-					Object item = comboBox.getSelectedItem();
-					System.out.println("choosen value " + item.toString());
-					String userOption = item.toString();
+			okButton.addActionListener(e -> {
+				String separator1 = null;
+				frame.dispose();
+				Object item = comboBox.getSelectedItem();
+				System.out.println("chosen value " + item.toString());
+				String userOption = item.toString();
 
-					switch (userOption) {
+				switch (userOption) {
 
-					case "Comma ,":
-						separator = ",";
-						break;
+				case "Comma ,":
+					separator1 = ",";
+					break;
 
-					case "Semicolon ;":
-						separator = ";";
-						break;
-					}
-					analysis.setSeparator(separator);
-					JFileChooser chooser = new JFileChooser();
-					chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					chooser.setDialogTitle("choose root directory");
-					chooser.showOpenDialog(null);
-					File rootPath = chooser.getSelectedFile();
-					analysis.setDirectoryToScanForRuns(rootPath.toString());
-					analysis.run(analysis.getSeparator(), analysis.getDirectoryToScanForRuns());
+				case "Semicolon ;":
+					separator1 = ";";
+					break;
 				}
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.setDialogTitle("choose root directory");
+				chooser.showOpenDialog(null);
+				File rootPath = chooser.getSelectedFile();
+				analysis.run(separator1, rootPath.toString());
 			});
 		} else {
-			analysis.run(analysis.getSeparator(), analysis.getDirectoryToScanForRuns());
+			analysis.run(separator, directoryToScanForRuns);
 		}
 	}
 
@@ -131,24 +98,21 @@ public class RunsOverview {
 
 	public void run(String separator, String directoryToScanForRuns) {
 
-		ArrayList<File> directoryPaths = new ArrayList<File>();
+		ArrayList<File> directoryPaths = new ArrayList<>();
 		File[] directories = new File(directoryToScanForRuns).listFiles(File::isDirectory);
-		for (int i = 0; i < directories.length; i++) {
-			File dir = directories[i];
+		for (File dir : directories) {
 			if (!dir.isHidden() && dir.getName().contains("output-")) {
 				directoryPaths.add(dir);
 			}
 		}
-		listAllFiles(directoryPaths);
+		listAllFiles(directoryPaths, separator, directoryToScanForRuns);
 	}
 
-	public void listAllFiles(ArrayList<File> directoryPaths) {
-		Map<String, ArrayList<String>> runIdWithPath = new HashMap<String, ArrayList<String>>();
-		Iterator<File> directoryPathsItr = directoryPaths.iterator();
-		while (directoryPathsItr.hasNext()) {
-			ArrayList<String> pathList = new ArrayList<String>();
-			File directory = directoryPathsItr.next();
-			String dirName = directory.getName();
+	private void listAllFiles(ArrayList<File> directoryPaths, String separator, String directoryToScanForRuns) {
+		Map<String, ArrayList<String>> runIdWithPath = new HashMap<>();
+		for (File directoryPath : directoryPaths) {
+			ArrayList<String> pathList = new ArrayList<>();
+			String dirName = directoryPath.getName();
 			String[] nameSplit = dirName.split("-");
 			Iterator<String> filesItr;
 			if (fileList == null) {
@@ -156,7 +120,7 @@ public class RunsOverview {
 			}
 			filesItr = fileList.iterator();
 			while (filesItr.hasNext()) {
-				String path = directory + "/" + nameSplit[1] + "." + filesItr.next();
+				String path = directoryPath + "/" + nameSplit[1] + "." + filesItr.next();
 				pathList.add(path);
 			}
 			runIdWithPath.put(nameSplit[1], pathList);
@@ -166,18 +130,18 @@ public class RunsOverview {
 		runIdWithPath.entrySet().stream().sorted(Map.Entry.comparingByKey())
 				.forEachOrdered(x -> runIdWithPathSorted.put(x.getKey(), x.getValue()));
 		String[][] matrix = readFiles(runIdWithPathSorted);
-		String[][] matrixToPrint = addColumnTitles(matrix, columNames);
-		writeData(matrixToPrint, getDirectoryToScanForRuns(), separator);
+		String[][] matrixToPrint = addColumnTitles(matrix, columnNames);
+		writeData(matrixToPrint, directoryToScanForRuns, separator);
 	}
 
-	public String[][] readFiles(LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
-		String line = null;
+	private String[][] readFiles(LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
+		String line;
 		Set<String> keySet = runIdWithPathSorted.keySet();
 		Iterator<String> keyItr = keySet.iterator();
 		LinkedHashMap<String, ArrayList<String>> mappedFilesAndColumns = mapFilesAndColumns(runIdWithPathSorted);
 		String[][] matrix = new String[keySet.size() + 1][100];
 		int rowCount = 1;
-		int columnCount = 0;
+		int columnCount;
 		while (keyItr.hasNext()) {
 			String[] values = null;
 			String[] columns = null;
@@ -186,13 +150,11 @@ public class RunsOverview {
 			matrix[rowCount][0] = key;
 			ArrayList<String> filePaths = runIdWithPathSorted.get(key);
 			BufferedReader br;
-			Iterator<String> filePathsItr = filePaths.iterator();
-			while (filePathsItr.hasNext()) {
-				ArrayList<String> val = new ArrayList<String>();
-				ArrayList<String> col = new ArrayList<String>();
-				String filePath = filePathsItr.next();
+			for (String path : filePaths) {
+				ArrayList<String> val = new ArrayList<>();
+				ArrayList<String> col = new ArrayList<>();
 				try {
-					br = new BufferedReader(new FileReader(filePath));
+					br = new BufferedReader(new FileReader(path));
 					String lastLineToRead = null;
 					String firstLineToRead = null;
 					int count = 0;
@@ -203,10 +165,10 @@ public class RunsOverview {
 						lastLineToRead = line;
 						count++;
 					}
-					if (filePath.endsWith(".txt")) {
+					if (path.endsWith(".txt")) {
 						values = lastLineToRead.split("\t");
 						columns = firstLineToRead.split("\t");
-					} else if (filePath.endsWith(".csv")) {
+					} else if (path.endsWith(".csv")) {
 						values = lastLineToRead.split(";");
 						columns = firstLineToRead.split(";");
 					}
@@ -216,7 +178,7 @@ public class RunsOverview {
 					}
 					int loopLimit = values.length;
 					for (int i = 0; i < loopLimit; i++) {
-						File file = new File(filePath);
+						File file = new File(path);
 						String fileName = file.getName();
 						String[] fileNameSplit = fileName.split("[.]");
 						ArrayList<String> listToCompare = mappedFilesAndColumns.get(fileNameSplit[1]);
@@ -229,31 +191,31 @@ public class RunsOverview {
 							matrix[rowCount][columnCount] = fileName;
 							columnCount++;
 						}
-						String eachValue = val.get(i);
-						String[] split = null;
-						if (eachValue.contains(",")) {
-							split = eachValue.split(",");
-							eachValue = "";
-							for (int ii = 0; ii < split.length; ii++) {
-								eachValue += split[ii];
+						StringBuilder eachValue = new StringBuilder(val.get(i));
+						String[] split;
+						if (eachValue.toString().contains(",")) {
+							split = eachValue.toString().split(",");
+							eachValue = new StringBuilder();
+							for (String s : split) {
+								eachValue.append(s);
 							}
 						}
-						if (StringUtils.isNumeric(eachValue)) {
+						if (StringUtils.isNumeric(eachValue.toString())) {
 							NumberFormat nf = NumberFormat.getInstance(Locale.UK);
-							nf.parse(eachValue).doubleValue();
+							nf.parse(eachValue.toString()).doubleValue();
 						}
-						if (!eachValue.matches("^[a-zA-Z0-9.,_\"\"]+$")) {
-							eachValue = "NA";
+						if (!eachValue.toString().matches("^[a-zA-Z0-9.,_\"\"]+$")) {
+							eachValue = new StringBuilder("NA");
 						}
-						matrix[rowCount][columnCount] = eachValue;
+						matrix[rowCount][columnCount] = eachValue.toString();
 						columnCount++;
 					}
 					columnCount += 2;
 				} catch (FileNotFoundException e) {
-					File file1 = new File(filePath);
+					File file1 = new File(path);
 					matrix[rowCount][columnCount] = file1.getName();
 					columnCount++;
-					String[] fileName = filePath.split("[.]");
+					String[] fileName = path.split("[.]");
 					String file = fileName[fileName.length - 2];
 					int columnNumber = findOutColumnCount(file);
 					for (int i = 0; i < columnNumber; i++) {
@@ -261,10 +223,7 @@ public class RunsOverview {
 						columnCount++;
 					}
 					columnCount += 2;
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ParseException e) {
+				} catch (IOException | ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -276,21 +235,21 @@ public class RunsOverview {
 	}
 
 	// this method is to map files with respective column names
-	public LinkedHashMap<String, ArrayList<String>> mapFilesAndColumns(
+	private LinkedHashMap<String, ArrayList<String>> mapFilesAndColumns(
 			LinkedHashMap<String, ArrayList<String>> runIdWithPathSorted) {
-		fileColumnCount = new HashMap<String, Integer>();
-		String line = null;
+		fileColumnCount = new HashMap<>();
+		String line;
 		String[] columnTitles = null;
-		int columnSize = 0;
+		int columnSize;
 		String[] values;
 		Set<String> keySet = runIdWithPathSorted.keySet();
 		Iterator<String> keyItr = keySet.iterator();
-		int prevColumnSize = 0;
+		int prevColumnSize;
 		LinkedHashMap<String, ArrayList<String>> mappedFilesAndColumns = null;
 
 		while (keyItr.hasNext()) {
-			columNames = new ArrayList<String>();
-			LinkedHashMap<String, ArrayList<String>> filesWithColumnNames = new LinkedHashMap<String, ArrayList<String>>();
+			columnNames = new ArrayList<>();
+			LinkedHashMap<String, ArrayList<String>> filesWithColumnNames = new LinkedHashMap<>();
 			values = null;
 			columnSize = 0;
 			String key = keyItr.next();
@@ -346,13 +305,12 @@ public class RunsOverview {
 	// ========================================================================================================================================================================
 
 	private void initiateDefaultFileList() {
-		fileList = new HashSet<String>();
+		fileList = new HashSet<>();
 		fileList.add("drt_customer_stats_drt.csv");
 		fileList.add("drt_vehicle_stats_drt.csv");
 		fileList.add("modestats.txt");
 		fileList.add("pkm_modestats.txt");
 		fileList.add("scorestats.txt");
-//		Collections.sort(fileList, (s1, s2) -> s1.compareToIgnoreCase(s2));
 	}
 
 	private void decideEachFileColumnsCount(String fileName, int noOfColumns) {
@@ -382,36 +340,31 @@ public class RunsOverview {
 	}
 
 	public void createListOfColumnTitles(String[] columnTitles) {
-		for (int i = 0; i < columnTitles.length; i++) {
-			columNames.add(columnTitles[i]);
-		}
-		columNames.add(null);
-		columNames.add(null);
-		columNames.add(null);
+		Collections.addAll(columnNames, columnTitles);
+		columnNames.add(null);
+		columnNames.add(null);
+		columnNames.add(null);
 	}
 
 	private LinkedHashMap<String, ArrayList<String>> mapColumnTitlesToFiles(String[] columnTitles, String fileName,
 			LinkedHashMap<String, ArrayList<String>> filesWithColumnNames) {
-		ArrayList<String> columNames = new ArrayList<String>();
-		for (int i = 0; i < columnTitles.length; i++) {
-			columNames.add(columnTitles[i]);
-		}
-		filesWithColumnNames.put(fileName, columNames);
+		ArrayList<String> columnNames = new ArrayList<>();
+		Collections.addAll(columnNames, columnTitles);
+		filesWithColumnNames.put(fileName, columnNames);
 		return filesWithColumnNames;
 	}
 
 	// writing data to file
 	public static void writeData(String[][] matrix, String rootPath, String separator) {
 		int column = matrix[0].length;
-		int row = matrix.length;
 		try {
-			FileWriter fwriter = new FileWriter(new File(rootPath + "/runOverview.csv"), false);
+			FileWriter fwriter = new FileWriter(rootPath + "/runsOverview.csv", false);
 			BufferedWriter bw = new BufferedWriter(fwriter);
 			PrintWriter writer = new PrintWriter(bw);
-			for (int i = 0; i < row; i++) {
+			for (String[] strings : matrix) {
 				writer.println();
 				for (int j = 0; j < column; j++) {
-					String value = matrix[i][j];
+					String value = strings[j];
 					if (value == null) {
 						value = "";
 					}
@@ -421,29 +374,13 @@ public class RunsOverview {
 			}
 			writer.flush();
 			writer.close();
-			System.out.println(rootPath + "/runOverview.csv" + " file written succesfully");
+			System.out.println(rootPath + "/runsOverview.csv" + " file written successfully");
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-	}
-
-	public String getSeparator() {
-		return separator;
-	}
-
-	public void setSeparator(String separator) {
-		this.separator = separator;
-	}
-
-	public String getDirectoryToScanForRuns() {
-		return directoryToScanForRuns;
-	}
-
-	public void setDirectoryToScanForRuns(String directoryToScanForRuns) {
-		this.directoryToScanForRuns = directoryToScanForRuns;
 	}
 
 }

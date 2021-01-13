@@ -20,14 +20,13 @@ public class RunsOverviewTest {
 
 		String directoryToScanForRuns = "../matsim-analysis/test/input/org/matsim/analysis/run-overview";
 		RunsOverview analysis = new RunsOverview(getFileList());
-		analysis.setDirectoryToScanForRuns(directoryToScanForRuns);
-		analysis.run(analysis.getSeparator(), analysis.getDirectoryToScanForRuns());
+		analysis.run(",", directoryToScanForRuns);
 		BufferedReader brOne;
 		BufferedReader brTwo;
 
 		try {
 			brOne = new BufferedReader(
-					new FileReader("../matsim-analysis/test/input/org/matsim/analysis/run-overview/runOverview.csv"));
+					new FileReader("../matsim-analysis/test/input/org/matsim/analysis/run-overview/runsOverview.csv"));
 			CSVParser csvParserRunOverview = new CSVParser(brOne, CSVFormat.DEFAULT);
 			brTwo = new BufferedReader(new FileReader(
 					"../matsim-analysis/test/input/org/matsim/analysis/run-overview/runOverviewToCompare.csv"));
@@ -158,9 +157,6 @@ public class RunsOverviewTest {
 			csvParserRunOverview.close();
 			csvParserRunOverviewToCompare.close();
 
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -168,18 +164,15 @@ public class RunsOverviewTest {
 
 	}
 
-	//@Test
-	public void testAnalysisOutputsFourFiles() {
+	@Test
+	public void testAnalysisOutputsTwoFiles() {
 		String directoryToScanForRuns = "../matsim-analysis/test/input/org/matsim/analysis/run-overview";
-		RunsOverview analysis = new RunsOverview(getFileList());
-		analysis.setDirectoryToScanForRuns(directoryToScanForRuns);
-		analysis.run(analysis.getSeparator(), analysis.getDirectoryToScanForRuns());
-		BufferedReader brOne;
-		BufferedReader brTwo;
+		RunsOverview analysis = new RunsOverview(getTwoFileList());
+		analysis.run(",", directoryToScanForRuns);
 	}
 	
 	private Set<String> getFileList() {
-		Set<String> fileList = new HashSet<String>();
+		Set<String> fileList = new HashSet<>();
 		fileList.add("drt_customer_stats_drt.csv");
 		fileList.add("drt_vehicle_stats_drt.csv");
 		fileList.add("modestats.txt");
@@ -187,25 +180,10 @@ public class RunsOverviewTest {
 		fileList.add("scorestats.txt");
 		return fileList;
 	}
-	
-	
+
 	private Set<String> getTwoFileList() {
-		Set<String> fileList = new HashSet<String>();
+		Set<String> fileList = new HashSet<>();
 		fileList.add("modestats.txt");
-		fileList.add("scorestats.txt");
-		return fileList;
-	}
-	
-	private Set<String> getThreeFileList() {
-		Set<String> fileList = new HashSet<String>();
-		fileList.add("drt_customer_stats_drt.csv");
-		fileList.add("pkm_modestats.txt");
-		fileList.add("scorestats.txt");
-		return fileList;
-	}
-	
-	private Set<String> getOneFile() {
-		Set<String> fileList = new HashSet<String>();
 		fileList.add("scorestats.txt");
 		return fileList;
 	}
