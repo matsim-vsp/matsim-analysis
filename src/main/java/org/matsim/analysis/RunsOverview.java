@@ -362,7 +362,6 @@ public class RunsOverview {
 			BufferedWriter bw = new BufferedWriter(fwriter);
 			PrintWriter writer = new PrintWriter(bw);
 			for (String[] strings : matrix) {
-				writer.println();
 				for (int j = 0; j < column; j++) {
 					String value = strings[j];
 					if (value == null) {
@@ -371,6 +370,7 @@ public class RunsOverview {
 					writer.print(value);
 					writer.print(separator);
 				}
+				writer.println();
 			}
 			writer.flush();
 			writer.close();
