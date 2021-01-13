@@ -217,7 +217,8 @@ public class RunsOverview {
 					columnCount++;
 					String[] fileName = path.split("[.]");
 					String file = fileName[fileName.length - 2];
-					int columnNumber = findOutColumnCount(file);
+
+					int columnNumber = fileColumnCount.get(file);
 					for (int i = 0; i < columnNumber; i++) {
 						matrix[rowCount][columnCount] = "NA";
 						columnCount++;
@@ -283,7 +284,9 @@ public class RunsOverview {
 					}
 					columnSize += values.length;
 					String[] fileName = file.getName().split("[.]");
-					decideEachFileColumnsCount(fileName[1], values.length);
+
+					fileColumnCount.put(fileName[1], values.length);
+
 					createListOfColumnTitles(columnTitles);
 					mappedFilesAndColumns = mapColumnTitlesToFiles(columnTitles, fileName[1], filesWithColumnNames);
 //					}
@@ -311,18 +314,6 @@ public class RunsOverview {
 		fileList.add("modestats.txt");
 		fileList.add("pkm_modestats.txt");
 		fileList.add("scorestats.txt");
-	}
-
-	private void decideEachFileColumnsCount(String fileName, int noOfColumns) {
-
-		fileColumnCount.put(fileName, noOfColumns);
-
-	}
-
-	private int findOutColumnCount(String fileName) {
-
-		return fileColumnCount.get(fileName);
-
 	}
 
 	public String[][] addColumnTitles(String[][] matrix, ArrayList<String> titles) {
