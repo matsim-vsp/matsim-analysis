@@ -289,7 +289,14 @@ public class RunsOverview {
 					columnSize += values.length;
 					String[] fileName = file.getName().split("[.]");
 
-					fileColumnCount.put(fileName[1], values.length);
+					if (fileColumnCount.get(fileName[1]) != null && fileColumnCount.get(fileName[1]) != values.length) {
+						log.error("Number of columns in file " + file.getName() +
+								" differs from number of columns in other runs. Not implemented yet. Exiting.");
+						throw new RuntimeException("Number of columns in file " + file.getName() +
+								" differs from number of columns in other runs. Not implemented yet. Exiting.");
+					} else {
+						fileColumnCount.put(fileName[1], values.length);
+					}
 
 					createListOfColumnTitles(columnTitles);
 					mappedFilesAndColumns = mapColumnTitlesToFiles(columnTitles, fileName[1], filesWithColumnNames);
