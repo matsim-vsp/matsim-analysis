@@ -1,6 +1,7 @@
 package org.matsim.analysis;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,7 @@ public class RunsOverview {
 	Set<String> fileList;
 	ArrayList<String> columnNames;
 	HashMap<String, Integer> fileColumnCount;
+	private static final Logger log = Logger.getLogger(RunsOverview.class);
 
 	public RunsOverview(Set<String> fileList) {
 		this.fileList = fileList;
@@ -169,6 +171,7 @@ public class RunsOverview {
 						values = lastLineToRead.split("\t");
 						columns = firstLineToRead.split("\t");
 					} else if (path.endsWith(".csv")) {
+						// TODO: Find way to identify csv with , separator
 						values = lastLineToRead.split(";");
 						columns = firstLineToRead.split(";");
 					}
@@ -212,6 +215,7 @@ public class RunsOverview {
 					}
 					columnCount += 2;
 				} catch (FileNotFoundException e) {
+					log.debug(e);
 					File file1 = new File(path);
 					matrix[rowCount][columnCount] = file1.getName();
 					columnCount++;
