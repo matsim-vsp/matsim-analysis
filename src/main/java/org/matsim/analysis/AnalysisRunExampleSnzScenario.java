@@ -143,7 +143,7 @@ public class AnalysisRunExampleSnzScenario {
 			shapFileZonesCRS = "EPSG:25832";
 			zoneId = "id";
 
-			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/area_B_en_detail.shp";
+			shapeFileAgentFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/area_B_en_detail.shp";
 
 			shapeFileTripFilter = "../shared-svn/projects/avoev/matsim-input-files/gladbeck_umland/v1/area_B_en_detail.shp";
 			shapeFileTripFilterCRS = "EPSG:25832";
