@@ -1,0 +1,6 @@
+runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t;l_det
+snzDrt341;1;10000;0;0;�;0;0;0;0;�;�
+snzDrt341;2;10000;0;0;�;0;0;0;0;�;�
+snzDrt341;3;10000;0;0;�;0;0;0;0;�;�
+snzDrt341;499;10000;0;0;�;0;0;0;0;�;�
+snzDrt341;500;10000;0;0;�;0;0;0;0;�;�
