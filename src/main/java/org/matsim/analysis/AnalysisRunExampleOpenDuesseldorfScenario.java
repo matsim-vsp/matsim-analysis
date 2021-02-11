@@ -120,7 +120,7 @@ public class AnalysisRunExampleOpenDuesseldorfScenario {
 		tripFilter1a.preProcess(scenario1);
 		tripFilters.add(tripFilter1a);
 		
-		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("origin-and-destination-in-area");
+		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("o-and-d-in-area");
 		tripFilter1b.setZoneInformation(shapeFileTripFilter, shapeFileTripFilterCRS);
 		tripFilter1b.preProcess(scenario1);
 		tripFilter1b.setBuffer(Double.valueOf(0.));
