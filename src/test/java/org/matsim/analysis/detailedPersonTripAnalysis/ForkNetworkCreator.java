@@ -35,13 +35,13 @@ import org.matsim.lanes.LanesToLinkAssignment;
 public class ForkNetworkCreator {
 
 	
-	private static Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
-	private static Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
-	private static Id<Link> LINK_ID3 = Id.create("Link3", Link.class);
-	private static Id<Link> LINK_ID4 = Id.create("Link4", Link.class);
-	private static Id<Link> LINK_ID5 = Id.create("Link5", Link.class);
-	private static Id<Link> LINK_ID6 = Id.create("Link6", Link.class);
-	private static Id<Link> LINK_ID7 = Id.create("Link7", Link.class);
+	private final Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
+	private final Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
+	private final Id<Link> LINK_ID3 = Id.create("Link3", Link.class);
+	private final Id<Link> LINK_ID4 = Id.create("Link4", Link.class);
+	private final Id<Link> LINK_ID5 = Id.create("Link5", Link.class);
+	private final Id<Link> LINK_ID6 = Id.create("Link6", Link.class);
+	private final Id<Link> LINK_ID7 = Id.create("Link7", Link.class);
 
 	protected Scenario scenario;
 	protected boolean UseSignals = false;
