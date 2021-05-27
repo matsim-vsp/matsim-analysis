@@ -146,6 +146,17 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 		tripFilter1c.preProcess(scenario1);
 		tripFilters.add(tripFilter1c);
 
+		final List<VehicleFilter> vehicleFilters = new ArrayList<>();
+
+		VehicleAnalysisFilter vehicleAnalysisFilter0 = null;
+		vehicleFilters.add(vehicleAnalysisFilter0);
+
+		VehicleAnalysisFilter vehicleAnalysisFilter1 = new VehicleAnalysisFilter("drt-vehicles", "drt", VehicleAnalysisFilter.StringComparison.Contains);
+		vehicleFilters.add(vehicleAnalysisFilter1);
+
+		VehicleAnalysisFilter vehicleAnalysisFilter2 = new VehicleAnalysisFilter("pt-vehicles", "tr", VehicleAnalysisFilter.StringComparison.Contains);
+		vehicleFilters.add(vehicleAnalysisFilter2);
+
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
 			modes.add(mode);
@@ -158,6 +169,7 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 
 		analysis.setAgentFilters(agentFilters);
 		analysis.setTripFilters(tripFilters);
+		analysis.setVehicleFilters(vehicleFilters);
 
 		analysis.setScenarioCRS(scenarioCRS);
 		analysis.setZoneInformation(shapeFileZones, shapFileZonesCRS, zoneId);
