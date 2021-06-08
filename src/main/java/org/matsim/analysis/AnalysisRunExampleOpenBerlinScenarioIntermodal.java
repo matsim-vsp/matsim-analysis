@@ -151,7 +151,7 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 		VehicleAnalysisFilter vehicleAnalysisFilter0 = null;
 		vehicleFilters.add(vehicleAnalysisFilter0);
 
-		VehicleAnalysisFilter vehicleAnalysisFilter1 = new VehicleAnalysisFilter("drt-vehicles", "drt", VehicleAnalysisFilter.StringComparison.Contains);
+		VehicleAnalysisFilter vehicleAnalysisFilter1 = new VehicleAnalysisFilter("drt-vehicles", "rt", VehicleAnalysisFilter.StringComparison.Contains);
 		vehicleFilters.add(vehicleAnalysisFilter1);
 
 		VehicleAnalysisFilter vehicleAnalysisFilter2 = new VehicleAnalysisFilter("pt-vehicles", "tr", VehicleAnalysisFilter.StringComparison.Contains);
