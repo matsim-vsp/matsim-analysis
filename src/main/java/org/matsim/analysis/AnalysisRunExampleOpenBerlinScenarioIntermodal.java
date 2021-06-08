@@ -154,8 +154,11 @@ public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
 		VehicleAnalysisFilter vehicleAnalysisFilter1 = new VehicleAnalysisFilter("drt-vehicles", "rt", VehicleAnalysisFilter.StringComparison.Contains);
 		vehicleFilters.add(vehicleAnalysisFilter1);
 
-		VehicleAnalysisFilter vehicleAnalysisFilter2 = new VehicleAnalysisFilter("pt-vehicles", "tr", VehicleAnalysisFilter.StringComparison.Contains);
+		VehicleAnalysisFilter vehicleAnalysisFilter2 = new VehicleAnalysisFilter("tr-vehicles", "tr", VehicleAnalysisFilter.StringComparison.Contains);
 		vehicleFilters.add(vehicleAnalysisFilter2);
+
+		VehicleAnalysisFilter vehicleAnalysisFilter3 = new VehicleAnalysisFilter("pt-vehicles", "pt", VehicleAnalysisFilter.StringComparison.Contains);
+		vehicleFilters.add(vehicleAnalysisFilter3);
 
 		List<String> modes = new ArrayList<>();
 		for (String mode : modesString.split(",")) {
