@@ -4,7 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.matsim-vsp</groupId>
     <artifactId>matsim-analysis</artifactId>
-    <version>v3.2</version>
+    <!-- version does not contain a specific number to simplify the release process to one step (create a relase on GitHub)
+    so we do not need to remember about bumping the snapshot version after each release -->
+    <version>master-SNAPSHOT</version>
 
     <name>MATSim analysis project</name>
     <description>MATSim analysis project</description>
