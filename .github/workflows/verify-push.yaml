@@ -6,18 +6,6 @@ jobs:
   verify:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        module:
-          - MatsimAnalysisRunTest
-          - MatsimAnalysisRunDrtTest
-          - MatsimAnalysisRunIntermodalTest
-          - ModeAnalysisTest
-          - BasicPersonTripAnalysisTest
-          - PersonTripAnalysisTest
-          - ODAnalysisTest
-
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v2
@@ -36,8 +24,8 @@ jobs:
           java-version: 16
           distribution: 'adopt'
 
-      - name: Build module (with dependencies)
-        run: mvn -Dtest=${{matrix.module}} verify --batch-mode -Dmatsim.preferLocalDtds=true
+      - name: Build and test
+        run: mvn verify --batch-mode -Dmatsim.preferLocalDtds=true
 
     env:
       MAVEN_OPTS: -Xmx2g
