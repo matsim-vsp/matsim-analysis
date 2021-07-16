@@ -29,7 +29,7 @@
  			</snapshots>
  			<releases>
  				<enabled>true</enabled>
- 			</releases>		
+ 			</releases>
         </repository>
 		<repository>
 			<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
@@ -136,70 +136,7 @@
                     <downloadJavadocs>true</downloadJavadocs>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.matsim.gui.MATSimGUI</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-    
-    <profiles>
-		<profile>
-			<id>release</id>
-			<build>
 
-				<defaultGoal>assembly:assembly</defaultGoal>
-				<!--(I think that the above line is the reason why mvn -Prelease works-->
-				<!--without defining a goal. And it presumably only works because the-->
-				<!--assemply plugin is defined above. kai, oct'19)-->
-
-				<pluginManagement>
-					<!--pluginManagement further defines plugins *if* they are loaded-->
-					<!--elsewhere.  So this will only have an effect if the assembly plugin or-->
-					<!--the jar plugin are loaded above.  It then reconfigures it for the-->
-					<!--profile run.-->
-
-					<plugins>
-						<plugin>
-							<artifactId>maven-assembly-plugin</artifactId>
-							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
-								</descriptors>
-							</configuration>
-						</plugin>
-						<plugin>
-							<artifactId>maven-jar-plugin</artifactId>
-							<configuration>
-								<archive>
-									<manifest>
-										<addClasspath>true</addClasspath>
-										<classpathPrefix>libs/</classpathPrefix>
-									</manifest>
-								</archive>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
-	</profiles>
 </project>
