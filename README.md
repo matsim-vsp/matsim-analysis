@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/matsim-vsp/matsim-analysis.svg?branch=master)](https://travis-ci.org/matsim-vsp/matsim-analysis)
-
 # matsim-analysis
 
 This project may be used to analyze and compare MATSim (Multi-Agent Transport Simulation, www.matsim.org) simulation runs.
