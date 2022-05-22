@@ -26,7 +26,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.jcodec.api.awt.SequenceEncoder;
+import org.jcodec.api.awt.AWTSequenceEncoder;
 
 /**
 * @author ikaddoura
@@ -74,7 +74,7 @@ public class MATSimVideoUtils {
 		}
 		
 		String outputFile = outputDirectoryWithRunId + pngFileName + ".mp4";
-		SequenceEncoder enc = new SequenceEncoder(new File(outputFile));
+		AWTSequenceEncoder enc = AWTSequenceEncoder.create25Fps(new File(outputFile));
 
 		int counter = 0;
 		int counterNoImage = 0;
