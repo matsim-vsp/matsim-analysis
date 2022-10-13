@@ -19,7 +19,8 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -35,7 +36,7 @@ import static org.matsim.analysis.TripAnalysisFilter.TripConsiderType.OriginAndD
 import static org.matsim.analysis.TripAnalysisFilter.TripConsiderType.OriginOrDestination;
 
 public class AnalysisRunExampleOpenBerlinScenarioIntermodal {
-	private static final Logger log = Logger.getLogger(AnalysisRunExampleOpenBerlinScenarioIntermodal.class);
+	private static final Logger log = LogManager.getLogger(AnalysisRunExampleOpenBerlinScenarioIntermodal.class);
 			
 	public static void main(String[] args) throws IOException {
 

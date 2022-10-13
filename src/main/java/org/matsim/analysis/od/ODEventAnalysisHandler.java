@@ -24,7 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -44,7 +45,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 
 public class ODEventAnalysisHandler implements TransitDriverStartsEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
-	private final static Logger log = Logger.getLogger(ODEventAnalysisHandler.class);
+	private final static Logger log = LogManager.getLogger(ODEventAnalysisHandler.class);
 	
 	private final String[] helpLegModes;
 	private final String helpActivitySubString;

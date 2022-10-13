@@ -1,7 +1,8 @@
 package org.matsim.analysis;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +16,7 @@ public class RunsOverview {
 	Set<String> fileList;
 	ArrayList<String> columnNames;
 	HashMap<String, Integer> fileColumnCount;
-	private static final Logger log = Logger.getLogger(RunsOverview.class);
+	private static final Logger log = LogManager.getLogger(RunsOverview.class);
 
 	public RunsOverview(Set<String> fileList) {
 		this.fileList = fileList;
@@ -313,8 +314,8 @@ public class RunsOverview {
 
 	private void initiateDefaultFileList() {
 		fileList = new HashSet<>();
-		fileList.add("drt_customer_stats_drt.csv");
-		fileList.add("drt_vehicle_stats_drt.csv");
+//		fileList.add("drt_customer_stats_drt.csv");
+//		fileList.add("drt_vehicle_stats_drt.csv");
 		fileList.add("modestats.txt");
 		fileList.add("pkm_modestats.txt");
 		fileList.add("scorestats.txt");

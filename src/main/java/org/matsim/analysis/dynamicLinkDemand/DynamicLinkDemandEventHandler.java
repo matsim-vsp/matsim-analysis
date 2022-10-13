@@ -35,7 +35,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.VehicleFilter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -53,7 +54,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
-	private static final Logger log = Logger.getLogger(DynamicLinkDemandEventHandler.class);
+	private static final Logger log = LogManager.getLogger(DynamicLinkDemandEventHandler.class);
 	
 	private double timeBinSize = 3600.;
 	private VehicleFilter vehicleFilter;

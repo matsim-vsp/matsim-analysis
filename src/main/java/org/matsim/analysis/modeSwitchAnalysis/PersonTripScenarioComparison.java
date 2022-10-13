@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.analysis.TripFilter;
 import org.matsim.analysis.detailedPersonTripAnalysis.BasicPersonTripAnalysisHandler;
@@ -48,7 +49,7 @@ import org.matsim.core.utils.io.IOUtils;
  * 
  */
 public class PersonTripScenarioComparison {
-	private final static Logger log = Logger.getLogger(PersonTripScenarioComparison.class);
+	private final static Logger log = LogManager.getLogger(PersonTripScenarioComparison.class);
 	
 	private final String analysisOutputDirectoryModeSwitchAnalysisCoord;
 	private final String analysisOutputDirectoryModeSwitchAnalysis;

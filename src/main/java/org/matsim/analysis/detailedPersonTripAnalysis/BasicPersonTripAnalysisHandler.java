@@ -21,7 +21,8 @@
 package org.matsim.analysis.detailedPersonTripAnalysis;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,7 +49,7 @@ public class BasicPersonTripAnalysisHandler implements PersonMoneyEventHandler, 
 PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler ,
 PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	
-	private final static Logger log = Logger.getLogger(BasicPersonTripAnalysisHandler.class);
+	private final static Logger log = LogManager.getLogger(BasicPersonTripAnalysisHandler.class);
 	private final String helpActivitySubString;
 	private AnalysisMainModeIdentifier mainModeIdentifier;	
 	

@@ -25,7 +25,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +44,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 */
 
 public class Network2Shape {
-	private final static Logger log = Logger.getLogger(Network2Shape.class);
+	private final static Logger log = LogManager.getLogger(Network2Shape.class);
 
 	public static void exportNetwork2Shp(Scenario scenario, String outputDirectory, String scenarioCrs, CoordinateTransformation ct){
 		

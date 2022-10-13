@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -64,7 +65,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  */
 public class GISAnalyzer {
-	private static final Logger log = Logger.getLogger(GISAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(GISAnalyzer.class);
 
 	private final int scalingFactor;
 	private final Map<Integer, SimpleFeature> features = new HashMap<>();

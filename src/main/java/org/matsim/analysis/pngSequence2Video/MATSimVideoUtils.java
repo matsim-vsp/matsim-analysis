@@ -25,7 +25,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 
 /**
@@ -33,7 +34,7 @@ import org.jcodec.api.awt.AWTSequenceEncoder;
 */
 
 public class MATSimVideoUtils {
-	private static final Logger log = Logger.getLogger(MATSimVideoUtils.class);
+	private static final Logger log = LogManager.getLogger(MATSimVideoUtils.class);
 
 	public static void createLegHistogramVideo(String runDirectory, String runId, String outputDirectory) throws IOException {
 		createVideo(runDirectory, runId, outputDirectory, 1, "legHistogram_all");

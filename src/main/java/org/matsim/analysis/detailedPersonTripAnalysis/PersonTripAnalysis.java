@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.analysis.TripFilter;
 import org.matsim.api.core.v01.Coord;
@@ -43,7 +44,7 @@ import org.matsim.contrib.decongestion.handler.DelayAnalysis;
  *
  */
 public class PersonTripAnalysis {
-	private static final Logger log = Logger.getLogger(PersonTripAnalysis.class);
+	private static final Logger log = LogManager.getLogger(PersonTripAnalysis.class);
 
 	public void printAvgValuePerParameter(String csvFile, SortedMap<Double, List<Double>> parameter2values) {
 		File file = new File(csvFile);

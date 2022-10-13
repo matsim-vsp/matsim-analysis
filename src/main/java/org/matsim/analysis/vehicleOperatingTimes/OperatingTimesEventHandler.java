@@ -31,7 +31,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.VehicleFilter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -43,7 +44,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class OperatingTimesEventHandler implements  LinkLeaveEventHandler {
-	private static final Logger log = Logger.getLogger(OperatingTimesEventHandler.class);
+	private static final Logger log = LogManager.getLogger(OperatingTimesEventHandler.class);
 	
 	private Map<Id<Vehicle>,Double> vehId2earliestLinkLeaveTime = new HashMap<>();
 	private Map<Id<Vehicle>,Double> vehId2latestLinkLeaveTime = new HashMap<>();

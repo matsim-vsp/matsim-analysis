@@ -28,7 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
@@ -36,7 +37,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 */
 
 public class VisualizationScriptAdjustment {
-	private static final Logger log = Logger.getLogger(VisualizationScriptAdjustment.class);
+	private static final Logger log = LogManager.getLogger(VisualizationScriptAdjustment.class);
 
 	private final String runIdMarker = "policyCaseRunId";
 	private final String rundIdToCompareWithMarker = "baseCaseRunId";

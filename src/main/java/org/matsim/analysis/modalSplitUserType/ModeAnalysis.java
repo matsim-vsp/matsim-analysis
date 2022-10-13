@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.AgentFilter;
 import org.matsim.analysis.TripFilter;
 import org.matsim.api.core.v01.Scenario;
@@ -49,7 +50,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class ModeAnalysis {
 	
-	private static final Logger log = Logger.getLogger(ModeAnalysis.class);	
+	private static final Logger log = LogManager.getLogger(ModeAnalysis.class);
 	private final Population population;
 	private final Scenario scenario;
 	private final AgentFilter agentFilter;

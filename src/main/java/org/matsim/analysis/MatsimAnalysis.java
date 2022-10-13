@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.actDurations.ActDurationHandler;
 import org.matsim.analysis.detailedPersonTripAnalysis.BasicPersonTripAnalysisHandler;
 import org.matsim.analysis.detailedPersonTripAnalysis.PersonTripAnalysis;
@@ -78,7 +79,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  *  
  */
 public class MatsimAnalysis {
-	private static final Logger log = Logger.getLogger(MatsimAnalysis.class);
+	private static final Logger log = LogManager.getLogger(MatsimAnalysis.class);
 
 	private String scenarioCRS;	
 	private String shapeFileZones;

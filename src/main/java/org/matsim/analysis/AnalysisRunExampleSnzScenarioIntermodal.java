@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.TripAnalysisFilter.TripConsiderType;
 import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
 import org.matsim.api.core.v01.Scenario;
@@ -33,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class AnalysisRunExampleSnzScenarioIntermodal {
-	private static final Logger log = Logger.getLogger(AnalysisRunExampleSnzScenarioIntermodal.class);
+	private static final Logger log = LogManager.getLogger(AnalysisRunExampleSnzScenarioIntermodal.class);
 			
 	public static void main(String[] args) throws IOException {
 			

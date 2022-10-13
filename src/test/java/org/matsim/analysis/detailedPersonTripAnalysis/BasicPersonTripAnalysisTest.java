@@ -1,6 +1,7 @@
 package org.matsim.analysis.detailedPersonTripAnalysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +26,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class BasicPersonTripAnalysisTest {
 	
-	private static final Logger log = Logger.getLogger(BasicPersonTripAnalysisTest.class);
+	private static final Logger log = LogManager.getLogger(BasicPersonTripAnalysisTest.class);
 
 	private static final boolean printResults = true;
 	

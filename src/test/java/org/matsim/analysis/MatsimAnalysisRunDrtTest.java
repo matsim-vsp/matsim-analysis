@@ -23,7 +23,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.VehicleAnalysisFilter.StringComparison;
@@ -45,7 +46,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class MatsimAnalysisRunDrtTest {
-	private static final Logger log = Logger.getLogger(MatsimAnalysisRunDrtTest.class);
+	private static final Logger log = LogManager.getLogger(MatsimAnalysisRunDrtTest.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
